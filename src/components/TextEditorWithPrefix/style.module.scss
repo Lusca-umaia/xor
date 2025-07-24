@@ -1,0 +1,36 @@
+.wrapper {
+  display: flex;
+  position: relative;
+  align-items: center;
+  gap: 4px;
+
+  .titleText {
+    width: fit-content;
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    color: var(--neutral-800, #1e1e1d);
+    line-height: 150%;
+  }
+
+  .documentTitleText {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .sectionTitleText {
+    font-size: 16px;
+    color: var(--primary-600, #287886);
+    font-weight: 700;
+  }
+
+  .fieldTitleText {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.textDisabled {
+  color: var(--neutral-400, #d6d6d5) !important;
+}
