@@ -28,6 +28,7 @@ export default function Cursos() {
         {disciplinas.map((disciplina) => (
           <DisciplinaBox
             key={disciplina.codigo}
+            active
             carater={disciplina.carater}
             cargaHoraria={disciplina.cargaHoraria}
             codigo={disciplina.codigo}

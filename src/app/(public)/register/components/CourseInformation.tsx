@@ -18,7 +18,7 @@ const cursos = [
 ]
 
 interface CourseInformationProps {
-  handleChangeStep: (step: string) => void
+  handleChangeStep: (step: keyof typeof STEP_KEYS) => void
 }
 
 const CourseInformation: React.FC<CourseInformationProps> = ({
