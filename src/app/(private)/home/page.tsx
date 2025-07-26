@@ -1,6 +1,5 @@
 import Header from '@/components/Header/Header'
 import { LuTrendingUp } from 'react-icons/lu'
-import { FaBook } from 'react-icons/fa'
 import DisciplineCard from '@/components/DisciplineCard/DisciplineCard'
 import ModuleCard from '@/components/ModuleCard/ModuleCard'
 import QuickStats from '@/components/QuickStats/QuickStats'
