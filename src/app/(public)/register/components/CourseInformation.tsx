@@ -34,9 +34,6 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
     handleChangeStep(STEP_KEYS['PERSONAL_INFORMATION'])
   }
 
-  console.log('formData')
-  console.log(formData)
-
   return (
     <>
       <div className="grid border-b border-black/10 items-center pb-6 grid-cols-1 gap-6 sm:grid-cols-6">
@@ -44,16 +41,16 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
           <Select
             label="Curso"
             options={cursos}
-            onChange={(value) => handleChangeFormData(value, 'curso')}
-            value={formData.curso}
+            onChange={({ id }) => handleChangeFormData(id, 'cursoId')}
+            value={formData.cursoId}
           />
         </div>
         <div className="sm:col-span-2">
           <Select
             label="Grade"
             options={cursos}
-            onChange={(value) => handleChangeFormData(value, 'grade')}
-            value={formData.grade}
+            onChange={({ id }) => handleChangeFormData(id, 'gradeId')}
+            value={formData.gradeId}
           />
         </div>
         <div className="sm:col-span-1">
@@ -64,7 +61,7 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
             }
             min={1}
             label="Semestre atual"
-            value={formData['semestreAtual']}
+            value={formData['semestreAtual']?.toString()}
             name="semestreAtual"
           />
         </div>
@@ -72,7 +69,6 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
           <FormInput
             type="text"
             handleChange={(value) => handleChangeFormData(value, 'matricula')}
-            min={1}
             label="Matrícula"
             value={formData['matricula']}
             name="matricula"

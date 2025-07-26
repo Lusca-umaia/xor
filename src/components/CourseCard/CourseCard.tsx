@@ -91,6 +91,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
           Nota:{' '}
           <span className="font-medium text-green-600">{nota ?? '-'}</span>
         </p>
+        {/* {status === STATUS_KEYS.ANDAMENTO && (
+          <button
+            type="button"
+            className="w-full rounded-xl bg-white px-3.5 py-3.5 cursor-pointer text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          >
+            Concluir cadeira
+          </button>
+        )} */}
       </div>
     </div>
   )

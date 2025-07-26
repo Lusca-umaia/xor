@@ -9,12 +9,23 @@ interface HeaderProps {
   }[]
   title: string
   description?: string
+  actions?: {
+    primaryAction: {
+      title: string
+      onClick: () => void
+    }
+    secondaryAction?: {
+      title: string
+      onClick: () => void
+    }
+  }
 }
 
 const Header: React.FC<HeaderProps> = ({
   description,
   navigationItems,
-  title
+  title,
+  actions
 }) => {
   return (
     <div className="mb-4">
@@ -50,20 +61,26 @@ const Header: React.FC<HeaderProps> = ({
             <p className="text-base text-gray-500 font-medium">{description}</p>
           )}
         </div>
-        {/* <div className="mt-4 flex shrink-0 md:ml-4 md:mt-0">
-          <button
-            type="button"
-            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            Ação 1
-          </button>
-          <button
-            type="button"
-            className="ml-3 inline-flex items-center rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-          >
-            Ação 2
-          </button>
-        </div> */}
+        {actions && (
+          <div className="mt-4 flex shrink-0 md:ml-4 md:mt-0">
+            <button
+              type="button"
+              onClick={actions.primaryAction.onClick}
+              className="cursor-pointer inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+              {actions.primaryAction.title}
+            </button>
+            {actions.secondaryAction && (
+              <button
+                type="button"
+                onClick={actions.secondaryAction.onClick}
+                className="ml-3 cursor-pointer inline-flex items-center rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              >
+                {actions.secondaryAction.title}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

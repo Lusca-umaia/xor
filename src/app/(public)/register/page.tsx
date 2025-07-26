@@ -5,7 +5,7 @@ import CourseInformation from './components/CourseInformation'
 import PersonalInformation from './components/PersonalInformation'
 import { STEP_KEYS } from '@/helpers/consts'
 import Link from 'next/link'
-import { MdKeyboardArrowLeft } from 'react-icons/md'
+import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
 
 const STEP_TITLES = {
   [STEP_KEYS.COURSE_INFORMATION]: 'Informações do curso',
@@ -38,11 +38,14 @@ const Register = () => {
   }
 
   return (
-    <div className="max-w-6xl space-y-4 mx-auto mt-4">
+    <div className="max-w-7xl space-y-4 mx-auto mt-4">
       <div className="flex flex-col justify-between">
-        <button onClick={handleBack} className="cursor-pointer">
-          <span className="leading-none flex text-sm gap-0.5 items-center text-gray-500 font-medium">
-            <MdKeyboardArrowLeft className="text-xl -m-1" />
+        <button
+          onClick={handleBack}
+          className="flex items-center cursor-pointer"
+        >
+          <MdOutlineKeyboardArrowLeft className="text-xl text-gray-500" />
+          <span className="leading-none text-sm gap-0.5 text-gray-500 font-medium">
             Voltar
           </span>
         </button>

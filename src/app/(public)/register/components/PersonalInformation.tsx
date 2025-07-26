@@ -19,8 +19,7 @@ interface Field {
 const fields: Field[] = [
   { nome: 'nome', type: 'text', label: 'Nome completo' },
   { nome: 'email', type: 'email', label: 'Email' },
-  { nome: 'senha', type: 'text', label: 'Senha' },
-  { nome: 'cpf', type: 'text', label: 'CPF', mask: '000.000.000-00' }
+  { nome: 'senha', type: 'text', label: 'Senha' }
 ]
 
 const PersonalInformation: React.FC<PersonalInformationProps> = ({

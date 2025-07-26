@@ -1,3 +1,4 @@
+'use client'
 import CourseCard, { STATUS_KEYS } from '@/components/CourseCard/CourseCard'
 import Header from '@/components/Header/Header'
 import StatCard from '@/components/StatCard/StatCard'
@@ -6,6 +7,51 @@ import { LuGraduationCap } from 'react-icons/lu'
 import { FiClock } from 'react-icons/fi'
 import { LuBookCheck } from 'react-icons/lu'
 import { IoBookOutline } from 'react-icons/io5'
+import clsx from 'clsx'
+import { useState } from 'react'
+
+const TABS_KEYS = {
+  GERAL: 'GERAL',
+  ATUAL: 'ATUAL'
+} as const
+
+const TABS = [
+  {
+    label: 'Visão geral',
+    key: TABS_KEYS.GERAL
+  },
+  {
+    label: 'Semestre atual',
+    key: TABS_KEYS.ATUAL
+  }
+]
+
+interface CadastroAluno {
+  nome: string
+  email: string
+  senha: string
+  cursoId: number
+  gradeId: number
+  semestreAtual: number
+  matricula: string
+  cadeirasRealizadas: {
+    id: number
+    nota: number
+  }[]
+  cadeirasAtivas: number[]
+}
+
+interface Questoes {
+  titulo: string
+  cadeiraId: number
+  questoes: {
+    enunciado: string
+    opcoes: {
+      enunciado: string
+      isCorreta: boolean
+    }[]
+  }[]
+}
 
 const mockData = {
   curso: {
@@ -167,6 +213,10 @@ const mockDataDisciplinas: {
 ]
 
 const CourseProgressionPage = () => {
+  const [currentTab, setCurrentTab] = useState<keyof typeof TABS_KEYS>(
+    TABS_KEYS.GERAL
+  )
+
   const progressoGeral = (() => {
     const obrigatorias = mockData.stat.cargaObrigatoriasFeitas
 
@@ -188,17 +238,30 @@ const CourseProgressionPage = () => {
     (mockData.stat.cargaOpativasFeitas / mockData.grade.cargaOptativas) * 100
 
   const optativas = mockDataDisciplinas.filter(
-    ({ carater }) => carater === 'OPTATIVA'
+    ({ carater, status }) =>
+      carater === 'OPTATIVA' &&
+      (currentTab === TABS_KEYS.ATUAL ? status === STATUS_KEYS.ANDAMENTO : true)
   )
 
   const obrigatorias = Object.groupBy(
-    mockDataDisciplinas.filter(({ carater }) => carater === 'OBRIGATÓRIA'),
+    mockDataDisciplinas.filter(
+      ({ carater, status }) =>
+        carater === 'OBRIGATÓRIA' &&
+        (currentTab === TABS_KEYS.ATUAL
+          ? status === STATUS_KEYS.ANDAMENTO
+          : true)
+    ),
     ({ semestreCadeira }) => semestreCadeira
   )
 
   return (
     <div>
-      <Header title="Olá, Lucas, veja o seu progresso!" />
+      <Header
+        title="Olá, Lucas, veja o seu progresso!"
+        actions={{
+          primaryAction: { title: 'Encerrar semestre', onClick: () => {} }
+        }}
+      />
       <div className="space-y-4">
         <div className="bg-white border border-gray-100 rounded-2xl space-y-4 shadow-md p-6">
           <span className="text-2xl flex items-center gap-2">
@@ -264,6 +327,26 @@ const CourseProgressionPage = () => {
             </div>
           </div>
         </div>
+        <div className="bg-white border border-gray-100 rounded-xl space-y-4 shadow-lg p-1">
+          <div className="grid grid-cols-2">
+            {TABS.map(({ key, label }) => (
+              <div
+                onClick={() => setCurrentTab(key)}
+                key={key}
+                className={clsx(
+                  'bg-white text-center cursor-pointer col-span-1 rounded-md text-base space-y-2 py-2 px-8',
+                  {
+                    'border border-gray-100 shadow-sm font-semibold':
+                      currentTab === key,
+                    'text-gray-600 font-medium': currentTab !== key
+                  }
+                )}
+              >
+                {label}
+              </div>
+            ))}
+          </div>
+        </div>
         <h3 className="font-semibold text-2xl ">Disciplinas obrigatórias</h3>
         {Object.entries(obrigatorias).map(([semestre, cadeiras]) => {
           const concluídas = cadeiras!.filter(
@@ -301,20 +384,22 @@ const CourseProgressionPage = () => {
           )
         })}
         <h3 className="font-semibold text-2xl ">Disciplinas optativas</h3>
-        <div className="bg-white border border-gray-100 rounded-2xl space-y-4 shadow-lg p-6">
-          <div className="grid grid-cols-4 gap-4">
-            {optativas.map((optativa) => (
-              <CourseCard
-                key={optativa.codigo}
-                carater={optativa.carater}
-                nome={optativa.nomeCadeira}
-                codigo={optativa.codigo}
-                status={optativa.status}
-                nota={optativa.nota}
-              />
-            ))}
+        {optativas.length > 0 && (
+          <div className="bg-white border border-gray-100 rounded-2xl space-y-4 shadow-lg p-6">
+            <div className="grid grid-cols-4 gap-4">
+              {optativas.map((optativa) => (
+                <CourseCard
+                  key={optativa.codigo}
+                  carater={optativa.carater}
+                  nome={optativa.nomeCadeira}
+                  codigo={optativa.codigo}
+                  status={optativa.status}
+                  nota={optativa.nota}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
