@@ -6,7 +6,6 @@ import {
   DialogPanel,
   DialogTitle
 } from '@headlessui/react'
-import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 interface ModalEncerrarCadeiraParcialmenteProps {
@@ -19,11 +18,6 @@ interface ModalEncerrarCadeiraParcialmenteProps {
 const ModalEncerrarCadeiraParcialmente: React.FC<
   ModalEncerrarCadeiraParcialmenteProps
 > = ({ open, onClose, disciplinaId, disciplinaNome }) => {
-  const searchParams = useSearchParams()
-
-  //   const disciplinaNome = searchParams.get('disciplinaNome')
-  //   const disciplinaId = searchParams.get('disciplinaId')
-
   const [nota, setNota] = useState('')
 
   return (
