@@ -1,6 +1,6 @@
 'use client'
 
-import { ChangeEvent, InputHTMLAttributes } from 'react'
+import { InputHTMLAttributes } from 'react'
 import { IMaskInput } from 'react-imask'
 
 interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -9,7 +9,7 @@ interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
   type: InputHTMLAttributes<HTMLInputElement>['type']
   required?: boolean
   mask?: string
-  value: string
+  value?: string
   disabled?: boolean
   handleChange: (value: string) => void
   className?: string
@@ -25,7 +25,7 @@ const FormInput: React.FC<FormInputProps> = ({
   handleChange,
   label,
   mask,
-  value,
+  value = '',
   required = false,
   ...props
 }) => {

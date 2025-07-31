@@ -1,6 +1,5 @@
 import Header from '@/components/Header/Header'
 import { LuTrendingUp } from 'react-icons/lu'
-import { FaBook } from 'react-icons/fa'
 import DisciplineCard from '@/components/DisciplineCard/DisciplineCard'
 import ModuleCard from '@/components/ModuleCard/ModuleCard'
 import QuickStats from '@/components/QuickStats/QuickStats'
@@ -8,6 +7,7 @@ import { GiProgression } from 'react-icons/gi'
 import { IoTimerSharp } from 'react-icons/io5'
 import { TbMessageChatbot } from 'react-icons/tb'
 import { STATUS_KEYS } from '@/components/CourseCard/CourseCard'
+import { FaTasks } from 'react-icons/fa'
 
 const moduleCard = [
   {
@@ -30,6 +30,12 @@ const moduleCard = [
     path: '/chat',
     descricao:
       'Tire dúvidas, revise conteúdos ou peça sugestões de estudo com a ajuda de uma Inteligência Artificial treinada para te apoiar durante a jornada.'
+  },
+  {
+    nome: 'Questões',
+    icon: <FaTasks className="text-4xl mx-auto" />,
+    path: '/questoes/lista-questionario',
+    descricao: 'Resolva questões para testar e reforçar seus conhecimentos.'
   }
 ]
 
@@ -75,7 +81,7 @@ const HomePage = () => {
           <QuickStats />
           <div className="col-span-3 flex flex-col gap-4">
             <div className="bg-white border border-gray-100 rounded-2xl space-y-6 shadow-lg p-6">
-              <span className="text-xl flex items-center gap-2">
+              <span className="max-lg:text-base text-xl flex items-center gap-2">
                 <LuTrendingUp className="text-muted-foreground" />
                 <h3 className=" font-bold leading-none tracking-tight">
                   Visão geral da progressão do curso
@@ -85,6 +91,7 @@ const HomePage = () => {
                 {mockData.cadeiras.map((cadeira) => (
                   <DisciplineCard
                     key={cadeira.id}
+                    id={cadeira.id}
                     nome={cadeira.nome}
                     status={cadeira.status}
                     xp={cadeira.xp}
@@ -92,7 +99,7 @@ const HomePage = () => {
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 2xl:grid-cols-3 justify-end gap-4">
+            <div className="grid grid-cols-2 max-md:grid-cols-1 2xl:grid-cols-3 justify-end gap-4">
               {moduleCard.map((module) => (
                 <ModuleCard
                   key={module.nome}

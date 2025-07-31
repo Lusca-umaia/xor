@@ -3,15 +3,15 @@ import styles from './style.module.scss'
 import clsx from 'clsx'
 
 const TITLE_KEYS = {
-  DOCUMENT_TITLE: 'DOCUMENT_TITLE',
-  SECTION_TITLE: 'SECTION_TITLE',
-  FIELD_TITLE: 'FIELD_TITLE'
+  QUESTIONARIO_TITLE: 'QUESTIONARIO_TITLE',
+  QUESTAO_TITLE: 'QUESTAO_TITLE',
+  OPCAO_TITLE: 'OPCAO_TITLE'
 } as const
 
 const DEFAULT_TITLES = {
-  [TITLE_KEYS.DOCUMENT_TITLE]: 'Título do documento',
-  [TITLE_KEYS.SECTION_TITLE]: 'Título da seção',
-  [TITLE_KEYS.FIELD_TITLE]: 'Título do campo'
+  [TITLE_KEYS.QUESTIONARIO_TITLE]: 'Título do questionário',
+  [TITLE_KEYS.QUESTAO_TITLE]: 'Título da seção',
+  [TITLE_KEYS.OPCAO_TITLE]: 'Título do campo'
 } as const
 
 interface TextEditorWithPrefixProps {
@@ -20,7 +20,7 @@ interface TextEditorWithPrefixProps {
   title: string
   defaultTitle?: string
   disabled?: boolean
-  prefix: ReactNode
+  prefix?: ReactNode
   isViewMode?: boolean
 }
 
@@ -35,15 +35,16 @@ const TextEditorWithPrefix = ({
 }: TextEditorWithPrefixProps) => {
   const textRef = useRef<HTMLParagraphElement>(null)
 
-  const isDocumentTitle = type === TITLE_KEYS.DOCUMENT_TITLE
-  const isSectionTitle = type === TITLE_KEYS.SECTION_TITLE
-  const isFieldTitle = type === TITLE_KEYS.FIELD_TITLE
+  const isQuestionarioTitle = type === TITLE_KEYS.QUESTIONARIO_TITLE
+  const isQuestaoTitle = type === TITLE_KEYS.QUESTAO_TITLE
+  const isOpcaoTitle = type === TITLE_KEYS.OPCAO_TITLE
 
   const onBlur = (e: React.FocusEvent<HTMLParagraphElement>) => {
     const currentText = e.currentTarget.innerText
     const processedValue = currentText
 
     if (!processedValue.trim()) {
+      textRef.current!.textContent = defaultTitle ?? DEFAULT_TITLES[type]
       handleChange(defaultTitle ?? DEFAULT_TITLES[type])
     } else {
       handleChange(processedValue)
@@ -55,10 +56,9 @@ const TextEditorWithPrefix = ({
       <div
         suppressContentEditableWarning
         className={clsx(styles.titleText, {
-          [styles.textDisabled]: disabled && !isViewMode,
-          [styles.documentTitleText]: isDocumentTitle,
-          [styles.sectionTitleText]: isSectionTitle,
-          [styles.fieldTitleText]: isFieldTitle
+          [styles.questionarioTitleText]: isQuestionarioTitle,
+          [styles.questaoTitleText]: isQuestaoTitle,
+          [styles.opcaoTitleText]: isOpcaoTitle
         })}
       >
         <span>{prefix}</span>

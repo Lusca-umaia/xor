@@ -1,15 +1,9 @@
 'use client'
 import Header from '@/components/Header/Header'
-import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import { LuCoffee, LuRotateCcw, LuPlay, LuBrain, LuPause } from 'react-icons/lu'
 
 type TimerMode = 'WORK' | 'SHORT_BREAK' | 'LONG_BREAK'
-
-const TABS_KEYS = {
-  TIMER: 'TIMER',
-  STATISTIC: 'STATISTIC'
-}
 
 const MODE_KEYS = {
   WORK: 'WORK',
@@ -50,17 +44,6 @@ const MODE_HEADER = {
   }
 }
 
-const TABS = [
-  {
-    label: 'Timer',
-    key: TABS_KEYS.TIMER
-  },
-  {
-    label: 'Estatísticas',
-    key: TABS_KEYS.STATISTIC
-  }
-]
-
 const TIMER_DURATIONS = {
   [MODE_KEYS.WORK]: 25 * 60,
   [MODE_KEYS.SHORT_BREAK]: 5 * 60,
@@ -70,7 +53,6 @@ const TIMER_DURATIONS = {
 const Pomodoro = () => {
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATIONS[MODE_KEYS.WORK])
   const [isRunning, setIsRunning] = useState(false)
-  const [currentTab, setCurrentTab] = useState(TABS_KEYS.TIMER)
   const [mode, setMode] = useState<TimerMode>(MODE_KEYS.WORK)
 
   useEffect(() => {
@@ -125,30 +107,7 @@ const Pomodoro = () => {
         />
       </div>
       <div className="space-y-8 max-w-6xl mx-auto">
-        <div className="bg-white border border-gray-100 rounded-xl space-y-4 shadow-lg p-1">
-          <div className="grid grid-cols-2">
-            {TABS.map(({ key, label }) => (
-              <div
-                onClick={() => setCurrentTab(key)}
-                key={key}
-                className={clsx(
-                  'bg-white text-center cursor-pointer col-span-1 rounded-md text-base space-y-2 py-2 px-8',
-                  {
-                    'border border-gray-100 shadow-sm font-semibold':
-                      currentTab === key,
-                    'text-gray-600 font-medium': currentTab !== key
-                  }
-                )}
-              >
-                {label}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div
-          hidden={currentTab !== 'TIMER'}
-          className="w-xl mx-auto bg-white border border-gray-100 rounded-2xl space-y-8 shadow-lg p-6"
-        >
+        <div className="w-xl max-md:w-full mx-auto bg-white border border-gray-100 rounded-2xl space-y-8 shadow-lg max-md:p-4 p-6">
           <span className="flex items-center justify-center gap-2">
             <div className="p-2 aspect-square bg-gray-200 rounded-full">
               {MODE_HEADER[MODE_KEYS[mode]].icon}
@@ -169,7 +128,7 @@ const Pomodoro = () => {
               }}
             ></div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 max-md:grid-cols-1 max-md:gap-2 gap-4">
             {MODE_NAVIGATION.map((mode) => (
               <button
                 key={mode.key}
@@ -182,7 +141,7 @@ const Pomodoro = () => {
               </button>
             ))}
           </div>
-          <div className="flex gap-4">
+          <div className="flex max-md:flex-col max-md:gap-2 gap-4">
             <button
               type="button"
               onClick={toggleTimer}
@@ -198,7 +157,7 @@ const Pomodoro = () => {
             <button
               onClick={resetTimer}
               type="button"
-              className="w-fit  flex justify-center items-center rounded-xl bg-white px-7 py-3.5 cursor-pointer text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              className="w-fit max-md:w-full flex justify-center items-center rounded-xl bg-white px-7 py-3.5 cursor-pointer text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
             >
               <LuRotateCcw className="text-lg" />
             </button>

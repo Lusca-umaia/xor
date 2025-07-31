@@ -37,8 +37,8 @@ const mockData = {
 const QuickStats = () => {
   return (
     <div className="2xl:sticky 2xl:top-4 col-span-1 bg-white border border-gray-100 rounded-2xl space-y-6 shadow-lg p-6">
-      <span className="text-xl flex items-center gap-2">
-        <GoGoal className="text-muted-foreground" />
+      <span className="text-xl max-md:text-base flex items-center gap-2">
+        <GoGoal className="max-md:text-xl text-muted-foreground" />
         <h3 className=" font-bold leading-none tracking-tight">
           Estatísticas rápidas
         </h3>
