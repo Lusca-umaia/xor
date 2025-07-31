@@ -2,29 +2,33 @@ import { ReactNode } from 'react'
 
 import clsx from 'clsx'
 import { VscVerified } from 'react-icons/vsc'
-import { LuCircle } from 'react-icons/lu'
+import { LuCircle, LuCirclePlay } from 'react-icons/lu'
 
 export const STATUS_KEYS = {
   PENDENTE: 'PENDENTE',
-  CONCLUIDA: 'CONCLUIDA'
+  CONCLUIDA: 'CONCLUIDA',
+  ANDAMENTO: 'ANDAMENTO'
 } as const
 
 interface CourseCardProps {
   nome: string
   codigo: string
   cargaHoraria: number
-  carater: 'OBRIGATÓRIA' | 'OPTATIVA'
+  carater: 'OBRIGATORIA' | 'OPTATIVA'
   status: keyof typeof STATUS_KEYS
   nota?: number | null
   onClick: () => void
-  handleChangeNota: (value: string) => void
+  handleChangeNota?: (value: string) => void
 }
 
 const CARD_ICON: Record<CourseCardProps['status'], ReactNode> = {
   [STATUS_KEYS.CONCLUIDA]: (
     <VscVerified className={`shrink-0 text-2xl text-green-600`} />
   ),
-  [STATUS_KEYS.PENDENTE]: <LuCircle className="shrink-0 text-xl text-black" />
+  [STATUS_KEYS.PENDENTE]: <LuCircle className="shrink-0 text-xl text-black" />,
+  [STATUS_KEYS.ANDAMENTO]: (
+    <LuCirclePlay className="shrink-0 text-2xl text-blue-600" />
+  )
 }
 
 const CARD_BADGE: Record<CourseCardProps['status'], ReactNode> = {
@@ -36,6 +40,11 @@ const CARD_BADGE: Record<CourseCardProps['status'], ReactNode> = {
   [STATUS_KEYS.PENDENTE]: (
     <span className="self-start shrink-0 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
       Pendente
+    </span>
+  ),
+  [STATUS_KEYS.ANDAMENTO]: (
+    <span className="self-start shrink-0 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+      Em andamento
     </span>
   )
 }
@@ -56,7 +65,8 @@ const DisciplinaBox: React.FC<CourseCardProps> = ({
         'border-l-[6px] cursor-pointer hover:scale-105 duration-200 flex flex-col bg-white rounded-2xl rounded-l-lg space-y-3 shadow-md p-4',
         {
           'border-green-600': status === STATUS_KEYS.CONCLUIDA,
-          'border-black': status === STATUS_KEYS.PENDENTE
+          'border-black': status === STATUS_KEYS.PENDENTE,
+          'border-blue-600': status === STATUS_KEYS.ANDAMENTO
         }
       )}
     >
@@ -91,7 +101,9 @@ const DisciplinaBox: React.FC<CourseCardProps> = ({
               step=".1"
               max={10}
               onClick={(e) => e.stopPropagation()}
-              onChange={(e) => handleChangeNota(e.target.value)}
+              onChange={(e) =>
+                handleChangeNota && handleChangeNota(e.target.value)
+              }
               className="block w-16 ml-auto rounded-md outline-indigo-700 border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 font-medium text-sm"
             />
           </p>

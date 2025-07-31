@@ -107,7 +107,7 @@ const Pomodoro = () => {
         />
       </div>
       <div className="space-y-8 max-w-6xl mx-auto">
-        <div className="w-xl mx-auto bg-white border border-gray-100 rounded-2xl space-y-8 shadow-lg p-6">
+        <div className="w-xl max-md:w-full mx-auto bg-white border border-gray-100 rounded-2xl space-y-8 shadow-lg max-md:p-4 p-6">
           <span className="flex items-center justify-center gap-2">
             <div className="p-2 aspect-square bg-gray-200 rounded-full">
               {MODE_HEADER[MODE_KEYS[mode]].icon}
@@ -128,7 +128,7 @@ const Pomodoro = () => {
               }}
             ></div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 max-md:grid-cols-1 max-md:gap-2 gap-4">
             {MODE_NAVIGATION.map((mode) => (
               <button
                 key={mode.key}
@@ -141,7 +141,7 @@ const Pomodoro = () => {
               </button>
             ))}
           </div>
-          <div className="flex gap-4">
+          <div className="flex max-md:flex-col max-md:gap-2 gap-4">
             <button
               type="button"
               onClick={toggleTimer}
@@ -157,7 +157,7 @@ const Pomodoro = () => {
             <button
               onClick={resetTimer}
               type="button"
-              className="w-fit  flex justify-center items-center rounded-xl bg-white px-7 py-3.5 cursor-pointer text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              className="w-fit max-md:w-full flex justify-center items-center rounded-xl bg-white px-7 py-3.5 cursor-pointer text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
             >
               <LuRotateCcw className="text-lg" />
             </button>

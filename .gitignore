@@ -7,7 +7,6 @@
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
-!package-lock.json
 !.yarn/releases
 !.yarn/versions
 

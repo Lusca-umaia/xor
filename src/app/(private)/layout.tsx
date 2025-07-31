@@ -7,9 +7,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="flex">
+    <div className="flex max-lg:flex-col">
       <Navbar />
-      <div className="p-8 w-full">{children}</div>
+      <div className="p-8 max-md:p-3 w-full max-lg:mt-[40px]">{children}</div>
     </div>
   )
 }

@@ -8,7 +8,9 @@ import { FiClock } from 'react-icons/fi'
 import { LuBookCheck } from 'react-icons/lu'
 import { IoBookOutline } from 'react-icons/io5'
 import clsx from 'clsx'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { mockDataDisciplinas } from '@/utils/mockData'
+import ModalEncerrarSemestre from '@/components/ModalEncerrarCurso/ModalEncerrarCurso'
 
 const TABS_KEYS = {
   GERAL: 'GERAL',
@@ -25,33 +27,6 @@ const TABS = [
     key: TABS_KEYS.ATUAL
   }
 ]
-
-interface CadastroAluno {
-  nome: string
-  email: string
-  senha: string
-  cursoId: number
-  gradeId: number
-  semestreAtual: number
-  matricula: string
-  cadeirasRealizadas: {
-    id: number
-    nota: number
-  }[]
-  cadeirasAtivas: number[]
-}
-
-interface Questoes {
-  titulo: string
-  cadeiraId: number
-  questoes: {
-    enunciado: string
-    opcoes: {
-      enunciado: string
-      isCorreta: boolean
-    }[]
-  }[]
-}
 
 const mockData = {
   curso: {
@@ -75,147 +50,11 @@ const mockData = {
   }
 }
 
-const mockDataDisciplinas: {
-  nomeCadeira: string
-  semestreCadeira: number
-  codigo: string
-  status: keyof typeof STATUS_KEYS
-  nota?: number
-  carater: 'OBRIGATÓRIA' | 'OPTATIVA'
-}[] = [
-  // 1º Semestre
-  {
-    nomeCadeira: 'Cálculo I',
-    semestreCadeira: 1,
-    codigo: 'SEM1-MAT001',
-    status: 'CONCLUIDA',
-    nota: 5.6,
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Introdução à Computação',
-    semestreCadeira: 1,
-    codigo: 'SEM1-INF001',
-    status: 'CONCLUIDA',
-    nota: 7.6,
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Leitura e Produção de Texto',
-    semestreCadeira: 1,
-    codigo: 'SEM1-LET001',
-    status: 'ANDAMENTO',
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Fundamentos de Matemática',
-    semestreCadeira: 1,
-    codigo: 'SEM1-MAT002',
-    status: 'PENDENTE',
-    carater: 'OBRIGATÓRIA'
-  },
-
-  // 2º Semestre
-  {
-    nomeCadeira: 'Cálculo II',
-    semestreCadeira: 2,
-    codigo: 'SEM2-MAT003',
-    status: 'ANDAMENTO',
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Programação I',
-    semestreCadeira: 2,
-    codigo: 'SEM2-INF002',
-    status: 'CONCLUIDA',
-    nota: 5.6,
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Álgebra Linear',
-    semestreCadeira: 2,
-    codigo: 'SEM2-MAT004',
-    status: 'PENDENTE',
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Física Geral I',
-    semestreCadeira: 2,
-    codigo: 'SEM2-FIS001',
-    status: 'CONCLUIDA',
-    nota: 5.6,
-    carater: 'OBRIGATÓRIA'
-  },
-
-  // 3º Semestre
-  {
-    nomeCadeira: 'Estrutura de Dados',
-    semestreCadeira: 3,
-    codigo: 'SEM3-INF003',
-    status: 'ANDAMENTO',
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Cálculo III',
-    semestreCadeira: 3,
-    codigo: 'SEM3-MAT005',
-    status: 'PENDENTE',
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Física Geral II',
-    semestreCadeira: 3,
-    codigo: 'SEM3-FIS002',
-    status: 'CONCLUIDA',
-    nota: 5.6,
-    carater: 'OBRIGATÓRIA'
-  },
-  {
-    nomeCadeira: 'Lógica Matemática',
-    semestreCadeira: 3,
-    codigo: 'SEM3-MAT006',
-    status: 'PENDENTE',
-    nota: 5.6,
-    carater: 'OBRIGATÓRIA'
-  },
-
-  // Optativas
-  {
-    nomeCadeira: 'Oficina de Robótica',
-    semestreCadeira: 0,
-    codigo: 'OPT-ROB001',
-    status: 'CONCLUIDA',
-    nota: 5.6,
-    carater: 'OPTATIVA'
-  },
-  {
-    nomeCadeira: 'Tópicos Especiais em Computação I',
-    semestreCadeira: 0,
-    codigo: 'OPT-INF099',
-    status: 'ANDAMENTO',
-    carater: 'OPTATIVA'
-  },
-  {
-    nomeCadeira: 'Introdução à Filosofia da Ciência',
-    semestreCadeira: 0,
-    codigo: 'OPT-FIL001',
-    status: 'PENDENTE',
-    carater: 'OPTATIVA'
-  },
-  {
-    nomeCadeira: 'Design de Interfaces',
-    semestreCadeira: 0,
-    codigo: 'OPT-DES001',
-    status: 'CONCLUIDA',
-    nota: 5.6,
-    carater: 'OPTATIVA'
-  }
-]
-
 const CourseProgressionPage = () => {
   const [currentTab, setCurrentTab] = useState<keyof typeof TABS_KEYS>(
     TABS_KEYS.GERAL
   )
+  const [openModal, setOpenModal] = useState(false)
 
   const progressoGeral = (() => {
     const obrigatorias = mockData.stat.cargaObrigatoriasFeitas
@@ -254,54 +93,80 @@ const CourseProgressionPage = () => {
     ({ semestreCadeira }) => semestreCadeira
   )
 
+  const cadeirasAtivas = useMemo(
+    () =>
+      mockDataDisciplinas.filter(
+        ({ status }) => status === STATUS_KEYS.ANDAMENTO
+      ),
+    []
+  )
+
   return (
     <div>
       <Header
         title="Olá, Lucas, veja o seu progresso!"
         actions={{
-          primaryAction: { title: 'Encerrar semestre', onClick: () => {} }
+          primaryAction: {
+            title: 'Encerrar semestre',
+            onClick: () => setOpenModal((prevValue) => !prevValue)
+          }
         }}
       />
+      <ModalEncerrarSemestre
+        cadeirasAtivas={cadeirasAtivas}
+        open={openModal}
+        setOpen={setOpenModal}
+      />
       <div className="space-y-4">
-        <div className="bg-white border border-gray-100 rounded-2xl space-y-4 shadow-md p-6">
+        <div className="bg-white border border-gray-100 max-md:p-4 rounded-2xl space-y-4 shadow-md p-6">
           <span className="text-2xl flex items-center gap-2">
-            <LuGraduationCap className="text-4xl" />
+            <LuGraduationCap className="max-lg:text-2xl text-4xl" />
             <div className="space-y-0.5">
-              <h3 className="font-semibold leading-none tracking-tight">
+              <h3 className="font-semibold max-md:text-lg leading-none tracking-tight">
                 {mockData.curso.nome} - {mockData.curso.codigo}
               </h3>
-              <p className="text-base font-semibold">
+              <p className="text-base max-md:text-sm font-semibold">
                 Matrícula:{' '}
                 <span className="font-normal">{mockData.aluno.matricula}</span>
               </p>
             </div>
           </span>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-1  lg:grid-cols-2 2xl:grid-cols-3 gap-4">
             <StatCard
               title="Progresso geral"
               value={`${progressoGeral * 100}%`}
-              icon={<GoGoal className="text-3xl text-blue-600" />}
+              icon={
+                <GoGoal className="max-lg:text-xl shrink-0 text-3xl text-blue-600" />
+              }
             />
             <StatCard
               title="Obrigatórias"
               value={`${mockData.stat.obrigatoriasFeitas}/${mockData.grade.quantidadeObrigatorias}`}
-              icon={<LuBookCheck className="text-3xl text-green-600" />}
+              icon={
+                <LuBookCheck className="max-lg:text-xl shrink-0 text-3xl text-green-600" />
+              }
             />
             <StatCard
               title="Optativas"
               value={`${mockData.stat.optativasFeitas} concluída(s)`}
-              icon={<IoBookOutline className="text-3xl text-indigo-600" />}
+              icon={
+                <IoBookOutline className="max-lg:text-xl shrink-0 text-3xl text-indigo-600" />
+              }
             />
             <StatCard
               title="Carga horária"
               value={`${mockData.grade.cargaHoraria}h`}
-              icon={<FiClock className="text-3xl text-orange-600" />}
+              icon={
+                <FiClock className="max-lg:text-xl shrink-0 text-3xl text-orange-600" />
+              }
             />
           </div>
           <div className="flex flex-col gap-1">
             <span className="flex justify-between gap-2">
-              <p className="font-semibold">Disciplinas Obrigatórias</p>
-              <p>
+              <p className="font-semibold max-lg:text-sm text-base">
+                Disciplinas Obrigatórias
+              </p>
+              <p className="font-semibold max-lg:text-sm text-base">
                 {`${mockData.stat.cargaObrigatoriasFeitas}/${cargaHorariaObrigatoria}h`}
               </p>
             </span>
@@ -314,8 +179,10 @@ const CourseProgressionPage = () => {
           </div>
           <div className="flex flex-col gap-1">
             <span className="flex justify-between gap-2">
-              <p className="font-semibold">Disciplinas Optativas</p>
-              <p>
+              <p className="font-semibold max-lg:text-sm text-base">
+                Disciplinas Optativas
+              </p>
+              <p className="font-semibold max-lg:text-sm text-base">
                 {`${mockData.stat.cargaOpativasFeitas}/${mockData.grade.cargaOptativas}h`}{' '}
               </p>
             </span>
@@ -328,13 +195,13 @@ const CourseProgressionPage = () => {
           </div>
         </div>
         <div className="bg-white border border-gray-100 rounded-xl space-y-4 shadow-lg p-1">
-          <div className="grid grid-cols-2">
+          <div className="grid max-md:grid-cols-1 grid-cols-2">
             {TABS.map(({ key, label }) => (
               <div
                 onClick={() => setCurrentTab(key)}
                 key={key}
                 className={clsx(
-                  'bg-white text-center cursor-pointer col-span-1 rounded-md text-base space-y-2 py-2 px-8',
+                  'bg-white max-md:text-sm text-center cursor-pointer col-span-1 rounded-md text-base space-y-2 py-2 px-8',
                   {
                     'border border-gray-100 shadow-sm font-semibold':
                       currentTab === key,
@@ -347,7 +214,9 @@ const CourseProgressionPage = () => {
             ))}
           </div>
         </div>
-        <h3 className="font-semibold text-2xl ">Disciplinas obrigatórias</h3>
+        <h3 className="font-bold text-2xl max-md:text-lg">
+          Disciplinas obrigatórias
+        </h3>
         {Object.entries(obrigatorias).map(([semestre, cadeiras]) => {
           const concluídas = cadeiras!.filter(
             (c) => c.status === 'CONCLUIDA'
@@ -356,9 +225,9 @@ const CourseProgressionPage = () => {
           return (
             <div
               key={semestre}
-              className="bg-white border border-gray-100 rounded-2xl space-y-4 shadow-lg p-6"
+              className="bg-white border max-md:p-4 border-gray-100 rounded-2xl space-y-4 shadow-lg p-6"
             >
-              <span className="text-xl flex items-center gap-2">
+              <span className="max-md:text-base text-xl flex items-center gap-2">
                 <div className="flex gap-4 items-center">
                   <h3 className="font-bold leading-none tracking-tight">
                     {semestre}º Semestre
@@ -368,7 +237,7 @@ const CourseProgressionPage = () => {
                   </span>
                 </div>
               </span>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-4 gap-4">
                 {cadeiras!.map((cadeira, index) => (
                   <CourseCard
                     key={index}
@@ -383,10 +252,12 @@ const CourseProgressionPage = () => {
             </div>
           )
         })}
-        <h3 className="font-semibold text-2xl ">Disciplinas optativas</h3>
+        <h3 className="font-bold max-md:text-lg text-2xl ">
+          Disciplinas optativas
+        </h3>
         {optativas.length > 0 && (
-          <div className="bg-white border border-gray-100 rounded-2xl space-y-4 shadow-lg p-6">
-            <div className="grid grid-cols-4 gap-4">
+          <div className="bg-white border border-gray-100 max-md:p-4 rounded-2xl space-y-4 shadow-lg p-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-4 gap-4">
               {optativas.map((optativa) => (
                 <CourseCard
                   key={optativa.codigo}

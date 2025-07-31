@@ -6,10 +6,12 @@ import PersonalInformation from './components/PersonalInformation'
 import { STEP_KEYS } from '@/helpers/consts'
 import Link from 'next/link'
 import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
+import CurrentSemester from './components/CurrentSemester'
 
 const STEP_TITLES = {
   [STEP_KEYS.COURSE_INFORMATION]: 'Informações do curso',
-  [STEP_KEYS.PERSONAL_INFORMATION]: 'Informações pessoais'
+  [STEP_KEYS.PERSONAL_INFORMATION]: 'Informações pessoais',
+  [STEP_KEYS.CURRENT_SEMESTER]: 'Informações do semestre atual'
 } as const
 
 const Register = () => {
@@ -30,6 +32,9 @@ const Register = () => {
     ),
     [STEP_KEYS.PERSONAL_INFORMATION]: (
       <PersonalInformation handleChangeStep={handleChangeStep} />
+    ),
+    [STEP_KEYS.CURRENT_SEMESTER]: (
+      <CurrentSemester handleChangeStep={handleChangeStep} />
     )
   }
 
@@ -38,8 +43,8 @@ const Register = () => {
   }
 
   return (
-    <div className="max-w-7xl space-y-4 mx-auto mt-4">
-      <div className="flex flex-col justify-between">
+    <div className="px-4 max-w-7xl space-y-4 mx-auto mt-4 mb-8">
+      <div className=" flex flex-col justify-between">
         <button
           onClick={handleBack}
           className="flex items-center cursor-pointer"
@@ -55,16 +60,18 @@ const Register = () => {
         <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
           <div className="px-4 py-6 sm:p-8">
             <ProgressBar />
-            <h2 className="text-lg border-black/10 pb-3 mb-3 border-b font-semibold">
+            <h2 className="text-base md:text-lg border-black/10 pb-3 my-3 border-b font-semibold">
               {STEP_TITLES[currentStep]}
             </h2>
-            {STEP_COMPONENTS[currentStep]}
+            <form onSubmit={(e) => e.preventDefault()}>
+              {STEP_COMPONENTS[currentStep]}
+            </form>
           </div>
         </div>
         <div className="flex justify-center">
           <span className="text-base font-medium">
             Já possui conta?{' '}
-            <Link href={'/'} className="text-indigo-600 underline">
+            <Link href={'/login'} className="text-indigo-600 underline">
               Login
             </Link>
           </span>
