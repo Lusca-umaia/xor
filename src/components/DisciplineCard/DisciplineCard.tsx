@@ -32,27 +32,7 @@ const DisciplineCard: React.FC<DisciplineCardProps> = ({
   status
 }) => {
   const { icon, label } = CARD_STATUS_INFORMATION[status]
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const pathname = usePathname()
   const [openModal, setOpenModal] = useState(false)
-
-  // const handleChangeModal = (value: boolean) => {
-  //   const params = new URLSearchParams(searchParams.toString())
-  //   const disciplinaId = params.get('disciplinaId')
-  //   const disciplinaNome = params.get('disciplinaNome')
-
-  //   if (!disciplinaId && !disciplinaNome) {
-  //     params.set('disciplinaId', id.toString())
-  //     params.set('disciplinaNome', nome)
-  //   } else {
-  //     params.delete('disciplinaId')
-  //     params.delete('disciplinaNome')
-  //   }
-
-  //   router.push(`${pathname}?${params.toString()}`)
-  //   setOpenModal(value)
-  // }
 
   const handleChangeModal = (value: boolean) => {
     setOpenModal(value)
