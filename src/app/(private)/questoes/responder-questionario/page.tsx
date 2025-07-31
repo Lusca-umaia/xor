@@ -98,9 +98,6 @@ const Questions = () => {
     'RESPOSTA'
   )
 
-  console.log('mockFormData')
-  console.log(mockFormData)
-
   const [respostas, setRespostas] = useState<Record<string, string>>({})
 
   const resetRespostas = () => {
