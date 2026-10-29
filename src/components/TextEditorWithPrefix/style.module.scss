@@ -1,0 +1,30 @@
+.wrapper {
+  display: flex;
+  position: relative;
+  align-items: center;
+  gap: 4px;
+
+  .titleText {
+    width: fit-content;
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    line-height: 150%;
+  }
+
+  .questionarioTitleText {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .questaoTitleText {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .opcaoTitleText {
+    font-size: 14px;
+    font-weight: 600;
+  }
+}

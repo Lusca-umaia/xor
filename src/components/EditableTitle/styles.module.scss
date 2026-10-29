@@ -1,0 +1,55 @@
+.wrapper {
+  display: flex;
+  position: relative;
+  align-items: center;
+  gap: 4px;
+
+  .disabled {
+    position: absolute;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+  }
+
+  .editInput {
+    height: fit-content;
+    white-space: pre-wrap;
+    color: var(--neutral-800, #1e1e1d);
+    font-size: 20px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+    resize: none;
+    background-color: transparent;
+    border: none;
+    line-height: 150%;
+  }
+
+  .inputDocumentTitle {
+    color: var(--neutral-800, #1e1e1d);
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .inputSectionTitle {
+    color: var(--primary-600, #287886);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .inputFieldTitle {
+    color: var(--neutral-800, #1e1e1d);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .titleText {
+    width: fit-content;
+    font-size: 20px;
+    font-weight: 800;
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: var(--neutral-800, #1e1e1d);
+    line-height: 150%;
+  }
+}
