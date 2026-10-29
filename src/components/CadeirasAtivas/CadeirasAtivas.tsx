@@ -8,8 +8,54 @@ export default function CadeirasAtivas() {
     handleChangeCadeiraAtiva,
     obrigatoriasInativas,
     CADEIRAS_ATIVAS,
-    optativasInativas
+    optativasInativas,
+    historico,
+    cadeirasHistorico
   } = useRegisterContext()
+
+  const cadeirasEmAndamento = cadeirasHistorico.filter(
+    ({ status }) => status === 'ANDAMENTO'
+  )
+
+  if (historico) {
+    return (
+      <fieldset className="space-y-4">
+        <div>
+          <p className="text-sm font-semibold leading-6 text-gray-900">
+            Disciplinas em andamento identificadas no histórico
+          </p>
+          <p className="text-xs font-medium text-gray-500">
+            Elas foram adicionadas automaticamente ao semestre atual.
+          </p>
+        </div>
+
+        {cadeirasEmAndamento.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {cadeirasEmAndamento.map((cadeira) => (
+              <DisciplinaBox
+                key={`${cadeira.codigo}-${cadeira.periodo}`}
+                nome={cadeira.nome}
+                codigo={cadeira.codigo}
+                cargaHoraria={cadeira.cargaHoraria}
+                carater={cadeira.carater}
+                status={cadeira.status}
+                nota={cadeira.nota}
+                frequencia={cadeira.frequencia}
+                periodo={cadeira.periodo}
+                situacao={cadeira.situacao}
+                docente={cadeira.docente}
+                tipoComponente={cadeira.tipoComponente}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="rounded-xl bg-gray-50 px-3 py-2 text-xs font-medium text-gray-500 ring-1 ring-inset ring-gray-200">
+            Nenhuma disciplina em andamento foi encontrada no histórico.
+          </p>
+        )}
+      </fieldset>
+    )
+  }
 
   return (
     <fieldset>
@@ -63,9 +109,9 @@ export default function CadeirasAtivas() {
               {optativasInativas.map((cadeira) => (
                 <DisciplinaBox
                   key={cadeira.codigo}
-                  handleChangeNota={(value) =>
+                  handleChangeNota={() => {
                     handleChangeCadeiraAtiva(cadeira.id)
-                  }
+                  }}
                   onClick={() => handleChangeCadeiraAtiva(cadeira.id)}
                   carater={cadeira.carater}
                   status={

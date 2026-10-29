@@ -10,16 +10,10 @@ interface CurrentSemesterProps {
   handleChangeStep: (step: keyof typeof STEP_KEYS) => void
 }
 
-const schemaCadeirasAtivas = z.object({
-  cadeirasAtivas: z
-    .array(z.number().int().positive())
-    .min(1, 'Você deve selecionar pelo menos uma cadeira')
-})
-
 const CurrentSemester: React.FC<CurrentSemesterProps> = ({
   handleChangeStep
 }) => {
-  const { formData } = useRegisterContext()
+  const { formData, historico } = useRegisterContext()
   const [error, setError] = useState<string>('')
 
   const handleWithPreviousStep = () => {
@@ -31,7 +25,13 @@ const CurrentSemester: React.FC<CurrentSemesterProps> = ({
   })
 
   const handleSubmit = () => {
-    const result = schemaCadeirasAtivas.safeParse({
+    const schema = z.object({
+      cadeirasAtivas: z
+        .array(z.number().int().positive())
+        .min(historico ? 0 : 1, 'Você deve selecionar pelo menos uma cadeira')
+    })
+
+    const result = schema.safeParse({
       cadeirasAtivas: formData.cadeirasAtivas
     })
 
