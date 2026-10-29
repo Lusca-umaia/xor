@@ -2,6 +2,7 @@ export interface CadastroAluno {
   nome: string
   email: string
   senha: string
+  cursoNome: string
   cursoId: number | null
   gradeId: number | null
   semestreAtual: number | null

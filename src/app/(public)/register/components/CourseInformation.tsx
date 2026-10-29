@@ -1,18 +1,16 @@
-import Select from '@/components/Select/Select'
-import CadeirasRealizadas from '@/components/CadeirasRealizadas/CadeirasRealizadas'
-import { STEP_KEYS } from '@/helpers/consts'
-import { useRegisterContext } from '@/context/RegisterContext'
-import FormInput from '@/components/FormInput/FormInput'
-import { z } from 'zod'
+'use client'
+
 import { useState } from 'react'
-import { isNull } from 'lodash'
-import { cursosMock } from '@/utils/mockData'
+
+import FormInput from '@/components/FormInput/FormInput'
+import CadeirasRealizadas from '@/components/CadeirasRealizadas/CadeirasRealizadas'
+import { useRegisterContext } from '@/context/RegisterContext'
+import { STEP_KEYS } from '@/helpers/consts'
+import { z } from 'zod'
+import HistoricoImport from './HistoricoImport'
 
 export const schemaDadosAcademicos = z.object({
-  cursoId: z
-    .number({ message: 'É necessário informar o curso' })
-    .int()
-    .positive('Selecione um curso'),
+  cursoNome: z.string().min(1, 'É necessário informar o curso'),
   semestreAtual: z.coerce
     .number({ message: 'É necessário informar o semestre atual' })
     .int({ message: 'Semestre deve ser um número inteiro' })
@@ -35,7 +33,7 @@ interface CourseInformationProps {
 const CourseInformation: React.FC<CourseInformationProps> = ({
   handleChangeStep
 }) => {
-  const { handleChangeFormData, formData } = useRegisterContext()
+  const { handleChangeFormData, formData, historico } = useRegisterContext()
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleWithPreviousStep = () => {
@@ -44,8 +42,7 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
 
   const handleWithNextStep = () => {
     const result = schemaDadosAcademicos.safeParse({
-      cursoId: formData.cursoId,
-      gradeId: formData.gradeId,
+      cursoNome: formData.cursoNome,
       semestreAtual: formData.semestreAtual,
       matricula: formData.matricula,
       cadeirasRealizadas: formData.cadeirasRealizadas
@@ -65,49 +62,57 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
     handleChangeStep(STEP_KEYS['CURRENT_SEMESTER'])
   }
 
-  const cursos = cursosMock!.map(({ id, nome }) => ({ id, nome }))
-
   return (
     <>
-      <div className="grid border-b border-black/10 items-center pb-6 gap-6 grid-cols-6">
-        <div className="mb-auto max-md:col-span-6 col-span-2">
-          <Select
-            label="Curso"
-            options={cursos}
-            onChange={({ id }) => {
-              handleChangeFormData(id, 'cursoId')
-              handleChangeFormData(null, 'gradeId')
-            }}
-            value={formData.cursoId}
-            error={errors.cursoId}
-          />
+      <div className="space-y-6">
+        <HistoricoImport />
+
+        <div className="grid border-b border-black/10 items-center pb-6 gap-6 grid-cols-6">
+          <div className="mb-auto max-md:col-span-6 col-span-2">
+            <FormInput
+              type="text"
+              label="Curso"
+              handleChange={(value) => handleChangeFormData(value, 'cursoNome')}
+              value={formData.cursoNome}
+              name="cursoNome"
+              error={errors.cursoNome}
+              placeholder="Ex: Ciência da Computação"
+            />
+          </div>
+          <div className="mb-auto max-md:col-span-6 col-span-2">
+            <FormInput
+              type="number"
+              min={1}
+              label="Semestre atual"
+              handleChange={(value) =>
+                handleChangeFormData(value, 'semestreAtual')
+              }
+              value={formData['semestreAtual']?.toString()}
+              name="semestreAtual"
+              error={errors.semestreAtual}
+              placeholder="Ex: 3"
+            />
+          </div>
+          <div className="mb-auto max-md:col-span-6 col-span-2">
+            <FormInput
+              type="text"
+              label="Matrícula"
+              handleChange={(value) => handleChangeFormData(value, 'matricula')}
+              value={formData['matricula']}
+              name="matricula"
+              error={errors.matricula}
+              placeholder="Ex: 2020123456"
+            />
+          </div>
         </div>
-        <div className="mb-auto max-md:col-span-6 col-span-2">
-          <FormInput
-            type="number"
-            min={1}
-            label="Semestre atual"
-            handleChange={(value) =>
-              handleChangeFormData(value, 'semestreAtual')
-            }
-            value={formData['semestreAtual']?.toString()}
-            name="semestreAtual"
-            error={errors.semestreAtual}
-            placeholder="Ex: 3"
-          />
-        </div>
-        <div className="mb-auto max-md:col-span-6 col-span-2">
-          <FormInput
-            type="text"
-            label="Matrícula"
-            handleChange={(value) => handleChangeFormData(value, 'matricula')}
-            value={formData['matricula']}
-            name="matricula"
-            error={errors.matricula}
-            placeholder="Ex: 2020123456"
-          />
-        </div>
-        <div className="col-span-6">
+
+        <p className="-mt-3 text-xs font-medium text-gray-500">
+          {historico
+            ? 'Esses dados foram preenchidos a partir do histórico. Edite apenas se precisar corrigir algo.'
+            : 'Sem o histórico, preencha os dados manualmente e marque as cadeiras que você já cursou.'}
+        </p>
+
+        <div className="border-t border-black/10 pt-6">
           <CadeirasRealizadas />
           {errors['cadeirasRealizadas'] && (
             <p className="text-sm font-medium mt-2 text-red-600">
@@ -116,6 +121,7 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
           )}
         </div>
       </div>
+
       <div className="ml-auto w-fit flex mt-6 gap-2">
         <button
           type="button"
