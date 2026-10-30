@@ -2,6 +2,7 @@
 import clsx from 'clsx'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
 import {
+  LuAward,
   LuCalculator,
   LuChartLine,
   LuFileText,
@@ -20,6 +21,7 @@ import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
 import CalculadoraTab from './components/CalculadoraTab'
 import { AvisoDemo, Card } from './components/Comuns'
 import DesempenhoTab from './components/DesempenhoTab'
+import PortfolioTab from './components/PortfolioTab'
 import PreRequisitosTab from './components/PreRequisitosTab'
 import RelatorioTab from './components/RelatorioTab'
 
@@ -27,7 +29,8 @@ const TABS = [
   { key: 'desempenho', label: 'Desempenho', icon: <LuChartLine /> },
   { key: 'calculadora', label: 'Calculadora de meta', icon: <LuCalculator /> },
   { key: 'prerequisitos', label: 'Pré-requisitos', icon: <LuNetwork /> },
-  { key: 'relatorio', label: 'Relatório', icon: <LuFileText /> }
+  { key: 'relatorio', label: 'Relatório', icon: <LuFileText /> },
+  { key: 'portfolio', label: 'Portfólio', icon: <LuAward /> }
 ] as const satisfies readonly { key: string; label: string; icon: ReactNode }[]
 
 type TabKey = (typeof TABS)[number]['key']
@@ -88,7 +91,7 @@ const AcademicoPage = () => {
     <div>
       <Header
         title="Vida acadêmica"
-        description="Desempenho, calculadora de meta, pré-requisitos e relatório semestral."
+        description="Desempenho, calculadora de meta, pré-requisitos, relatório semestral e portfólio."
       />
       <div className="space-y-4">
         {data.demonstracao && <AvisoDemo />}
@@ -143,6 +146,7 @@ const AcademicoPage = () => {
               </p>
             </Card>
           ))}
+        {tab === 'portfolio' && <PortfolioTab />}
         {tab === 'relatorio' && (
           <RelatorioTab
             curriculo={data.curriculo}
