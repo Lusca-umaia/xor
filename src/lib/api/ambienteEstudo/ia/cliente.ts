@@ -41,12 +41,19 @@ async function chamar(corpo: Record<string, unknown>, sinal?: AbortSignal) {
     console.error('[ia] sem conexão', erro)
     throw new ApiError(
       502,
-      'Não foi possível falar com a IA. Verifique se o Ollama está rodando'
+      'Não foi possível falar com a IA. Verifique se o Ollama está rodando (npm run ia:verificar)'
     )
   }
 
   if (!resposta.ok) {
-    console.error('[ia]', resposta.status, await resposta.text())
+    const detalhe = await resposta.text()
+    console.error('[ia]', resposta.status, detalhe)
+    // Ollama sem o modelo: 404 "model ... not found".
+    if (resposta.status === 404 && /not found/i.test(detalhe))
+      throw new ApiError(
+        503,
+        `O modelo de IA "${modelo}" não está instalado. Rode npm run ia:setup`
+      )
     throw new ApiError(502, 'A IA não conseguiu responder')
   }
   return resposta
