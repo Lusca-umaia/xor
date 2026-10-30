@@ -16,6 +16,8 @@ import { Card, Estatistica, Explicacao, formatarNota } from './Comuns'
 interface Props {
   curriculo: DisciplinaCurriculo[]
   historico: TentativaHistorico[]
+  // Tentativas sem semestre nem período válido, que ficaram fora do IRA.
+  semPeriodo?: number
 }
 
 const L = 560
@@ -78,7 +80,7 @@ const GraficoIRA: React.FC<{ pontos: ReturnType<typeof evolucaoIRA> }> = ({
         points={linha('iraPeriodo')}
       />
       {pontos.map((p, i) => (
-        <g key={p.periodo}>
+        <g key={p.ordem}>
           {p.iraAcumulado !== null && (
             <circle cx={x(i)} cy={y(p.iraAcumulado)} r="4" fill="#1d3446">
               <title>{`${p.periodo}: acumulado ${formatarNota(p.iraAcumulado)} · período ${formatarNota(p.iraPeriodo)}`}</title>
@@ -99,7 +101,11 @@ const GraficoIRA: React.FC<{ pontos: ReturnType<typeof evolucaoIRA> }> = ({
   )
 }
 
-const DesempenhoTab: React.FC<Props> = ({ curriculo, historico }) => {
+const DesempenhoTab: React.FC<Props> = ({
+  curriculo,
+  historico,
+  semPeriodo = 0
+}) => {
   const dados = useMemo(() => {
     const porCodigo = indexarCurriculo(curriculo)
     const sit = situacoes(curriculo, historico)
@@ -135,7 +141,7 @@ const DesempenhoTab: React.FC<Props> = ({ curriculo, historico }) => {
         <Estatistica
           rotulo="Reprovações / trancamentos"
           valor={`${dados.reprovacoes} / ${dados.trancamentos}`}
-          detalhe="no histórico de exemplo"
+          detalhe="no histórico"
         />
       </div>
 
@@ -181,7 +187,10 @@ const DesempenhoTab: React.FC<Props> = ({ curriculo, historico }) => {
             linha tracejada verde marca a média 7.
           </p>
           <p>
-            Dados: histórico fictício de demonstração e matriz de CC 2024.1.
+            {semPeriodo > 0 &&
+              `${semPeriodo} tentativa(s) sem semestre nem período válido ficaram fora do cálculo. `}
+            Para o IRA entram todas as suas tentativas com nota, inclusive
+            optativas.
           </p>
         </Explicacao>
       </Card>
