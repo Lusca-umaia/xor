@@ -1,5 +1,11 @@
 'use client'
-import { LuTimer, LuUserRound } from 'react-icons/lu'
+import {
+  LuCalendarDays,
+  LuClipboardList,
+  LuGraduationCap,
+  LuTimer,
+  LuUserRound
+} from 'react-icons/lu'
 import { FaTasks } from 'react-icons/fa'
 import { GiProgression } from 'react-icons/gi'
 import { FaHome } from 'react-icons/fa'
@@ -17,6 +23,21 @@ export const options = [
     icon: <GiProgression />,
     path: '/courseProgression',
     name: 'Progressão de curso'
+  },
+  {
+    icon: <LuGraduationCap />,
+    path: '/academico',
+    name: 'Vida acadêmica'
+  },
+  {
+    icon: <LuCalendarDays />,
+    path: '/calendario',
+    name: 'Calendário'
+  },
+  {
+    icon: <LuClipboardList />,
+    path: '/atividades',
+    name: 'Atividades'
   },
   {
     icon: <LuTimer />,
