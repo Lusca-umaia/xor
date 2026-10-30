@@ -31,7 +31,7 @@ export default function NavbarMobile() {
         <button
           type="button"
           onClick={() => setOpenMenu(true)}
-          className="col-span-1 cursor-pointer inline-flex rounded-md bg-white text-gray-900 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="col-span-1 cursor-pointer inline-flex rounded-md bg-white text-gray-900 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-xor-navy focus:ring-offset-2"
         >
           <IoMenu className="text-2xl" />
         </button>
@@ -64,7 +64,7 @@ export default function NavbarMobile() {
           <button
             type="button"
             onClick={() => closeModal()}
-            className="lg:hidden cursor-pointer inline-flex ml-auto rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="lg:hidden cursor-pointer inline-flex ml-auto rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-xor-navy focus:ring-offset-2"
           >
             <FaXmark className="h-5 w-5" />
           </button>

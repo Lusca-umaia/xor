@@ -162,7 +162,7 @@ const DadosGerais: React.FC<DadosGeraisProps> = ({
             <button
               type="button"
               onClick={onAlterarEmail}
-              className="inline-flex cursor-pointer items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+              className="inline-flex cursor-pointer items-center gap-1 text-sm font-semibold text-xor-navy hover:text-xor-slate"
             >
               Alterar email
               <LuArrowRight />

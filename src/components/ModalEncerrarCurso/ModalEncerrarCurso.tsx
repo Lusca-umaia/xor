@@ -181,7 +181,7 @@ const ModalEncerrarCurso: React.FC<ModalEncerrarCursoProps> = ({
                           className={clsx(
                             'flex cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2 text-sm ring-1 ring-inset',
                             proximas.has(disciplina.id)
-                              ? 'bg-indigo-50 ring-indigo-300'
+                              ? 'bg-xor-navy/5 ring-xor-navy/30'
                               : 'ring-gray-200 hover:bg-gray-50'
                           )}
                         >
@@ -228,7 +228,7 @@ const ModalEncerrarCurso: React.FC<ModalEncerrarCursoProps> = ({
                   type="submit"
                   onClick={handleClickNext}
                   disabled={!podeSeguir}
-                  className="disabled:opacity-80 not-disabled:cursor-pointer inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs not-disabled:hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
+                  className="disabled:opacity-80 not-disabled:cursor-pointer inline-flex w-full justify-center rounded-md bg-xor-navy px-3 py-2 text-sm font-semibold text-white shadow-xs not-disabled:hover:bg-xor-navy/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-xor-navy sm:col-start-2"
                 >
                   {passo === passoProximoSemestre
                     ? isPending

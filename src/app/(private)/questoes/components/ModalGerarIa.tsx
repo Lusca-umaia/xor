@@ -125,7 +125,7 @@ const ModalGerarIa: React.FC<ModalGerarIaProps> = ({
               className="space-y-5"
             >
               <div className="flex items-start gap-3">
-                <div className="rounded-xl bg-violet-50 p-2.5 text-violet-700">
+                <div className="rounded-xl bg-xor-lime/15 p-2.5 text-xor-navy">
                   <LuSparkles className="text-xl" />
                 </div>
                 <div>
@@ -208,7 +208,7 @@ const ModalGerarIa: React.FC<ModalGerarIaProps> = ({
               </fieldset>
 
               {gerar.isPending && (
-                <div className="flex items-center gap-3 rounded-xl bg-violet-50 p-3 text-sm text-violet-800">
+                <div className="flex items-center gap-3 rounded-xl bg-xor-lime/15 p-3 text-sm text-xor-navy">
                   <LuLoaderCircle className="shrink-0 animate-spin text-lg" />
                   Gerando questões... modelos locais podem levar alguns minutos.
                 </div>
@@ -232,7 +232,7 @@ const ModalGerarIa: React.FC<ModalGerarIaProps> = ({
                 <button
                   type="submit"
                   disabled={gerar.isPending}
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-violet-500 disabled:opacity-60"
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-xor-navy px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-xor-navy/90 disabled:opacity-60"
                 >
                   <LuSparkles />
                   {gerar.isPending ? 'Gerando...' : 'Gerar questões'}

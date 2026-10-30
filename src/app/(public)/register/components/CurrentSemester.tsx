@@ -52,7 +52,7 @@ const CurrentSemester: React.FC<CurrentSemesterProps> = ({
         <button
           type="button"
           onClick={() => router.push('/login')}
-          className="cursor-pointer rounded-md bg-black px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-700/95"
+          className="cursor-pointer rounded-md bg-xor-navy px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-xor-navy/90"
         >
           Ir para o login
         </button>
@@ -97,7 +97,7 @@ const CurrentSemester: React.FC<CurrentSemesterProps> = ({
         <button
           type="button"
           onClick={handleWithPreviousStep}
-          className="cursor-pointer rounded-md bg-black px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-700 hover:bg-gray-700/95"
+          className="cursor-pointer rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
         >
           Voltar
         </button>
@@ -105,7 +105,7 @@ const CurrentSemester: React.FC<CurrentSemesterProps> = ({
           type="submit"
           onClick={handleSubmit}
           disabled={isPending}
-          className="cursor-pointer disabled:opacity-70 rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          className="cursor-pointer disabled:opacity-70 rounded-md bg-xor-navy px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-xor-navy/90"
         >
           {isPending ? 'Enviando...' : 'Enviar'}
         </button>

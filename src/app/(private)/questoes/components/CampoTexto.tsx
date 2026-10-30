@@ -39,7 +39,7 @@ const CampoTexto: React.FC<CampoTextoProps> = ({
       value={value}
       onChange={(e) => handleChange(e.target.value)}
       className={clsx(
-        'block w-full resize-y field-sizing-content rounded-md border-0 p-2 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 outline-none',
+        'block w-full resize-y field-sizing-content rounded-md border-0 p-2 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy outline-none',
         label && 'mt-1',
         error ? 'ring-red-300' : 'ring-gray-300'
       )}

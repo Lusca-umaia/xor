@@ -369,7 +369,7 @@ const ModalEditarDisciplina: React.FC<ModalEditarDisciplinaProps> = ({
                   <button
                     type="submit"
                     disabled={ocupado}
-                    className="cursor-pointer disabled:opacity-70 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500"
+                    className="cursor-pointer disabled:opacity-70 rounded-md bg-xor-navy px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-xor-navy/90"
                   >
                     {salvar.isPending ? 'Salvando...' : 'Salvar'}
                   </button>

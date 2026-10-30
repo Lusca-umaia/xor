@@ -84,7 +84,7 @@ const ModalEncerrarCadeiraParcialmente: React.FC<
                 type="button"
                 disabled={!resultadoValido(resultado) || isPending}
                 onClick={salvar}
-                className="disabled:opacity-80 not-disabled:cursor-pointer inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs not-disabled:hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
+                className="disabled:opacity-80 not-disabled:cursor-pointer inline-flex w-full justify-center rounded-md bg-xor-navy px-3 py-2 text-sm font-semibold text-white shadow-xs not-disabled:hover:bg-xor-navy/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-xor-navy sm:col-start-2"
               >
                 {isPending ? 'Salvando...' : 'Encerrar disciplina'}
               </button>

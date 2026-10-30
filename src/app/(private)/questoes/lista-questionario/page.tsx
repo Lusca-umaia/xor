@@ -167,7 +167,7 @@ const ListaQuestoes = () => {
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar por título, descrição ou disciplina"
-              className="block w-full rounded-xl border-0 py-2 pl-9 pr-3 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 outline-none"
+              className="block w-full rounded-xl border-0 py-2 pl-9 pr-3 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy outline-none"
             />
           </div>
           <div className="flex rounded-xl bg-gray-100 p-1 text-sm font-semibold">
@@ -227,7 +227,7 @@ const ListaQuestoes = () => {
               <button
                 type="button"
                 onClick={() => novo(true)}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-violet-700 shadow-sm ring-1 ring-inset ring-violet-200 hover:bg-violet-50"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-xor-navy shadow-sm ring-1 ring-inset ring-xor-lime/60 hover:bg-xor-lime/15"
               >
                 <LuSparkles /> Gerar com IA
               </button>
@@ -253,7 +253,7 @@ const ListaQuestoes = () => {
                 <button
                   type="button"
                   onClick={limparFiltros}
-                  className="mt-2 cursor-pointer text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                  className="mt-2 cursor-pointer text-sm font-semibold text-xor-navy hover:text-xor-slate"
                 >
                   Limpar filtros
                 </button>

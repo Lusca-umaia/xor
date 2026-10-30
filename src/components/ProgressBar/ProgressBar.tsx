@@ -48,7 +48,7 @@ export default function ProgressBar() {
                   className={classNames(
                     'h-0.5 w-full',
                     stepHasBeenCompleted(stepIdx)
-                      ? 'bg-indigo-600'
+                      ? 'bg-xor-navy'
                       : 'bg-gray-200'
                   )}
                 />
@@ -56,9 +56,9 @@ export default function ProgressBar() {
               <div
                 className={classNames(
                   'relative flex size-8 items-center justify-center border-2 rounded-full',
-                  stepHasBeenCompleted(stepIdx) ? 'bg-indigo-600' : 'bg-white',
+                  stepHasBeenCompleted(stepIdx) ? 'bg-xor-navy' : 'bg-white',
                   stepHasBeenCompleted(stepIdx) || currentStep === step.stepName
-                    ? 'border-indigo-600'
+                    ? 'border-xor-navy'
                     : 'border-gray-300'
                 )}
               >
@@ -70,7 +70,7 @@ export default function ProgressBar() {
                     className={classNames(
                       'size-2.5 rounded-full',
                       currentStep === step.stepName
-                        ? 'bg-indigo-600'
+                        ? 'bg-xor-lime'
                         : 'bg-gray-200'
                     )}
                   />
