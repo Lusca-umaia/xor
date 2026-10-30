@@ -1,132 +1,194 @@
 'use client'
-import Header from '@/components/Header/Header'
-import Skeleton, { SkeletonCard } from '@/components/Skeleton/Skeleton'
-import { useProgresso } from '@/hooks/queries/useProgresso'
-import { LuTrendingUp } from 'react-icons/lu'
+import Link from 'next/link'
+import { useMemo } from 'react'
+import {
+  LuArrowRight,
+  LuBookOpen,
+  LuBot,
+  LuCirclePlay,
+  LuListChecks,
+  LuTimer,
+  LuTrendingUp
+} from 'react-icons/lu'
 import DisciplineCard from '@/components/DisciplineCard/DisciplineCard'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import IconeTile from '@/components/IconeTile/IconeTile'
 import ModuleCard from '@/components/ModuleCard/ModuleCard'
-import QuickStats from '@/components/QuickStats/QuickStats'
-import { GiProgression } from 'react-icons/gi'
-import { IoTimerSharp } from 'react-icons/io5'
-import { TbMessageChatbot } from 'react-icons/tb'
+import Skeleton, { SkeletonCard } from '@/components/Skeleton/Skeleton'
 import { STATUS_KEYS } from '@/components/CourseCard/CourseCard'
-import { FaTasks } from 'react-icons/fa'
+import { useProgresso } from '@/hooks/queries/useProgresso'
+import { useSessoesFoco } from '@/hooks/queries/useSessoesFoco'
+import GraficoSemana from '../pomodoro/components/GraficoSemana'
+import { CONFIG_PADRAO } from '../pomodoro/consts'
+import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
+import { resumirSessoes } from '../pomodoro/utils/estatisticas'
+import BoasVindas, { BoasVindasSkeleton } from './components/BoasVindas'
+import FocoHoje from './components/FocoHoje'
+import QuestionariosRecentes from './components/QuestionariosRecentes'
 
 const moduleCard = [
   {
     nome: 'Progressão de curso',
-    icon: <GiProgression className="text-4xl mx-auto" />,
+    icon: <LuTrendingUp />,
     path: '/courseProgression',
     descricao:
-      'Acompanhe o andamento das suas disciplinas em tempo real. Uma forma clara e visual de entender seu crescimento acadêmico.'
+      'Acompanhe suas disciplinas e veja quanto falta para concluir o curso.'
   },
   {
     nome: 'Pomodoro',
-    icon: <IoTimerSharp className="text-4xl mx-auto" />,
+    icon: <LuTimer />,
     path: '/pomodoro',
     descricao:
-      'Organize seu tempo de estudo com a técnica Pomodoro. Alterne entre períodos de foco e pausas estratégicas para manter a produtividade em alta.'
+      'Alterne períodos de foco e pausas para manter a produtividade em alta.'
   },
   {
-    nome: 'Chat com IA',
-    icon: <TbMessageChatbot className="text-4xl mx-auto" />,
+    nome: 'Assistente com IA',
+    icon: <LuBot />,
     path: '/chat',
     descricao:
-      'Tire dúvidas, revise conteúdos ou peça sugestões de estudo com a ajuda de uma Inteligência Artificial treinada para te apoiar durante a jornada.'
+      'Tire dúvidas, revise conteúdos e peça sugestões de estudo para a IA.'
   },
   {
     nome: 'Questões',
-    icon: <FaTasks className="text-4xl mx-auto" />,
+    icon: <LuListChecks />,
     path: '/questoes/lista-questionario',
-    descricao: 'Resolva questões para testar e reforçar seus conhecimentos.'
+    descricao: 'Resolva questionários para testar e fixar o conteúdo.'
   }
 ]
 
 const HomePage = () => {
   const { data, isLoading, isError } = useProgresso()
+  const { data: sessoes } = useSessoesFoco()
+  const [configPomodoro] = useArmazenado('xor:pomodoro:config', CONFIG_PADRAO)
+
+  // Só calcula depois de carregar: depende da data local do navegador.
+  const foco = useMemo(
+    () => (sessoes ? resumirSessoes(sessoes) : undefined),
+    [sessoes]
+  )
 
   const cadeirasAtivas =
     data?.disciplinas.filter(
       ({ status }) => status === STATUS_KEYS.ANDAMENTO
     ) ?? []
 
-  const primeiroNome = data?.aluno.nome.split(' ')[0]
-
   return (
-    <div>
-      {isLoading ? (
-        <div className="mb-4 space-y-2">
-          <Skeleton className="h-8 w-80 max-w-full" />
-          <Skeleton className="h-4 w-[32rem] max-w-full" />
-        </div>
-      ) : (
-        <Header
-          title={
-            primeiroNome
-              ? `Bem-vindo(a) de volta, ${primeiroNome}!`
-              : 'Bem-vindo(a) de volta!'
-          }
-          description="Acompanhe sua evolução, conclua desafios e aproveite ferramentas que potencializam seus estudos!"
+    <div className="space-y-4">
+      {isLoading && <BoasVindasSkeleton />}
+      {isError && (
+        <p className="text-sm font-medium text-red-600">
+          Não foi possível carregar seus dados.
+        </p>
+      )}
+      {data && (
+        <BoasVindas
+          aluno={data.aluno}
+          resumo={data.resumo}
+          foco={foco}
+          metaDiaria={configPomodoro.metaDiaria}
         />
       )}
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 2xl:grid-cols-4 items-start max-2xl:gap-y-4 2xl:gap-4">
-          <QuickStats
-            carregando={isLoading}
-            curso={data?.aluno.curso?.nome}
-            semestre={data?.aluno.semestreAtual}
-            progresso={data?.resumo.percentualGeral}
-          />
-          <div className="col-span-3 flex flex-col gap-4">
-            <div className="bg-white border border-gray-100 rounded-2xl space-y-6 shadow-lg p-6">
-              <span className="max-lg:text-base text-xl flex items-center gap-2">
-                <LuTrendingUp className="text-muted-foreground" />
-                <h3 className=" font-bold leading-none tracking-tight">
-                  Disciplinas em andamento
-                </h3>
-              </span>
-              {isLoading && (
-                <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
-                  {Array.from({ length: 4 }, (_, i) => (
-                    <SkeletonCard key={i} className="p-6" />
-                  ))}
+
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-3">
+        <div className="space-y-4 xl:col-span-2">
+          <section className="space-y-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-lg max-md:p-4">
+            <header className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <IconeTile>
+                  <LuBookOpen />
+                </IconeTile>
+                <div>
+                  <h2 className="text-lg font-bold leading-tight tracking-tight max-md:text-base">
+                    Disciplinas em andamento
+                  </h2>
+                  {data ? (
+                    <p className="text-sm text-gray-500">
+                      {data.aluno.semestreAtual}º semestre ·{' '}
+                      {cadeirasAtivas.length}{' '}
+                      {cadeirasAtivas.length === 1
+                        ? 'disciplina'
+                        : 'disciplinas'}
+                    </p>
+                  ) : (
+                    <Skeleton className="mt-1 h-4 w-40" />
+                  )}
                 </div>
-              )}
-              {isError && (
-                <p className="text-sm font-medium text-red-600">
-                  Não foi possível carregar seus dados.
-                </p>
-              )}
-              {data && cadeirasAtivas.length === 0 && (
-                <p className="text-sm text-gray-500">
-                  Nenhuma disciplina em andamento. Você pode escolher as
-                  disciplinas do próximo semestre na tela de progressão.
-                </p>
-              )}
-              <div className="grid grid-cols-1 2xl:grid-cols-2  gap-4">
+              </div>
+              <Link
+                href="/courseProgression"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-xor-navy hover:text-xor-slate"
+              >
+                Ver progressão
+                <LuArrowRight />
+              </Link>
+            </header>
+
+            {isLoading && (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {Array.from({ length: 4 }, (_, i) => (
+                  <SkeletonCard key={i} className="p-6" />
+                ))}
+              </div>
+            )}
+
+            {data && cadeirasAtivas.length === 0 && (
+              <EstadoVazio
+                icon={<LuCirclePlay />}
+                titulo="Nenhuma disciplina em andamento"
+                descricao="Escolha as disciplinas do próximo semestre na tela de progressão."
+                acao={
+                  <Link
+                    href="/courseProgression"
+                    className="rounded-md bg-xor-navy px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-xor-navy/90"
+                  >
+                    Ir para a progressão
+                  </Link>
+                }
+              />
+            )}
+
+            {cadeirasAtivas.length > 0 && (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {cadeirasAtivas.map((cadeira) => (
                   <DisciplineCard
                     key={cadeira.id}
                     id={cadeira.id}
                     nome={cadeira.nome}
+                    codigo={cadeira.codigo}
+                    cargaHoraria={cadeira.cargaHoraria}
+                    periodo={cadeira.periodo}
                     status={STATUS_KEYS.ANDAMENTO}
                   />
                 ))}
               </div>
-            </div>
-            <div className="grid grid-cols-2 max-md:grid-cols-1 2xl:grid-cols-3 justify-end gap-4">
-              {moduleCard.map((module) => (
-                <ModuleCard
-                  key={module.nome}
-                  icon={module.icon}
-                  nome={module.nome}
-                  path={module.path}
-                  descricao={module.descricao}
-                />
-              ))}
-            </div>
+            )}
+          </section>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {moduleCard.map((module) => (
+              <ModuleCard
+                key={module.nome}
+                icon={module.icon}
+                nome={module.nome}
+                path={module.path}
+                descricao={module.descricao}
+              />
+            ))}
           </div>
         </div>
+
+        <aside className="space-y-4">
+          <FocoHoje foco={foco} metaDiaria={configPomodoro.metaDiaria} />
+          {foco ? (
+            <GraficoSemana
+              dias={foco.ultimos7Dias}
+              metaMinutos={configPomodoro.metaDiaria * configPomodoro.foco}
+            />
+          ) : (
+            <Skeleton className="h-64 rounded-2xl" />
+          )}
+          <QuestionariosRecentes />
+        </aside>
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
-import { ReactNode, useCallback } from 'react'
+import Link from 'next/link'
+import { ReactNode } from 'react'
+import { LuArrowUpRight } from 'react-icons/lu'
+import IconeTile from '../IconeTile/IconeTile'
 
 interface ModuleCardProps {
   nome: string
@@ -10,36 +10,28 @@ interface ModuleCardProps {
   icon: ReactNode
 }
 
+// Atalho para um módulo do sistema; o card inteiro é o link.
 const ModuleCard: React.FC<ModuleCardProps> = ({
   descricao,
   nome,
   path,
   icon
-}) => {
-  const router = useRouter()
-
-  const handleNavigation = useCallback(() => {
-    router.push(path)
-  }, [path, router])
-
-  return (
-    <div className="bg-white border flex flex-col gap-6 border-gray-100 rounded-2xl shadow-lg p-6">
+}) => (
+  <Link
+    href={path}
+    className="group flex items-start gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-lg transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+  >
+    <IconeTile className="transition-colors duration-200 group-hover:bg-xor-navy group-hover:text-white">
       {icon}
-      <div className="flex text-center flex-col gap-2">
-        <h3 className="text-lg font-bold leading-none tracking-tight">
-          {nome}
-        </h3>
-        <p className="text-sm text-gray-400">{descricao}</p>
-      </div>
-      <button
-        type="button"
-        onClick={handleNavigation}
-        className="w-fit mt-auto rounded-xl block mx-auto bg-white px-3.5 py-3.5 cursor-pointer text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-      >
-        Entrar na sessão
-      </button>
+    </IconeTile>
+    <div className="min-w-0 flex-1 space-y-1">
+      <h3 className="font-bold leading-tight tracking-tight text-gray-900">
+        {nome}
+      </h3>
+      <p className="line-clamp-2 text-sm text-gray-500">{descricao}</p>
     </div>
-  )
-}
+    <LuArrowUpRight className="shrink-0 text-lg text-gray-300 transition-colors group-hover:text-xor-navy" />
+  </Link>
+)
 
 export default ModuleCard
