@@ -23,8 +23,5 @@ export function extrairIdPlaylist(entrada: string) {
   }
 }
 
-export const urlEmbed = (id: string) =>
-  `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(id)}`
-
 export const urlPlaylist = (id: string) =>
   `https://www.youtube.com/playlist?list=${encodeURIComponent(id)}`
