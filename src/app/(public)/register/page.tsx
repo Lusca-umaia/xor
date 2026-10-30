@@ -4,8 +4,9 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import CourseInformation from './components/CourseInformation'
 import PersonalInformation from './components/PersonalInformation'
 import { STEP_KEYS } from '@/helpers/consts'
+import Image from 'next/image'
 import Link from 'next/link'
-import { MdOutlineKeyboardArrowLeft } from 'react-icons/md'
+import { LuArrowLeft } from 'react-icons/lu'
 import CurrentSemester from './components/CurrentSemester'
 
 const STEP_TITLES = {
@@ -13,6 +14,14 @@ const STEP_TITLES = {
   [STEP_KEYS.PERSONAL_INFORMATION]: 'Informações pessoais',
   [STEP_KEYS.CURRENT_SEMESTER]: 'Informações do semestre atual'
 } as const
+
+const ORDEM_PASSOS = [
+  STEP_KEYS.PERSONAL_INFORMATION,
+  STEP_KEYS.COURSE_INFORMATION,
+  STEP_KEYS.CURRENT_SEMESTER
+]
+
+const formatarPasso = (numero: number) => String(numero).padStart(2, '0')
 
 const Register = () => {
   const searchParams = useSearchParams()
@@ -38,45 +47,74 @@ const Register = () => {
     )
   }
 
-  const handleBack = () => {
-    router.push('/')
-  }
+  const numeroPasso = ORDEM_PASSOS.indexOf(currentStep) + 1
 
   return (
-    <div className="px-4 max-w-7xl space-y-4 mx-auto mt-4 mb-8">
-      <div className=" flex flex-col justify-between">
-        <button
-          onClick={handleBack}
-          className="flex items-center cursor-pointer"
-        >
-          <MdOutlineKeyboardArrowLeft className="text-xl text-gray-500" />
-          <span className="leading-none text-sm gap-0.5 text-gray-500 font-medium">
-            Voltar
-          </span>
-        </button>
-        <h1 className="text-2xl font-bold">Cadastro do Aluno</h1>
-      </div>
-      <div className="space-y-2">
-        <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+    <div className="min-h-screen bg-gray-50">
+      <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <Link href="/">
+            <Image
+              src="/logo.png"
+              alt="XOR"
+              width={832}
+              height={389}
+              priority
+              className="h-9 w-auto"
+            />
+          </Link>
+          <p className="text-sm text-gray-500">
+            Já possui conta?{' '}
+            <Link
+              href="/login"
+              className="font-semibold text-xor-navy underline decoration-xor-lime decoration-2 underline-offset-4 hover:decoration-xor-navy"
+            >
+              Entrar
+            </Link>
+          </p>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
+        <div className="space-y-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900"
+          >
+            <LuArrowLeft />
+            Voltar ao início
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-xor-navy max-md:text-2xl">
+              Crie sua conta
+            </h1>
+            <p className="mt-1 text-gray-500 max-md:text-sm">
+              Em três passos você monta seu perfil acadêmico e já vê o seu
+              progresso no curso.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-gray-100 bg-white shadow-lg">
           <div className="px-4 py-6 sm:p-8">
             <ProgressBar />
-            <h2 className="text-base md:text-lg border-black/10 pb-3 my-3 border-b font-semibold">
-              {STEP_TITLES[currentStep]}
-            </h2>
+            <div className="mt-6 mb-6 flex items-center gap-3 border-b border-gray-100 pb-4">
+              {numeroPasso > 0 && (
+                <span className="rounded-md bg-xor-navy/5 px-2 py-1 font-mono text-xs font-bold text-xor-navy ring-1 ring-inset ring-xor-navy/10">
+                  {formatarPasso(numeroPasso)}/
+                  {formatarPasso(ORDEM_PASSOS.length)}
+                </span>
+              )}
+              <h2 className="text-lg font-bold tracking-tight max-md:text-base">
+                {STEP_TITLES[currentStep]}
+              </h2>
+            </div>
             <form onSubmit={(e) => e.preventDefault()}>
               {STEP_COMPONENTS[currentStep]}
             </form>
           </div>
         </div>
-        <div className="flex justify-center">
-          <span className="text-base font-medium">
-            Já possui conta?{' '}
-            <Link href={'/login'} className="text-indigo-600 underline">
-              Login
-            </Link>
-          </span>
-        </div>
-      </div>
+      </main>
     </div>
   )
 }
