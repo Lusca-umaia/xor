@@ -10,7 +10,7 @@ import PlaylistsTab from './components/PlaylistsTab'
 
 const TABS = [
   { key: 'playlists', label: 'Minhas playlists', icon: <LuPlay /> },
-  { key: 'livros', label: 'Livros abertos', icon: <LuBookOpen /> }
+  { key: 'livros', label: 'Livros de acesso livre', icon: <LuBookOpen /> }
 ] as const satisfies readonly { key: string; label: string; icon: ReactNode }[]
 
 type TabKey = (typeof TABS)[number]['key']
@@ -32,7 +32,7 @@ const MateriaisPage = () => {
     <div>
       <Header
         title="Materiais de estudo"
-        description="Playlists do YouTube e livros abertos para as suas disciplinas."
+        description="Playlists do YouTube e livros de acesso livre para as suas disciplinas."
       />
       <div className="space-y-4">
         <div
