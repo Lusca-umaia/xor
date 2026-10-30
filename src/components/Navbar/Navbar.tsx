@@ -3,6 +3,7 @@ import {
   LuCalendarDays,
   LuClipboardList,
   LuLibraryBig,
+  LuListChecks,
   LuGraduationCap,
   LuTimer,
   LuUserRound
@@ -29,6 +30,11 @@ export const options = [
     icon: <LuGraduationCap />,
     path: '/academico',
     name: 'Vida acadêmica'
+  },
+  {
+    icon: <LuListChecks />,
+    path: '/planejador',
+    name: 'Planejador de matrícula'
   },
   {
     icon: <LuCalendarDays />,
