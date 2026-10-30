@@ -1,7 +1,7 @@
 'use client'
 
 import clsx from 'clsx'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { LuLibrary, LuSearch, LuShieldCheck } from 'react-icons/lu'
 import { Material } from '@/@types/AmbienteEstudo'
@@ -37,6 +37,7 @@ export default function MateriaisPage() {
   const excluir = useExcluirMaterial()
 
   const [busca, setBusca] = useState('')
+  const router = useRouter()
   const [visualizando, setVisualizando] = useState<Material | null>(null)
   const [renomeando, setRenomeando] = useState<Material | null>(null)
   const [novoNome, setNovoNome] = useState('')
@@ -110,7 +111,14 @@ export default function MateriaisPage() {
               <ItemMaterial
                 key={material.id}
                 material={material}
-                aoVisualizar={() => setVisualizando(material)}
+                aoVisualizar={() =>
+                  // PDF abre no leitor; os outros tipos, na prévia lateral.
+                  material.tipo === 'PDF'
+                    ? router.push(
+                        `/ambientes/${ambienteId}/materiais/${material.id}`
+                      )
+                    : setVisualizando(material)
+                }
                 aoRenomear={() => {
                   setRenomeando(material)
                   setNovoNome(material.nome)

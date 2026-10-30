@@ -1,7 +1,9 @@
 'use client'
 
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { useState } from 'react'
-import { LuQuote } from 'react-icons/lu'
+import { LuBookOpen, LuQuote } from 'react-icons/lu'
 import { Citacao } from '@/@types/AmbienteEstudo'
 import Markdown from '../Markdown/Markdown'
 import Modal from '../Modal/Modal'
@@ -36,6 +38,17 @@ export function PainelCitacao({
   citacao: Citacao | null
   aoFechar: () => void
 }) {
+  const { ambienteId } = useParams<{ ambienteId?: string }>()
+  // Abre o material na página citada, com o trecho realçado no leitor.
+  const linkMaterial =
+    citacao && ambienteId && citacao.materialId
+      ? `/ambientes/${ambienteId}/materiais/${citacao.materialId}?${new URLSearchParams(
+          {
+            ...(citacao.pagina ? { pagina: String(citacao.pagina) } : {}),
+            trecho: citacao.trecho.replace(/…$/, '').slice(0, 400)
+          }
+        )}`
+      : null
   return (
     <Modal
       aberto={Boolean(citacao)}
@@ -49,6 +62,17 @@ export function PainelCitacao({
           <blockquote className="rounded-xl border-l-4 border-xor-navy bg-gray-50 p-4 text-sm text-gray-800">
             <Markdown conteudo={citacao.trecho} />
           </blockquote>
+          {linkMaterial && (
+            <Link
+              href={linkMaterial}
+              className="inline-flex items-center gap-2 rounded-lg bg-xor-navy px-3 py-2 text-sm font-semibold text-white hover:bg-xor-navy/90"
+            >
+              <LuBookOpen aria-hidden />
+              {citacao.pagina
+                ? `Abrir no material, página ${citacao.pagina}`
+                : 'Abrir o material'}
+            </Link>
+          )}
           <p className="text-xs text-gray-500">
             Este é o trecho do seu material usado para gerar o conteúdo. Se ele
             não sustenta o que foi dito, use o botão de reportar.

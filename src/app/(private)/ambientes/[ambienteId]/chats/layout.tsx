@@ -33,12 +33,15 @@ export default function ChatsLayout({ children }: { children: ReactNode }) {
   const excluir = useExcluirChat()
 
   const [criando, setCriando] = useState(false)
+  const [materiaisIniciais, setMateriaisIniciais] = useState<string[]>()
   const [renomeando, setRenomeando] = useState<Chat | null>(null)
   const [excluindo, setExcluindo] = useState<Chat | null>(null)
   const base = `/ambientes/${ambienteId}/chats`
 
   useEffect(() => {
     if (parametros.get('novo')) {
+      const material = parametros.get('material')
+      setMateriaisIniciais(material ? [material] : undefined)
       setCriando(true)
       router.replace(base, { scroll: false })
     }
@@ -51,7 +54,10 @@ export default function ChatsLayout({ children }: { children: ReactNode }) {
           ambienteId={ambienteId}
           chats={chats}
           chatAtivoId={chatAtivoId}
-          aoNovo={() => setCriando(true)}
+          aoNovo={() => {
+            setMateriaisIniciais(undefined)
+            setCriando(true)
+          }}
           aoRenomear={setRenomeando}
           aoAlternarFixado={(chat) =>
             atualizar.mutate({ id: chat.id, dados: { fixado: !chat.fixado } })
@@ -68,6 +74,7 @@ export default function ChatsLayout({ children }: { children: ReactNode }) {
         aoFechar={() => setCriando(false)}
         ambienteId={ambienteId}
         materiais={materiais}
+        materiaisIniciais={materiaisIniciais}
         salvando={criar.isPending}
         aoSalvar={(dados) =>
           criar.mutate(dados, {

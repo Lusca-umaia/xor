@@ -24,6 +24,8 @@ interface ModalContextoChatProps {
   materiais: Material[]
   /** Sem valores iniciais, o modal cria um chat novo. */
   inicial?: DadosContextoChat
+  /** Chat novo já com estes materiais (ex.: aberto pelo leitor de PDF). */
+  materiaisIniciais?: string[]
 }
 
 /** Cria um chat ou edita o contexto (materiais e modo) de um chat existente. */
@@ -34,7 +36,8 @@ export default function ModalContextoChat({
   salvando,
   ambienteId,
   materiais,
-  inicial
+  inicial,
+  materiaisIniciais
 }: ModalContextoChatProps) {
   const [dados, setDados] = useState<DadosContextoChat>({
     titulo: '',
@@ -47,9 +50,11 @@ export default function ModalContextoChat({
     setDados(
       inicial ?? {
         titulo: '',
-        materialIds: materiais
-          .filter(({ status }) => status === 'PRONTO')
-          .map(({ id }) => id),
+        materialIds:
+          materiaisIniciais ??
+          materiais
+            .filter(({ status }) => status === 'PRONTO')
+            .map(({ id }) => id),
         modo: 'TUTOR'
       }
     )
