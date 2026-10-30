@@ -1,23 +1,13 @@
 'use client'
 import clsx from 'clsx'
 import { useState } from 'react'
-import {
-  LuExternalLink,
-  LuPlay,
-  LuTrash2,
-  LuTriangleAlert
-} from 'react-icons/lu'
+import { LuPlay, LuTriangleAlert } from 'react-icons/lu'
 import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
 import { CHAVES } from '@/services/academico/chaves'
-import { extrairIdPlaylist, urlEmbed, urlPlaylist } from '@/utils/youtube'
+import { extrairIdPlaylist } from '@/utils/youtube'
 import { Card } from '../../academico/components/Comuns'
 import { useArmazenado } from '../../pomodoro/hooks/useArmazenado'
-
-interface Playlist {
-  id: string
-  playlistId: string
-  titulo: string
-}
+import PlayerPlaylist, { type Playlist } from './PlayerPlaylist'
 
 const campo = 'rounded-md border border-gray-300 px-2 py-1.5 text-sm'
 
@@ -105,7 +95,8 @@ const PlaylistsTab: React.FC = () => {
           )}
         </form>
         <p className="text-xs text-gray-500">
-          As playlists ficam salvas só neste navegador. O player usa o domínio
+          As playlists, o progresso, os vídeos assistidos e as anotações ficam
+          salvos só neste navegador. O player usa o domínio
           youtube-nocookie.com.
         </p>
       </Card>
@@ -117,45 +108,20 @@ const PlaylistsTab: React.FC = () => {
           descricao="Cole o link de uma playlist de estudo do YouTube para assistir aqui, ao lado dos seus outros materiais."
         />
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="space-y-4">
           {playlists.map((p) => (
-            <Card key={p.id}>
-              <div className="flex items-start justify-between gap-2">
-                <h4 className="font-bold leading-tight">{p.titulo}</h4>
-                <div className="flex shrink-0 items-center gap-3 text-gray-400">
-                  <a
-                    href={urlPlaylist(p.playlistId)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Abrir ${p.titulo} no YouTube`}
-                    className="hover:text-xor-navy"
-                  >
-                    <LuExternalLink />
-                  </a>
-                  <button
-                    type="button"
-                    aria-label={`Remover ${p.titulo}`}
-                    onClick={() =>
-                      setPlaylists((l) => l.filter((x) => x.id !== p.id))
-                    }
-                    className="cursor-pointer hover:text-red-600"
-                  >
-                    <LuTrash2 />
-                  </button>
-                </div>
-              </div>
-              <div className="aspect-video overflow-hidden rounded-xl bg-gray-100">
-                <iframe
-                  src={urlEmbed(p.playlistId)}
-                  title={`Playlist: ${p.titulo}`}
-                  loading="lazy"
-                  allow="accelerometer; encrypted-media; picture-in-picture; fullscreen"
-                  allowFullScreen
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  className="size-full"
-                />
-              </div>
-            </Card>
+            <PlayerPlaylist
+              key={p.id}
+              playlist={p}
+              onAtualizar={(patch) =>
+                setPlaylists((l) =>
+                  l.map((x) => (x.id === p.id ? { ...x, ...patch } : x))
+                )
+              }
+              onRemover={() =>
+                setPlaylists((l) => l.filter((x) => x.id !== p.id))
+              }
+            />
           ))}
         </div>
       )}
