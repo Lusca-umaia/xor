@@ -410,10 +410,9 @@ export default function LeitorPdf({
     void (async () => {
       try {
         const biblioteca = await import('pdfjs-dist')
-        biblioteca.GlobalWorkerOptions.workerSrc = new URL(
-          'pdfjs-dist/build/pdf.worker.min.mjs',
-          import.meta.url
-        ).toString()
+        // Copiado de node_modules por scripts/copiar-worker-pdf.mjs. A versão
+        // na URL evita usar um worker antigo do cache depois de atualizar.
+        biblioteca.GlobalWorkerOptions.workerSrc = `/pdfjs/pdf.worker.min.mjs?v=${biblioteca.version}`
         carregamento = biblioteca.getDocument({ url })
         const documento = await carregamento.promise
         const medidas: Tamanho[] = []

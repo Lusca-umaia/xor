@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# worker do pdf.js, copiado de node_modules (scripts/copiar-worker-pdf.mjs)
+/public/pdfjs/

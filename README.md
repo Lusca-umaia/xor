@@ -26,7 +26,7 @@ O XOR ajuda o aluno da Universidade Federal do Ceará a acompanhar a própria gr
 
 ## Como rodar
 
-Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
+Pré-requisitos: Node.js 22.13 ou superior (o leitor e a extração de PDF dependem do `pdfjs-dist`, que exige essa versão; o `.nvmrc` já aponta para o Node 22), npm e um projeto no Supabase.
 
 1. Instale as dependências:
 
