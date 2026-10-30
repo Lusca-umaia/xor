@@ -40,6 +40,8 @@ interface FormGerarAtividadeProps {
   ambienteId: string
   materiais: Material[]
   tipoInicial?: TipoAtividade
+  /** Tópico já preenchido (ex.: "Praticar" um ponto fraco na visão geral). */
+  topicoInicial?: string
 }
 
 export default function FormGerarAtividade({
@@ -49,7 +51,8 @@ export default function FormGerarAtividade({
   gerando = false,
   ambienteId,
   materiais,
-  tipoInicial = 'QUIZ'
+  tipoInicial = 'QUIZ',
+  topicoInicial = ''
 }: FormGerarAtividadeProps) {
   const [tipo, setTipo] = useState<TipoAtividade>(tipoInicial)
   const [materialIds, setMaterialIds] = useState<string[]>([])
@@ -65,11 +68,11 @@ export default function FormGerarAtividade({
     setMaterialIds(
       materiais.filter(({ status }) => status === 'PRONTO').map(({ id }) => id)
     )
-    setTopico('')
+    setTopico(topicoInicial)
     setTitulo('')
     // Só ao abrir: não sobrescreve a seleção se a lista de materiais atualizar.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aberto, tipoInicial])
+  }, [aberto, tipoInicial, topicoInicial])
 
   const escolherTipo = (novo: TipoAtividade) => {
     setTipo(novo)

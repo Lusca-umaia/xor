@@ -35,17 +35,24 @@ export default function AtividadesPage() {
 
   const [formAberto, setFormAberto] = useState(false)
   const [tipoInicial, setTipoInicial] = useState<TipoAtividade>('QUIZ')
+  const [topicoInicial, setTopicoInicial] = useState('')
   const [filtro, setFiltro] = useState<TipoAtividade | 'TODAS'>('TODAS')
   const [excluindo, setExcluindo] = useState<AtividadeListagem | null>(null)
 
-  // Atalhos da visão geral chegam com ?novo=1 (e opcionalmente &tipo=...).
+  // Atalhos da visão geral chegam com ?novo=1 (e opcionalmente &tipo= e &topico=).
   useEffect(() => {
     if (parametros.get('novo')) {
       setTipoInicial((parametros.get('tipo') as TipoAtividade | null) ?? 'QUIZ')
+      setTopicoInicial(parametros.get('topico')?.slice(0, 200) ?? '')
       setFormAberto(true)
       router.replace(`/ambientes/${ambienteId}/atividades`, { scroll: false })
     }
   }, [parametros, router, ambienteId])
+
+  const abrirNovo = () => {
+    setTopicoInicial('')
+    setFormAberto(true)
+  }
 
   const filtradas = (atividades ?? []).filter(
     ({ tipo }) => filtro === 'TODAS' || tipo === filtro
@@ -95,7 +102,7 @@ export default function AtividadesPage() {
         <Botao
           variante="primario"
           icone={<LuPlus aria-hidden />}
-          onClick={() => setFormAberto(true)}
+          onClick={abrirNovo}
         >
           Gerar atividade
         </Botao>
@@ -109,7 +116,7 @@ export default function AtividadesPage() {
           titulo="Nenhuma atividade ainda"
           descricao="Gere quizzes, questões de verdadeiro ou falso, lacunas, discursivas com rubrica ou flashcards a partir dos seus materiais."
           acao={
-            <Botao variante="primario" onClick={() => setFormAberto(true)}>
+            <Botao variante="primario" onClick={abrirNovo}>
               Gerar primeira atividade
             </Botao>
           }
@@ -137,6 +144,7 @@ export default function AtividadesPage() {
         ambienteId={ambienteId}
         materiais={materiais}
         tipoInicial={tipoInicial}
+        topicoInicial={topicoInicial}
         gerando={gerar.isPending}
         aoGerar={(config) =>
           gerar.mutate(config, { onSuccess: () => setFormAberto(false) })
