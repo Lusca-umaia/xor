@@ -7,6 +7,7 @@ import { useRegisterContext } from '@/context/RegisterContext'
 import { LuPencilLine } from 'react-icons/lu'
 import DisciplinaBox from '../DisciplinaBox/DisciplinaBox'
 import CadastroManual from '../CadastroManual/CadastroManual'
+import ExtrasPeriodo from './ExtrasPeriodo'
 
 function numeroDoPeriodo(periodo: string | null): number {
   const correspondencia = periodo?.match(/^(\d{4})\.([12])$/)
@@ -39,7 +40,8 @@ const CadeirasRealizadas = () => {
     cadeirasPendentes,
     removerDisciplinaHistorico,
     restaurarDisciplinasHistorico,
-    totalRemovidasHistorico
+    totalRemovidasHistorico,
+    cursadasExtrasHistorico
   } = useRegisterContext()
 
   const [editandoNotas, setEditandoNotas] = useState(false)
@@ -91,7 +93,7 @@ const CadeirasRealizadas = () => {
                 <button
                   type="button"
                   onClick={restaurarDisciplinasHistorico}
-                  className="cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
+                  className="cursor-pointer font-semibold text-xor-navy hover:text-xor-slate"
                 >
                   desfazer
                 </button>
@@ -116,7 +118,9 @@ const CadeirasRealizadas = () => {
               {periodo}
             </h3>
             <span className="rounded-md px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-200">
-              {cadeiras.length} disciplina(s)
+              {cadeiras.length +
+                (cursadasExtrasHistorico[periodo]?.length ?? 0)}{' '}
+              disciplina(s)
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -145,6 +149,7 @@ const CadeirasRealizadas = () => {
               />
             ))}
           </div>
+          {periodo !== 'Sem período' && <ExtrasPeriodo periodo={periodo} />}
         </div>
       ))}
 

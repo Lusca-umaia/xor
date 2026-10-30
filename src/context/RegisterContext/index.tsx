@@ -66,8 +66,18 @@ export interface Register {
     nota: number | null
   ) => void
   removerCursada: (semestreId: string, codigo: string) => void
-  // Disciplinas manuais com alguma aprovação em semestres cursados.
+  // Disciplinas com aprovação registrada à mão (semestres ou períodos do histórico).
   codigosAprovadosManual: Set<string>
+  // Disciplinas adicionadas à mão em um período que veio do histórico.
+  cursadasExtrasHistorico: Record<string, CursadaManual[]>
+  adicionarCursadaHistorico: (
+    periodo: string,
+    disciplina: DadosDisciplina,
+    resultado: Omit<CursadaManual, 'codigo'>
+  ) => string | null
+  removerCursadaHistorico: (periodo: string, codigo: string) => void
+  // Todas as disciplinas conhecidas no cadastro (histórico + manuais).
+  catalogoDisciplinas: DadosDisciplina[]
   montarCadastro: () => CadastroInput
 }
 
@@ -217,6 +227,9 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
   const [removidasHistorico, setRemovidasHistorico] = useState<Set<string>>(
     new Set()
   )
+  const [cursadasExtrasHistorico, setCursadasExtrasHistorico] = useState<
+    Record<string, CursadaManual[]>
+  >({})
 
   const handleChangeFormData = useCallback(
     (value: string | number | null, path: keyof Register['formData']) => {
@@ -272,6 +285,7 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
 
   const restaurarDisciplinasHistorico = useCallback(() => {
     setRemovidasHistorico(new Set())
+    setCursadasExtrasHistorico({})
   }, [])
 
   const importarHistorico = useCallback((resultado: ResultadoHistorico) => {
@@ -283,6 +297,7 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
     setHistorico(resultado)
     setNotasAjustadas({})
     setRemovidasHistorico(new Set())
+    setCursadasExtrasHistorico({})
     setFormData((prevFormData) => ({
       ...prevFormData,
       cursoNome: resultado.dadosCurso.nome ?? prevFormData.cursoNome,
@@ -297,6 +312,7 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
     setHistorico(null)
     setNotasAjustadas({})
     setRemovidasHistorico(new Set())
+    setCursadasExtrasHistorico({})
     setFormData((prevFormData) => ({
       ...prevFormData,
       cursoNome: '',
@@ -310,13 +326,102 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
   const codigosAprovadosManual = useMemo(
     () =>
       new Set(
-        formData.semestresManuais.flatMap(({ cursadas }) =>
+        [
+          ...formData.semestresManuais.map(({ cursadas }) => cursadas),
+          ...Object.values(cursadasExtrasHistorico)
+        ].flatMap((cursadas) =>
           cursadas
             .filter(({ status }) => status === 'APROVADA')
             .map(({ codigo }) => codigo)
         )
       ),
-    [formData.semestresManuais]
+    [formData.semestresManuais, cursadasExtrasHistorico]
+  )
+
+  const catalogoDisciplinas = useMemo(() => {
+    const catalogo = new Map<string, DadosDisciplina>()
+
+    for (const cadeira of [...cadeirasHistorico, ...cadeirasPendentes]) {
+      const codigo = codigoDaCadeira(cadeira)
+      if (!catalogo.has(codigo)) {
+        catalogo.set(codigo, {
+          codigo,
+          nome: cadeira.nome,
+          cargaHoraria: cadeira.cargaHoraria,
+          carater: cadeira.carater
+        })
+      }
+    }
+    for (const {
+      codigo,
+      nome,
+      cargaHoraria,
+      carater
+    } of formData.disciplinasManuais) {
+      if (!catalogo.has(codigo)) {
+        catalogo.set(codigo, { codigo, nome, cargaHoraria, carater })
+      }
+    }
+
+    return [...catalogo.values()]
+  }, [cadeirasHistorico, cadeirasPendentes, formData.disciplinasManuais])
+
+  const adicionarCursadaHistorico = useCallback(
+    (
+      periodo: string,
+      disciplina: DadosDisciplina,
+      { status, nota }: Omit<CursadaManual, 'codigo'>
+    ) => {
+      const codigo = normalizarCodigo(disciplina.codigo)
+      if (!codigo) return 'Informe um código válido'
+
+      const noPeriodo =
+        cadeirasHistorico.some(
+          (c) => c.periodo === periodo && codigoDaCadeira(c) === codigo
+        ) || cursadasExtrasHistorico[periodo]?.some((c) => c.codigo === codigo)
+      if (noPeriodo) return 'Essa disciplina já está neste período'
+
+      const jaAprovada =
+        cadeirasHistorico.some(
+          (c) => c.status === 'CONCLUIDA' && codigoDaCadeira(c) === codigo
+        ) || codigosAprovadosManual.has(codigo)
+      if (status === 'APROVADA' && jaAprovada) {
+        return 'Essa disciplina já foi aprovada'
+      }
+
+      // Disciplina nova (fora do histórico) entra no catálogo manual.
+      if (!catalogoDisciplinas.some((d) => d.codigo === codigo)) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          disciplinasManuais: [
+            ...prevFormData.disciplinasManuais,
+            { ...disciplina, codigo, emAndamento: false }
+          ]
+        }))
+      }
+
+      setCursadasExtrasHistorico((prev) => ({
+        ...prev,
+        [periodo]: [...(prev[periodo] ?? []), { codigo, status, nota }]
+      }))
+      return null
+    },
+    [
+      cadeirasHistorico,
+      cursadasExtrasHistorico,
+      codigosAprovadosManual,
+      catalogoDisciplinas
+    ]
+  )
+
+  const removerCursadaHistorico = useCallback(
+    (periodo: string, codigo: string) => {
+      setCursadasExtrasHistorico((prev) => ({
+        ...prev,
+        [periodo]: (prev[periodo] ?? []).filter((c) => c.codigo !== codigo)
+      }))
+    },
+    []
   )
 
   const adicionarDisciplinaManual = useCallback(
@@ -495,13 +600,37 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
       )
       const codigos = new Set(doHistorico.disciplinas.map((d) => d.codigo))
 
+      const disciplinas = [
+        ...doHistorico.disciplinas,
+        ...manual.disciplinas.filter((d) => !codigos.has(d.codigo))
+      ]
+      const codigosFinais = new Set(disciplinas.map((d) => d.codigo))
+
+      // Adicionadas à mão em períodos do histórico. Ignora as de disciplinas
+      // que o aluno removeu do histórico depois.
+      const extras = Object.entries(cursadasExtrasHistorico).flatMap(
+        ([periodo, cursadas]) =>
+          cursadas
+            .filter(({ codigo }) => codigosFinais.has(codigo))
+            .map(
+              ({ codigo, status, nota }): TentativaCadastro => ({
+                codigo,
+                status,
+                nota: status === 'TRANCADA' ? null : nota,
+                periodo,
+                semestre: calcularSemestreAtual(
+                  historico.dadosCurso.anoPeriodoInicial,
+                  periodo
+                )
+              })
+            )
+      )
+
       academico = {
-        disciplinas: [
-          ...doHistorico.disciplinas,
-          ...manual.disciplinas.filter((d) => !codigos.has(d.codigo))
-        ],
+        disciplinas,
         tentativas: [
           ...doHistorico.tentativas,
+          ...extras,
           ...manual.tentativas.filter((t) => !codigos.has(t.codigo))
         ]
       }
@@ -518,7 +647,13 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
       cargaOptativaExigida: formData.cargaOptativaExigida,
       ...academico
     }
-  }, [formData, historico, cadeirasHistorico, cadeirasPendentes])
+  }, [
+    formData,
+    historico,
+    cadeirasHistorico,
+    cadeirasPendentes,
+    cursadasExtrasHistorico
+  ])
 
   return (
     <RegisterContext.Provider
@@ -544,6 +679,10 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
         atualizarNotaCursada,
         removerCursada,
         codigosAprovadosManual,
+        cursadasExtrasHistorico,
+        adicionarCursadaHistorico,
+        removerCursadaHistorico,
+        catalogoDisciplinas,
         montarCadastro
       }}
     >
