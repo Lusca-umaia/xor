@@ -174,7 +174,7 @@ export const mapearResumo = (row: ResumoRow): Resumo => ({
 })
 
 export const COLUNAS_ATIVIDADE =
-  'id, ambiente_id, titulo, tipo, material_ids, dificuldade, questoes, flashcards, origem_chat_id, origem_resumo_id, status, criado_em'
+  'id, ambiente_id, titulo, tipo, material_ids, dificuldade, topico, questoes, flashcards, origem_chat_id, origem_resumo_id, status, mensagem_erro, criado_em'
 
 export interface AtividadeRow {
   id: string
@@ -183,11 +183,13 @@ export interface AtividadeRow {
   tipo: TipoAtividade
   material_ids: string[]
   dificuldade: DificuldadeConfig
+  topico: string | null
   questoes: Questao[]
   flashcards: Flashcard[]
   origem_chat_id: string | null
   origem_resumo_id: string | null
   status: StatusGeracao
+  mensagem_erro: string | null
   criado_em: string
 }
 
@@ -198,11 +200,13 @@ export const mapearAtividade = (row: AtividadeRow): Atividade => ({
   tipo: row.tipo,
   materialIds: row.material_ids ?? [],
   dificuldade: row.dificuldade,
+  topico: row.topico,
   questoes: row.questoes ?? [],
   flashcards: row.flashcards ?? [],
   origemChatId: row.origem_chat_id,
   origemResumoId: row.origem_resumo_id,
   status: row.status,
+  mensagemErro: row.mensagem_erro,
   criadoEm: row.criado_em
 })
 
