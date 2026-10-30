@@ -2,7 +2,7 @@
 
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { useState } from 'react'
-import { LuShieldCheck, LuUserPen } from 'react-icons/lu'
+import { LuLock, LuShieldCheck, LuUserPen } from 'react-icons/lu'
 import Header from '@/components/Header/Header'
 import Skeleton from '@/components/Skeleton/Skeleton'
 import { usePerfil } from '@/hooks/queries/usePerfil'
@@ -10,6 +10,7 @@ import AlterarEmail from './components/AlterarEmail'
 import AlterarSenha from './components/AlterarSenha'
 import DadosGerais from './components/DadosGerais'
 import PerfilHero, { PerfilHeroSkeleton } from './components/PerfilHero'
+import PrivacidadeIA from './components/PrivacidadeIA'
 
 const ABAS = [
   {
@@ -21,6 +22,11 @@ const ABAS = [
     label: 'Login e segurança',
     descricao: 'Email e senha',
     icon: <LuShieldCheck />
+  },
+  {
+    label: 'Privacidade e IA',
+    descricao: 'Dados locais e uso de IA',
+    icon: <LuLock />
   }
 ]
 
@@ -31,6 +37,7 @@ const PerfilSkeleton = () => (
     <PerfilHeroSkeleton />
     <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[18rem_1fr]">
       <div className="space-y-2 rounded-2xl border border-gray-100 bg-white p-2 shadow-lg max-lg:flex max-lg:gap-2 max-lg:space-y-0">
+        <Skeleton className="h-12 w-full rounded-xl max-lg:w-36" />
         <Skeleton className="h-12 w-full rounded-xl max-lg:w-36" />
         <Skeleton className="h-12 w-full rounded-xl max-lg:w-36" />
       </div>
@@ -104,6 +111,9 @@ export default function PerfilPage() {
               <TabPanel className="space-y-4 outline-none">
                 <AlterarEmail perfil={perfil} />
                 <AlterarSenha />
+              </TabPanel>
+              <TabPanel className="outline-none">
+                <PrivacidadeIA />
               </TabPanel>
             </TabPanels>
           </TabGroup>
