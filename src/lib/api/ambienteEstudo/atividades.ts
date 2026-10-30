@@ -77,9 +77,12 @@ export async function listarAtividades(
     const daAtividade = linhas.filter(
       ({ atividade_id }) => atividade_id === row.id
     )
-    const melhor = daAtividade
-      .filter(({ concluida_em }) => concluida_em)
-      .sort((a, b) => b.acertos - a.acertos)[0]
+    const concluidas = daAtividade.filter(({ concluida_em }) => concluida_em)
+    const melhor = [...concluidas].sort((a, b) => b.acertos - a.acertos)[0]
+    const ultima = concluidas
+      .map(({ concluida_em }) => concluida_em as string)
+      .sort()
+      .at(-1)
     return {
       ...mapearAtividade(row),
       melhorResultado: melhor
@@ -88,7 +91,8 @@ export async function listarAtividades(
       tentativaEmAndamento: daAtividade.some(
         ({ concluida_em }) => !concluida_em
       ),
-      flashcardsPendentes: contarPendentes(row.flashcards ?? [])
+      flashcardsPendentes: contarPendentes(row.flashcards ?? []),
+      ultimaConclusaoEm: ultima ?? null
     }
   })
 }
@@ -143,7 +147,11 @@ export async function gerarAtividade(
       aluno_id: ctx.user.id,
       ambiente_id: ambienteId,
       titulo: (
-        config.titulo?.trim() || ROTULO_TIPO_ATIVIDADE[config.tipo]
+        config.titulo?.trim() ||
+        // Sem título, o tópico diferencia atividades do mesmo tipo.
+        [ROTULO_TIPO_ATIVIDADE[config.tipo], config.topico?.trim()]
+          .filter(Boolean)
+          .join(': ')
       ).slice(0, 200),
       tipo: config.tipo,
       material_ids: config.materialIds,

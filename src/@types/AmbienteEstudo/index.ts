@@ -244,11 +244,14 @@ export interface Atividade {
   tipo: TipoAtividade
   materialIds: string[]
   dificuldade: DificuldadeConfig
+  /** Tópico pedido ao gerar (opcional). */
+  topico: string | null
   questoes: Questao[]
   flashcards: Flashcard[]
   origemChatId: string | null
   origemResumoId: string | null
   status: StatusGeracao
+  mensagemErro: string | null
   criadoEm: string
 }
 
@@ -283,6 +286,8 @@ export interface AtividadeListagem extends Atividade {
   melhorResultado: { acertos: number; total: number } | null
   tentativaEmAndamento: boolean
   flashcardsPendentes: number
+  /** Quando a última tentativa foi concluída (para ordenar e agrupar). */
+  ultimaConclusaoEm: string | null
 }
 
 // ---------- Simulados ----------
