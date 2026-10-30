@@ -1,0 +1,76 @@
+/*
+ * Camada de texto do pdf.js (seleção, busca e destaque de citações).
+ * Trecho mínimo de pdfjs-dist/web/pdf_viewer.css; o resto do visualizador
+ * oficial não é usado.
+ */
+.leitor-pdf .textLayer {
+  color-scheme: only light;
+  position: absolute;
+  text-align: initial;
+  inset: 0;
+  overflow: clip;
+  opacity: 1;
+  line-height: 1;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  caret-color: CanvasText;
+  z-index: 0;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+
+.leitor-pdf .textLayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  user-select: text;
+}
+
+.leitor-pdf .textLayer > :not(.markedContent),
+.leitor-pdf .textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x))
+    scale(var(--min-font-size-inv));
+}
+
+.leitor-pdf .textLayer .markedContent {
+  display: contents;
+}
+
+.leitor-pdf .textLayer ::selection {
+  background: rgb(29 52 70 / 0.25);
+  color: transparent;
+}
+
+.leitor-pdf .textLayer br::selection {
+  background: transparent;
+}
+
+/* Ocorrência da busca. */
+.leitor-pdf .textLayer mark.busca {
+  position: static;
+  color: transparent;
+  background: rgb(198 222 52 / 0.65);
+  border-radius: 2px;
+}
+
+.leitor-pdf .textLayer mark.busca.atual {
+  background: rgb(29 52 70 / 0.35);
+  outline: 2px solid rgb(29 52 70 / 0.6);
+}
+
+/* Trecho citado pela IA (aberto a partir de uma fonte). */
+.leitor-pdf .textLayer span.citado {
+  background: rgb(198 222 52 / 0.45);
+  border-radius: 2px;
+}
