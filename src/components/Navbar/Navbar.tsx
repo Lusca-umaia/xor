@@ -1,5 +1,5 @@
 'use client'
-import { LuTimer, LuUserRound } from 'react-icons/lu'
+import { LuGraduationCap, LuTimer, LuUserRound } from 'react-icons/lu'
 import { FaTasks } from 'react-icons/fa'
 import { GiProgression } from 'react-icons/gi'
 import { FaHome } from 'react-icons/fa'
@@ -17,6 +17,11 @@ export const options = [
     icon: <GiProgression />,
     path: '/courseProgression',
     name: 'Progressão de curso'
+  },
+  {
+    icon: <LuGraduationCap />,
+    path: '/ambientes',
+    name: 'Ambientes de estudo'
   },
   {
     icon: <LuTimer />,
