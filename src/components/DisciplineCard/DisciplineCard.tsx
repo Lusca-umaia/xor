@@ -1,17 +1,15 @@
 'use client'
+import Link from 'next/link'
 import { useState } from 'react'
-import { BsLightningCharge } from 'react-icons/bs'
 import { RiProgress2Line } from 'react-icons/ri'
 import { STATUS_KEYS } from '../CourseCard/CourseCard'
 import { MdOutlineDoneAll } from 'react-icons/md'
 import ModalEncerrarCadeiraParcialmente from '../ModalEncerrarCadeiraParcialmente/ModalEncerrarCadeiraParcialmente'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 
 interface DisciplineCardProps {
   nome: string
   id: number
   status: (typeof STATUS_KEYS)['ANDAMENTO'] | (typeof STATUS_KEYS)['CONCLUIDA']
-  xp: number
 }
 
 const CARD_STATUS_INFORMATION = {
@@ -28,7 +26,6 @@ const CARD_STATUS_INFORMATION = {
 const DisciplineCard: React.FC<DisciplineCardProps> = ({
   nome,
   id,
-  xp,
   status
 }) => {
   const { icon, label } = CARD_STATUS_INFORMATION[status]
@@ -49,10 +46,6 @@ const DisciplineCard: React.FC<DisciplineCardProps> = ({
         </h3>
         <div className="flex max-lg:flex-col justify-center gap-2">
           <span className="whitespace-nowrap inline-flex justify-center items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
-            <BsLightningCharge className="text-xl text-muted-foreground" />
-            {xp} XP
-          </span>
-          <span className="whitespace-nowrap inline-flex justify-center items-center gap-x-1.5 rounded-md px-2 py-1 text-xs font-medium text-gray-900 ring-1 ring-inset ring-gray-200">
             {icon}
             {label}
           </span>
@@ -68,12 +61,12 @@ const DisciplineCard: React.FC<DisciplineCardProps> = ({
             Concluir cadeira
           </button>
         )}
-        <button
-          type="button"
-          className="w-full rounded-xl bg-white px-3.5 py-3.5 cursor-pointer text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+        <Link
+          href={`/questoes/lista-questionario?disciplina=${id}`}
+          className="w-full text-center rounded-xl bg-white px-3.5 py-3.5 cursor-pointer text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
         >
           Ver questões
-        </button>
+        </Link>
       </div>
       <ModalEncerrarCadeiraParcialmente
         disciplinaId={id}

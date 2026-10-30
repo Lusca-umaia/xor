@@ -6,6 +6,7 @@ import { CadeiraHistorico } from '@/@types/Historico'
 import { useRegisterContext } from '@/context/RegisterContext'
 import { LuPencilLine } from 'react-icons/lu'
 import DisciplinaBox from '../DisciplinaBox/DisciplinaBox'
+import CadastroManual from '../CadastroManual/CadastroManual'
 
 function numeroDoPeriodo(periodo: string | null): number {
   const correspondencia = periodo?.match(/^(\d{4})\.([12])$/)
@@ -32,14 +33,13 @@ function agruparPorPeriodo(cadeiras: CadeiraHistorico[]) {
 
 const CadeirasRealizadas = () => {
   const {
-    handleChangeCadeiraRealizada,
-    CADEIRAS_REALIZADAS,
     handleChangeNotaCadeiraRealizada,
-    optativas,
-    obrigatorias,
     historico,
     cadeirasHistorico,
-    cadeirasPendentes
+    cadeirasPendentes,
+    removerDisciplinaHistorico,
+    restaurarDisciplinasHistorico,
+    totalRemovidasHistorico
   } = useRegisterContext()
 
   const [editandoNotas, setEditandoNotas] = useState(false)
@@ -69,100 +69,7 @@ const CadeirasRealizadas = () => {
   if (!historico) {
     return (
       <fieldset>
-        {(Object.entries(obrigatorias).length > 0 || optativas.length > 0) && (
-          <p className="text-sm font-semibold leading-6 text-gray-900">
-            Selecione as cadeiras que você já cursou:
-          </p>
-        )}
-        <div className="space-y-4 flex flex-col mt-1">
-          {Object.entries(obrigatorias).map(([semestre, cadeiras]) => {
-            return (
-              <div key={semestre} className="space-y-4">
-                <span className="text-xl flex items-center gap-2">
-                  <div className="flex gap-4 items-center">
-                    <h3 className="font-bold leading-none  text-sm tracking-tight">
-                      {semestre}º Semestre
-                    </h3>
-                  </div>
-                </span>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {cadeiras!.map((cadeira) => (
-                    <DisciplinaBox
-                      key={cadeira.codigo}
-                      nota={CADEIRAS_REALIZADAS[cadeira.id]?.nota}
-                      handleChangeNota={(value) => {
-                        handleChangeNotaCadeiraRealizada(
-                          cadeira.id,
-                          parseFloat(value)
-                        )
-                      }}
-                      onClick={() => handleChangeCadeiraRealizada(cadeira.id)}
-                      carater={cadeira.carater}
-                      status={
-                        CADEIRAS_REALIZADAS[cadeira.id.toString()]
-                          ? 'CONCLUIDA'
-                          : 'PENDENTE'
-                      }
-                      cargaHoraria={cadeira.cargaHoraria}
-                      codigo={cadeira.codigo}
-                      nome={cadeira.nome}
-                      periodo={`${cadeira.semestre}º semestre`}
-                      editavel={editandoNotas}
-                    />
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-          {optativas && optativas.length > 0 && (
-            <div className="space-y-4 flex flex-col mt-1">
-              <div className="space-y-4 ">
-                <span className="text-xl flex items-center gap-2">
-                  <div className="flex gap-4 items-center">
-                    <h3 className="font-bold leading-none  text-sm tracking-tight">
-                      Optativas
-                    </h3>
-                  </div>
-                </span>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {optativas.map((cadeira) => (
-                    <DisciplinaBox
-                      key={cadeira.codigo}
-                      handleChangeNota={(value) =>
-                        handleChangeNotaCadeiraRealizada(
-                          cadeira.id,
-                          parseFloat(value)
-                        )
-                      }
-                      nota={CADEIRAS_REALIZADAS[cadeira.id]?.nota}
-                      onClick={() => handleChangeCadeiraRealizada(cadeira.id)}
-                      carater={cadeira.carater}
-                      status={
-                        CADEIRAS_REALIZADAS[cadeira.id.toString()]
-                          ? 'CONCLUIDA'
-                          : 'PENDENTE'
-                      }
-                      cargaHoraria={cadeira.cargaHoraria}
-                      codigo={cadeira.codigo}
-                      nome={cadeira.nome}
-                      editavel={editandoNotas}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="mt-4 flex justify-end">
-          <button
-            type="button"
-            onClick={() => setEditandoNotas((prev) => !prev)}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            <LuPencilLine className="text-sm" />
-            {editandoNotas ? 'Concluir edição' : 'Editar notas'}
-          </button>
-        </div>
+        <CadastroManual />
       </fieldset>
     )
   }
@@ -177,6 +84,19 @@ const CadeirasRealizadas = () => {
           <p className="text-xs font-medium text-gray-500">
             {totalConcluidas} concluída(s) · {emAndamento.length} em andamento ·{' '}
             {totalReprovadas} reprovada(s)
+            {totalRemovidasHistorico > 0 && (
+              <>
+                {' · '}
+                {totalRemovidasHistorico} removida(s){' '}
+                <button
+                  type="button"
+                  onClick={restaurarDisciplinasHistorico}
+                  className="cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
+                >
+                  desfazer
+                </button>
+              </>
+            )}
           </p>
         </div>
         <button
@@ -203,6 +123,7 @@ const CadeirasRealizadas = () => {
             {cadeiras.map((cadeira) => (
               <DisciplinaBox
                 key={`${cadeira.codigo}-${cadeira.periodo}`}
+                onRemover={() => removerDisciplinaHistorico(cadeira)}
                 nome={cadeira.nome}
                 codigo={cadeira.codigo}
                 cargaHoraria={cadeira.cargaHoraria}
@@ -241,6 +162,7 @@ const CadeirasRealizadas = () => {
             {emAndamento.map((cadeira) => (
               <DisciplinaBox
                 key={`${cadeira.codigo}-${cadeira.periodo}`}
+                onRemover={() => removerDisciplinaHistorico(cadeira)}
                 nome={cadeira.nome}
                 codigo={cadeira.codigo}
                 cargaHoraria={cadeira.cargaHoraria}
@@ -272,6 +194,7 @@ const CadeirasRealizadas = () => {
             {cadeirasPendentes.map((cadeira) => (
               <DisciplinaBox
                 key={cadeira.codigo}
+                onRemover={() => removerDisciplinaHistorico(cadeira)}
                 nome={cadeira.nome}
                 codigo={cadeira.codigo}
                 cargaHoraria={cadeira.cargaHoraria}
@@ -285,6 +208,12 @@ const CadeirasRealizadas = () => {
           </div>
         </div>
       )}
+      <div className="border-t border-black/10 pt-5">
+        <CadastroManual
+          titulo="Faltou alguma disciplina?"
+          descricao="Adicione semestres ou disciplinas que não aparecem no histórico. Códigos que já vieram do histórico são ignorados."
+        />
+      </div>
     </fieldset>
   )
 }

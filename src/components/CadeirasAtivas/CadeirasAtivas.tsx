@@ -2,23 +2,89 @@
 
 import { useRegisterContext } from '@/context/RegisterContext'
 import DisciplinaBox from '../DisciplinaBox/DisciplinaBox'
+import FormNovaDisciplina, {
+  DadosFormDisciplina
+} from '../FormNovaDisciplina/FormNovaDisciplina'
+
+// Disciplinas manuais que podem entrar no semestre atual.
+const AtivasManuais = ({ titulo }: { titulo: string }) => {
+  const {
+    formData,
+    adicionarDisciplinaManual,
+    alternarAndamento,
+    codigosAprovadosManual
+  } = useRegisterContext()
+
+  const candidatas = formData.disciplinasManuais.filter(
+    ({ codigo }) => !codigosAprovadosManual.has(codigo)
+  )
+
+  // Código já cadastrado: só marca como em andamento.
+  const adicionar = (disciplina: DadosFormDisciplina) => {
+    const codigo = disciplina.codigo.trim().toUpperCase()
+    const existente = formData.disciplinasManuais.find(
+      (d) => d.codigo === codigo
+    )
+
+    if (!existente) return adicionarDisciplinaManual(disciplina, true)
+    if (codigosAprovadosManual.has(codigo)) {
+      return 'Essa disciplina já foi aprovada'
+    }
+    if (!existente.emAndamento) alternarAndamento(codigo)
+    return null
+  }
+
+  return (
+    <fieldset className="space-y-4">
+      <div>
+        <p className="text-sm font-semibold leading-6 text-gray-900">
+          {titulo}
+        </p>
+        <p className="text-xs font-medium text-gray-500">
+          Clique nas pendentes para marcar como em andamento, ou adicione uma
+          disciplina nova.
+        </p>
+      </div>
+
+      <FormNovaDisciplina
+        statusPermitidos={['ANDAMENTO']}
+        catalogo={formData.disciplinasManuais}
+        onAdicionar={adicionar}
+      />
+
+      {candidatas.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {candidatas.map((disciplina) => (
+            <DisciplinaBox
+              key={disciplina.codigo}
+              nome={disciplina.nome}
+              codigo={disciplina.codigo}
+              cargaHoraria={disciplina.cargaHoraria}
+              carater={disciplina.carater}
+              status={disciplina.emAndamento ? 'ANDAMENTO' : 'PENDENTE'}
+              onClick={() => alternarAndamento(disciplina.codigo)}
+            />
+          ))}
+        </div>
+      )}
+    </fieldset>
+  )
+}
 
 export default function CadeirasAtivas() {
-  const {
-    handleChangeCadeiraAtiva,
-    obrigatoriasInativas,
-    CADEIRAS_ATIVAS,
-    optativasInativas,
-    historico,
-    cadeirasHistorico
-  } = useRegisterContext()
+  const { historico, cadeirasHistorico, removerDisciplinaHistorico } =
+    useRegisterContext()
+
+  if (!historico) {
+    return <AtivasManuais titulo="Disciplinas do semestre atual" />
+  }
 
   const cadeirasEmAndamento = cadeirasHistorico.filter(
     ({ status }) => status === 'ANDAMENTO'
   )
 
-  if (historico) {
-    return (
+  return (
+    <div className="space-y-6">
       <fieldset className="space-y-4">
         <div>
           <p className="text-sm font-semibold leading-6 text-gray-900">
@@ -34,6 +100,7 @@ export default function CadeirasAtivas() {
             {cadeirasEmAndamento.map((cadeira) => (
               <DisciplinaBox
                 key={`${cadeira.codigo}-${cadeira.periodo}`}
+                onRemover={() => removerDisciplinaHistorico(cadeira)}
                 nome={cadeira.nome}
                 codigo={cadeira.codigo}
                 cargaHoraria={cadeira.cargaHoraria}
@@ -54,80 +121,10 @@ export default function CadeirasAtivas() {
           </p>
         )}
       </fieldset>
-    )
-  }
 
-  return (
-    <fieldset>
-      <p className="text-sm font-semibold leading-6 text-gray-900">
-        Selecione as cadeiras do semestre atual:
-      </p>
-      <div className="space-y-4 flex flex-col mt-1">
-        {Object.entries(obrigatoriasInativas).map(([semestre, cadeiras]) => {
-          return (
-            <div key={semestre} className="space-y-4 ">
-              <span className="text-xl flex items-center gap-2">
-                <div className="flex gap-4 items-center">
-                  <h3 className="font-bold leading-none  text-sm tracking-tight">
-                    {semestre}º Semestre
-                  </h3>
-                </div>
-              </span>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {cadeiras!.map((cadeira) => (
-                  <DisciplinaBox
-                    key={cadeira.codigo}
-                    handleChangeNota={() => {
-                      handleChangeCadeiraAtiva(cadeira.id)
-                    }}
-                    onClick={() => handleChangeCadeiraAtiva(cadeira.id)}
-                    carater={cadeira.carater}
-                    status={
-                      CADEIRAS_ATIVAS[cadeira.id.toString()]
-                        ? 'ANDAMENTO'
-                        : 'PENDENTE'
-                    }
-                    cargaHoraria={cadeira.cargaHoraria}
-                    codigo={cadeira.codigo}
-                    nome={cadeira.nome}
-                  />
-                ))}
-              </div>
-            </div>
-          )
-        })}
-        <div className="space-y-4 flex flex-col mt-1">
-          <div className="space-y-4 ">
-            <span className="text-xl flex items-center gap-2">
-              <div className="flex gap-4 items-center">
-                <h3 className="font-bold leading-none  text-sm tracking-tight">
-                  Optativas
-                </h3>
-              </div>
-            </span>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {optativasInativas.map((cadeira) => (
-                <DisciplinaBox
-                  key={cadeira.codigo}
-                  handleChangeNota={() => {
-                    handleChangeCadeiraAtiva(cadeira.id)
-                  }}
-                  onClick={() => handleChangeCadeiraAtiva(cadeira.id)}
-                  carater={cadeira.carater}
-                  status={
-                    CADEIRAS_ATIVAS[cadeira.id.toString()]
-                      ? 'ANDAMENTO'
-                      : 'PENDENTE'
-                  }
-                  cargaHoraria={cadeira.cargaHoraria}
-                  codigo={cadeira.codigo}
-                  nome={cadeira.nome}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="border-t border-black/10 pt-5">
+        <AtivasManuais titulo="Outras disciplinas deste semestre" />
       </div>
-    </fieldset>
+    </div>
   )
 }
