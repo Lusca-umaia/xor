@@ -8,12 +8,15 @@ import clsx from 'clsx'
 import { useState } from 'react'
 import Image from 'next/image'
 import { IoMenu } from 'react-icons/io5'
+import { HiOutlineLogout } from 'react-icons/hi'
+import { useLogout } from '@/hooks/mutations/useLogout'
 
 export default function NavbarMobile() {
   const router = useRouter()
   const pathname = usePathname()
 
   const [openMenu, setOpenMenu] = useState(false)
+  const { mutate: sair } = useLogout()
   const getFirstPath = () => {
     return '/' + pathname.split('/')[1]
   }
@@ -93,6 +96,13 @@ export default function NavbarMobile() {
               </span>
             </li>
           ))}
+          <li
+            onClick={() => sair()}
+            className="mt-auto mb-2 cursor-pointer text-2xl w-full gap-2 px-3 py-2 h-10 flex items-center rounded-full text-gray-900 hover:bg-gray-100"
+          >
+            <HiOutlineLogout />
+            <span className="text-sm font-semibold">Sair</span>
+          </li>
         </ul>
       </div>
     </div>

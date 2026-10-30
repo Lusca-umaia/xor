@@ -33,7 +33,7 @@ const Stat = ({
 )
 
 const HistoricoImport = () => {
-  const { historico, curso, formData, importarHistorico, limparHistorico } =
+  const { historico, formData, importarHistorico, limparHistorico } =
     useRegisterContext()
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -183,7 +183,6 @@ const HistoricoImport = () => {
               <p className="truncate text-sm font-semibold text-gray-900">
                 {formData.cursoNome ||
                   historico.dadosCurso.nome ||
-                  curso?.nome ||
                   'Curso não identificado'}
               </p>
               <p className="text-xs font-medium text-gray-500">
@@ -287,15 +286,6 @@ const HistoricoImport = () => {
               {historico.resumo.cargaHorariaCursada}h de carga horária
             </p>
           </div>
-        )}
-
-        {!curso && (
-          <p className="flex items-start gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200">
-            <LuTriangleAlert className="mt-0.5 shrink-0 text-sm" />O curso do
-            histórico ainda não está cadastrado na base, então as disciplinas
-            não foram vinculadas a uma grade. As cadeiras abaixo continuam sendo
-            montadas a partir do próprio histórico.
-          </p>
         )}
       </div>
 

@@ -5,7 +5,8 @@ import FormInput from '@/components/FormInput/FormInput'
 import { STEP_KEYS } from '@/helpers/consts'
 import Link from 'next/link'
 import { z } from 'zod'
-import { useRouter } from 'next/navigation'
+import { useLogin } from '@/hooks/mutations/useLogin'
+import { getErrorMessage } from '@/services/api'
 
 const schemaLogin = z.object({
   email: z.string().min(1, 'Email é obrigatório').email('Email inválido'),
@@ -23,11 +24,11 @@ export default function Login() {
     senha: ''
   })
 
-  const router = useRouter()
-
   const [errors, setErrors] = useState<
     Partial<Record<keyof LoginFormData, string>>
   >({})
+
+  const { mutate: submitLogin, isPending, error: loginError } = useLogin()
 
   const handleChange = (key: keyof LoginFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }))
@@ -49,8 +50,7 @@ export default function Login() {
     }
 
     setErrors({})
-
-    router.push('/home')
+    submitLogin(result.data)
   }
 
   return (
@@ -93,11 +93,18 @@ export default function Login() {
                 handleChange={(value) => handleChange('senha', value)}
               />
 
+              {loginError && (
+                <p className="text-sm font-medium text-red-600">
+                  {getErrorMessage(loginError)}
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="flex cursor-pointer w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                disabled={isPending}
+                className="flex cursor-pointer disabled:opacity-70 w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Entrar
+                {isPending ? 'Entrando...' : 'Entrar'}
               </button>
             </form>
           </div>

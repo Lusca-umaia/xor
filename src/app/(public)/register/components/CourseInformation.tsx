@@ -15,15 +15,7 @@ export const schemaDadosAcademicos = z.object({
     .number({ message: 'É necessário informar o semestre atual' })
     .int({ message: 'Semestre deve ser um número inteiro' })
     .min(1, 'Semestre deve ser maior que 0'),
-  matricula: z.string().min(1, 'Matrícula é obrigatória'),
-  cadeirasRealizadas: z
-    .array(
-      z.object({
-        id: z.number().int().positive('ID da cadeira inválido'),
-        nota: z.number().min(0, 'Nota mínima é 0').max(10, 'Nota máxima é 10')
-      })
-    )
-    .optional()
+  matricula: z.string().min(1, 'Matrícula é obrigatória')
 })
 
 interface CourseInformationProps {
@@ -44,8 +36,7 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
     const result = schemaDadosAcademicos.safeParse({
       cursoNome: formData.cursoNome,
       semestreAtual: formData.semestreAtual,
-      matricula: formData.matricula,
-      cadeirasRealizadas: formData.cadeirasRealizadas
+      matricula: formData.matricula
     })
 
     if (!result.success) {
@@ -109,16 +100,11 @@ const CourseInformation: React.FC<CourseInformationProps> = ({
         <p className="-mt-3 text-xs font-medium text-gray-500">
           {historico
             ? 'Esses dados foram preenchidos a partir do histórico. Edite apenas se precisar corrigir algo.'
-            : 'Sem o histórico, preencha os dados manualmente e marque as cadeiras que você já cursou.'}
+            : 'Sem o histórico, preencha os dados manualmente e adicione as disciplinas do seu curso.'}
         </p>
 
         <div className="border-t border-black/10 pt-6">
           <CadeirasRealizadas />
-          {errors['cadeirasRealizadas'] && (
-            <p className="text-sm font-medium mt-2 text-red-600">
-              {errors['cadeirasRealizadas']}
-            </p>
-          )}
         </div>
       </div>
 
