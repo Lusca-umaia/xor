@@ -20,7 +20,7 @@ export default function NavbarDescktop() {
   }
 
   return (
-    <nav className="flex max-lg:hidden sticky top-0 bg-white h-screen flex-col min-w-72 max-w-72 gap-4 p-2">
+    <nav className="flex max-lg:hidden print:hidden sticky top-0 bg-white h-screen flex-col min-w-72 max-w-72 gap-4 p-2">
       <Image
         src={'/logo.png'}
         className="w-10/12 mt-2 mx-auto h-auto"
