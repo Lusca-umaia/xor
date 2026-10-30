@@ -2,12 +2,18 @@
   "name": "xor",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
+    "predev": "node scripts/copiar-worker-pdf.mjs",
     "dev": "next dev --turbopack",
+    "prebuild": "node scripts/copiar-worker-pdf.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "tsc": "tsc --noEmit",
+    "postinstall": "node scripts/copiar-worker-pdf.mjs",
     "ia:setup": "node scripts/ia-setup.mjs",
     "ia:verificar": "node scripts/ia-setup.mjs --verificar"
   },
