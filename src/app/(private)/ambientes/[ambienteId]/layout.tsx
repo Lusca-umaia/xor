@@ -17,6 +17,7 @@ import {
   LuTrash2
 } from 'react-icons/lu'
 import CapaXor from '@/components/CapaXor/CapaXor'
+import AvisoIa from '@/components/AmbienteEstudo/AvisoIa/AvisoIa'
 import { SITUACOES } from '@/components/AmbienteEstudo/SeloSituacao/SeloSituacao'
 import { useHistoricoCadeiras } from '@/hooks/ambienteEstudo/useHistoricoCadeiras'
 import AbasAmbiente from '@/components/AmbienteEstudo/AbasAmbiente/AbasAmbiente'
@@ -171,6 +172,8 @@ export default function AmbienteLayout({ children }: { children: ReactNode }) {
         )}
         <AbasAmbiente ambienteId={ambienteId} />
       </header>
+
+      <AvisoIa />
 
       {children}
 

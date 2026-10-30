@@ -390,3 +390,12 @@ export interface ProgressoXp {
   /** Eventos dos últimos 60 dias, do mais recente para o mais antigo. */
   eventos: EventoXp[]
 }
+
+// ---------- Status da IA ----------
+
+export interface StatusIa {
+  situacao: 'OK' | 'SEM_MODELO' | 'OFFLINE' | 'NAO_CONFIGURADA'
+  modelo: string | null
+  /** Modelo de embeddings instalado (busca semântica). */
+  embeddings: boolean
+}

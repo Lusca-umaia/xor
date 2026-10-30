@@ -7,6 +7,7 @@ import type {
   MensagemChat,
   ModoChat
 } from '@/@types/AmbienteEstudo'
+import { ApiError } from '../http'
 import { temaDoAmbiente } from './ambientes'
 import {
   Contexto,
@@ -260,6 +261,7 @@ export async function enviarMensagem(
   async function* transmitir() {
     let recebido = ''
     let falhou = false
+    let motivo: string | null = null
     try {
       for await (const pedaco of chatStream(mensagensIa, sinal)) {
         recebido += pedaco
@@ -268,6 +270,8 @@ export async function enviarMensagem(
     } catch (erro) {
       if (!sinal.aborted) {
         falhou = true
+        // Erros conhecidos (ex.: modelo não instalado) já têm mensagem clara.
+        if (erro instanceof ApiError) motivo = erro.message
         console.error('[chat] falha no streaming', erro)
       }
     } finally {
@@ -275,7 +279,8 @@ export async function enviarMensagem(
       const texto = interrompida
         ? `${recebido.trimEnd()}\n\n*(resposta interrompida)*`
         : falhou && !recebido
-          ? 'Não foi possível falar com a IA agora. Verifique se o Ollama está rodando e tente de novo.'
+          ? (motivo ??
+            'Não foi possível falar com a IA agora. Verifique se o Ollama está rodando e tente de novo.')
           : recebido
       const { error } = await supabase
         .from('mensagens')
