@@ -42,6 +42,7 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
    SUPABASE_SECRET_KEY=<chave secreta>
 
    # Opcionais
+   NEXT_PUBLIC_SITE_URL=https://<domínio do app>
    LM_STUDIO_URL=http://localhost:1234/v1
    LM_STUDIO_MODEL=<modelo carregado no LM Studio>
    TOGETHER_API_KEY=<chave da Together AI>
@@ -52,6 +53,7 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
    | `NEXT_PUBLIC_SUPABASE_URL` | Cliente Supabase (servidor e middleware) | Sim |
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Cliente Supabase com a sessão do usuário | Sim |
    | `SUPABASE_SECRET_KEY` | Cliente admin, só no servidor (cadastro e troca de email) | Sim |
+   | `NEXT_PUBLIC_SITE_URL` | Links absolutos do Open Graph (prévia ao compartilhar o link) | Não. O padrão é `http://localhost:3000` |
    | `LM_STUDIO_URL` | Geração de questões com IA | Não. Sem ela, a geração responde 503 |
    | `LM_STUDIO_MODEL` | Modelo usado pelo LM Studio | Não |
    | `TOGETHER_API_KEY` | Chat com IA | Só para o chat |
