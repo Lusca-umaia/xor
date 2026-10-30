@@ -18,7 +18,6 @@ import Botao, { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
 import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
 import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
 import { classeCartao } from '@/components/AmbienteEstudo/estilos'
-import { MODO_DEMONSTRACAO } from '@/components/AmbienteEstudo/SeloIA/SeloIA'
 import {
   useIniciarTentativa,
   useSimulado,
@@ -134,14 +133,12 @@ export default function SimuladoPage() {
               </li>
             </ul>
 
-            {MODO_DEMONSTRACAO &&
-              simulado.questoes.length < simulado.config.quantidadeQuestoes && (
-                <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900">
-                  Você pediu {simulado.config.quantidadeQuestoes} questões, mas
-                  o banco de demonstração tinha {simulado.questoes.length}{' '}
-                  compatíveis.
-                </p>
-              )}
+            {simulado.questoes.length < simulado.config.quantidadeQuestoes && (
+              <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900">
+                Você pediu {simulado.config.quantidadeQuestoes} questões e a IA
+                gerou {simulado.questoes.length}.
+              </p>
+            )}
 
             <div>
               <h3 className="font-bold">Antes de começar</h3>

@@ -1,11 +1,8 @@
 'use client'
 
-import { LuInfo } from 'react-icons/lu'
+import { LuDownload } from 'react-icons/lu'
 import { Material } from '@/@types/AmbienteEstudo'
-import {
-  obterMiniatura,
-  obterPreviewSessao
-} from '@/services/ambienteEstudo/materiais'
+import { urlDoArquivo } from '@/services/ambienteEstudo/materiais'
 import {
   formatarDataHora,
   formatarTamanho
@@ -21,8 +18,7 @@ export default function VisualizadorMaterial({
   material: Material | null
   aoFechar: () => void
 }) {
-  const preview = material ? obterPreviewSessao(material.id) : null
-  const miniatura = material ? obterMiniatura(material.id) : null
+  const arquivo = material ? urlDoArquivo(material.id) : ''
 
   const conteudo = () => {
     if (!material) return null
@@ -33,30 +29,32 @@ export default function VisualizadorMaterial({
         </div>
       )
     }
-    if (material.tipo === 'IMAGEM' && (preview || miniatura)) {
+    if (material.tipo === 'IMAGEM') {
       return (
         <img
-          src={preview ?? miniatura ?? ''}
+          src={arquivo}
           alt={material.nome}
           className="w-full rounded-xl ring-1 ring-gray-200"
         />
       )
     }
-    if (material.tipo === 'PDF' && preview) {
+    if (material.tipo === 'PDF') {
       return (
         <iframe
-          src={preview}
+          src={arquivo}
           title={material.nome}
           className="h-[60vh] w-full rounded-xl ring-1 ring-gray-200"
         />
       )
     }
+    // DOCX e PPTX não têm pré-visualização no navegador: baixa o original.
     return (
-      <p className="flex items-start gap-2 rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
-        <LuInfo className="mt-0.5 shrink-0" aria-hidden />A pré-visualização
-        deste arquivo fica disponível depois da integração com o servidor. Por
-        enquanto, os arquivos não são guardados no navegador.
-      </p>
+      <a
+        href={arquivo}
+        className="inline-flex items-center gap-2 rounded-xl bg-gray-50 p-4 text-sm font-semibold text-gray-800 hover:bg-gray-100"
+      >
+        <LuDownload aria-hidden /> Baixar o arquivo original
+      </a>
     )
   }
 

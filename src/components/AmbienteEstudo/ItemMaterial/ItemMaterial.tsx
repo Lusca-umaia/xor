@@ -8,7 +8,7 @@ import {
   LuTrash2
 } from 'react-icons/lu'
 import { Material } from '@/@types/AmbienteEstudo'
-import { obterMiniatura } from '@/services/ambienteEstudo/materiais'
+import { urlDoArquivo } from '@/services/ambienteEstudo/materiais'
 import {
   formatarDataRelativa,
   formatarTamanho
@@ -36,7 +36,9 @@ export default function ItemMaterial({
   aoExcluir
 }: ItemMaterialProps) {
   const miniatura =
-    material.tipo === 'IMAGEM' ? obterMiniatura(material.id) : null
+    material.tipo === 'IMAGEM' && material.status === 'PRONTO'
+      ? urlDoArquivo(material.id)
+      : null
   const emAndamento =
     material.status === 'ENVIANDO' || material.status === 'PROCESSANDO'
   const comErro = material.status === 'ERRO'

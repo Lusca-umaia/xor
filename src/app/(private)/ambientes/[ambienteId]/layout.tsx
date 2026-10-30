@@ -23,7 +23,6 @@ import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
 import MenuAcoes from '@/components/AmbienteEstudo/MenuAcoes/MenuAcoes'
 import ModalAmbiente from '@/components/AmbienteEstudo/ModalAmbiente/ModalAmbiente'
 import ModalConfirmacao from '@/components/AmbienteEstudo/ModalConfirmacao/ModalConfirmacao'
-import { SeloDemonstracao } from '@/components/AmbienteEstudo/SeloIA/SeloIA'
 import {
   useAmbiente,
   useAtualizarAmbiente,
@@ -114,7 +113,6 @@ export default function AmbienteLayout({ children }: { children: ReactNode }) {
                     Arquivado
                   </span>
                 )}
-                <SeloDemonstracao />
               </div>
               <p className="text-sm font-medium text-gray-500">
                 {ambiente.disciplinaCodigo

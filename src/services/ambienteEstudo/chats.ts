@@ -4,110 +4,30 @@ import {
   MensagemChat,
   ModoChat
 } from '@/@types/AmbienteEstudo'
-import { exigir } from './erros'
-import {
-  agora,
-  alterarBanco,
-  clonar,
-  gerarId,
-  lerBanco
-} from './mock/armazenamento'
-import { esperar } from './mock/atraso'
-import { gerarRespostaChat, tituloDeTexto } from './mock/geradores'
-import {
-  materiaisUtilizaveis,
-  pacoteDoAmbiente,
-  preparar,
-  tocarAmbiente
-} from './mock/preparar'
+import api from '../api'
+import { dados } from './erros'
 
-const TITULO_PADRAO = 'Novo chat'
+export const listarChats = (ambienteId: string) =>
+  dados(api.get<Chat[]>(`/ambientes/${ambienteId}/chats`))
 
-const TEXTO_PEDIDO = {
-  DICA: '💡 Me dê uma dica',
-  RESPOSTA_COMPLETA: 'Mostre a resposta completa'
-}
+export const obterChat = (id: string) => dados(api.get<Chat>(`/chats/${id}`))
 
-export async function listarChats(ambienteId: string): Promise<Chat[]> {
-  await preparar(150, 350)
-  return clonar(
-    lerBanco()
-      .chats.filter((chat) => chat.ambienteId === ambienteId)
-      .sort(
-        (a, b) =>
-          Number(b.fixado) - Number(a.fixado) ||
-          b.atualizadoEm.localeCompare(a.atualizadoEm)
-      )
-  )
-}
-
-export async function obterChat(id: string): Promise<Chat> {
-  await preparar(100, 250)
-  return clonar(
-    exigir(
-      lerBanco().chats.find((chat) => chat.id === id),
-      'Chat'
-    )
-  )
-}
-
-export async function criarChat(
+export const criarChat = (
   ambienteId: string,
-  dados: { titulo?: string; materialIds: string[]; modo: ModoChat }
-): Promise<Chat> {
-  await preparar()
-  const chat: Chat = {
-    id: gerarId(),
-    ambienteId,
-    titulo: dados.titulo?.trim() || TITULO_PADRAO,
-    materialIds: dados.materialIds,
-    modo: dados.modo,
-    fixado: false,
-    criadoEm: agora(),
-    atualizadoEm: agora()
-  }
-  alterarBanco((banco) => {
-    banco.chats.push(chat)
-    tocarAmbiente(banco, ambienteId)
-  })
-  return clonar(chat)
-}
+  novo: { titulo?: string; materialIds: string[]; modo: ModoChat }
+) => dados(api.post<Chat>(`/ambientes/${ambienteId}/chats`, novo))
 
-export async function atualizarChat(
+export const atualizarChat = (
   id: string,
-  dados: Partial<Pick<Chat, 'titulo' | 'materialIds' | 'modo' | 'fixado'>>
-): Promise<Chat> {
-  await preparar(100, 250)
-  return clonar(
-    alterarBanco((banco) => {
-      const chat = exigir(
-        banco.chats.find((item) => item.id === id),
-        'Chat'
-      )
-      Object.assign(chat, dados)
-      return chat
-    })
-  )
+  campos: Partial<Pick<Chat, 'titulo' | 'materialIds' | 'modo' | 'fixado'>>
+) => dados(api.patch<Chat>(`/chats/${id}`, campos))
+
+export const excluirChat = async (id: string) => {
+  await dados(api.delete(`/chats/${id}`))
 }
 
-export async function excluirChat(id: string): Promise<void> {
-  await preparar()
-  alterarBanco((banco) => {
-    banco.chats = banco.chats.filter((chat) => chat.id !== id)
-    banco.mensagens = banco.mensagens.filter(
-      (mensagem) => mensagem.chatId !== id
-    )
-  })
-}
-
-export async function listarMensagens(chatId: string): Promise<MensagemChat[]> {
-  await preparar(100, 300)
-  return clonar(
-    lerBanco()
-      .mensagens.filter((mensagem) => mensagem.chatId === chatId)
-      .sort((a, b) => a.criadoEm.localeCompare(b.criadoEm))
-  )
-}
+export const listarMensagens = (chatId: string) =>
+  dados(api.get<MensagemChat[]>(`/chats/${chatId}/mensagens`))
 
 export interface EnvioMensagem {
   mensagemAluno: MensagemChat
@@ -117,112 +37,59 @@ export interface EnvioMensagem {
 }
 
 /**
- * Envia uma mensagem e devolve a resposta do assistente em streaming. Os
- * anexos passam a fazer parte do contexto do chat. O `sinal` interrompe a
- * resposta; o texto recebido até ali é mantido.
+ * Envia a mensagem e lê a resposta em streaming. Usa fetch porque o axios não
+ * lê o corpo aos poucos no navegador. A primeira linha da resposta traz as
+ * duas mensagens gravadas; o resto é o texto do assistente.
  */
 export async function enviarMensagem(
   chatId: string,
-  dados: DadosNovaMensagem,
+  nova: DadosNovaMensagem,
   sinal?: AbortSignal
 ): Promise<EnvioMensagem> {
-  await preparar(300, 700)
+  const resposta = await fetch(`/api/chats/${chatId}/mensagens`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(nova),
+    signal: sinal
+  })
 
-  const { mensagemAluno, mensagemAssistente, resposta } = alterarBanco(
-    (banco) => {
-      const chat = exigir(
-        banco.chats.find(({ id }) => id === chatId),
-        'Chat'
-      )
-      const anteriores = banco.mensagens.filter((m) => m.chatId === chatId)
+  if (!resposta.ok || !resposta.body) {
+    const corpo = await resposta.json().catch(() => null)
+    if (resposta.status === 401) window.location.assign('/login')
+    throw new Error(corpo?.error ?? 'Não foi possível enviar a mensagem.')
+  }
 
-      chat.materialIds = [...new Set([...chat.materialIds, ...dados.anexoIds])]
-      const conteudo =
-        dados.conteudo.trim() ||
-        (dados.pedido ? TEXTO_PEDIDO[dados.pedido] : '')
-      if (anteriores.length === 0 && chat.titulo === TITULO_PADRAO) {
-        chat.titulo = tituloDeTexto(conteudo)
-      }
-      chat.atualizadoEm = agora()
-      tocarAmbiente(banco, chat.ambienteId)
+  const leitor = resposta.body.getReader()
+  const decodificador = new TextDecoder()
+  let pendente = ''
 
-      // Cada pergunta nova avança o assunto; dica e resposta completa ficam
-      // no assunto da última pergunta.
-      const textosPedido = Object.values(TEXTO_PEDIDO)
-      const perguntas = anteriores.filter(
-        ({ papel, conteudo: texto }) =>
-          papel === 'ALUNO' && !textosPedido.includes(texto)
-      ).length
-      const resposta = gerarRespostaChat(
-        pacoteDoAmbiente(banco, chat.ambienteId),
-        materiaisUtilizaveis(banco, chat.materialIds),
-        {
-          modo: chat.modo,
-          pedido: dados.pedido,
-          indice: dados.pedido ? Math.max(0, perguntas - 1) : perguntas
-        }
-      )
-
-      const mensagemAluno: MensagemChat = {
-        id: gerarId(),
-        chatId,
-        papel: 'ALUNO',
-        conteudo,
-        anexoIds: dados.anexoIds,
-        citacoes: [],
-        foraDoMaterial: false,
-        status: 'CONCLUIDA',
-        criadoEm: agora()
-      }
-      const mensagemAssistente: MensagemChat = {
-        id: gerarId(),
-        chatId,
-        papel: 'ASSISTENTE',
-        conteudo: '',
-        anexoIds: [],
-        citacoes: [],
-        foraDoMaterial: resposta.foraDoMaterial,
-        status: 'TRANSMITINDO',
-        criadoEm: new Date(Date.now() + 1).toISOString()
-      }
-      banco.mensagens.push(mensagemAluno, mensagemAssistente)
-      return { mensagemAluno, mensagemAssistente, resposta }
-    }
+  // Lê até o fim da primeira linha (o JSON com as mensagens).
+  let quebra = -1
+  while (quebra === -1) {
+    const { done, value } = await leitor.read()
+    if (done) throw new Error('Resposta incompleta do servidor.')
+    pendente += decodificador.decode(value, { stream: true })
+    quebra = pendente.indexOf('\n')
+  }
+  const { mensagemAluno, mensagemAssistente } = JSON.parse(
+    pendente.slice(0, quebra)
   )
+  const inicio = pendente.slice(quebra + 1)
 
   async function* transmitir() {
-    let recebido = ''
-    let interrompida = false
+    if (inicio) yield inicio
     try {
-      // Pedaços de até 3 palavras, preservando espaços e quebras de linha.
-      const pedacos = resposta.conteudo.match(/(\S+\s*){1,3}/g) ?? []
-      for (const pedaco of pedacos) {
-        if (sinal?.aborted) {
-          interrompida = true
-          break
-        }
-        await esperar(30 + Math.random() * 50)
-        recebido += pedaco
-        yield pedaco
+      for (;;) {
+        const { done, value } = await leitor.read()
+        if (done) break
+        const texto = decodificador.decode(value, { stream: true })
+        if (texto) yield texto
       }
-    } finally {
-      alterarBanco((banco) => {
-        const salva = banco.mensagens.find(
-          ({ id }) => id === mensagemAssistente.id
-        )
-        if (!salva) return
-        salva.conteudo = interrompida
-          ? `${recebido.trimEnd()}\n\n*(resposta interrompida)*`
-          : recebido
-        salva.citacoes = resposta.citacoes
-        salva.status = 'CONCLUIDA'
-      })
+    } catch (erro) {
+      // Interrompido pelo aluno: o servidor salva o que já tinha chegado.
+      if (!sinal?.aborted) throw erro
     }
   }
 
-  return {
-    mensagemAluno: clonar(mensagemAluno),
-    mensagemAssistente: clonar(mensagemAssistente),
-    fluxo: transmitir()
-  }
+  return { mensagemAluno, mensagemAssistente, fluxo: transmitir() }
 }

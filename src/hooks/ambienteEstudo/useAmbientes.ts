@@ -5,8 +5,7 @@ import {
   criarAmbiente,
   excluirAmbiente,
   listarAmbientes,
-  obterAmbiente,
-  restaurarDemonstracao
+  obterAmbiente
 } from '@/services/ambienteEstudo/ambientes'
 import { chavesAmbiente, repetirConsulta } from './chavesConsulta'
 import { useMutacaoAmbiente } from './useMutacaoAmbiente'
@@ -48,12 +47,6 @@ export function useAtualizarAmbiente() {
 export function useExcluirAmbiente() {
   return useMutacaoAmbiente(excluirAmbiente, {
     mensagemSucesso: 'Ambiente excluído.'
-  })
-}
-
-export function useRestaurarDemonstracao() {
-  return useMutacaoAmbiente(restaurarDemonstracao, {
-    mensagemSucesso: 'Dados de demonstração restaurados.'
   })
 }
 
