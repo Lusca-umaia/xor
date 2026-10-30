@@ -27,14 +27,7 @@
 | Embedding | `bge-m3`, baixado. **Não usar nesta fase** |
 | Variáveis | Em `.env.local`: `LM_STUDIO_URL=http://localhost:11434/v1` e `LM_STUDIO_MODEL=xor-estudo` (reaproveita as variáveis que `src/lib/api/ia.ts` já lê) |
 
-Recriar o modelo, se sumir:
-
-```
-FROM qwen3:4b-instruct-2507-q4_K_M
-PARAMETER num_ctx 8192
-PARAMETER temperature 0.4
-```
-`ollama create xor-estudo -f Modelfile` (binário em `%LOCALAPPDATA%\Programs\Ollama\ollama.exe`).
+Recriar o modelo, se sumir: `npm run ia:setup` (o Modelfile está em [ia/xor-estudo.Modelfile](../ia/xor-estudo.Modelfile); passo a passo no README, seção "IA local").
 
 **Comportamentos do modelo observados em teste (levar em conta):**
 - Com `json_schema` estrito, a saída é sempre JSON válido no formato pedido.
