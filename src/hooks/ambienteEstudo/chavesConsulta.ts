@@ -22,7 +22,9 @@ export const chavesAmbiente = {
   simulados: (ambienteId: string) =>
     [...raiz, 'simulados', ambienteId] as const,
   simulado: (id: string) => [...raiz, 'simulado', id] as const,
-  tentativaSimulado: (id: string) => [...raiz, 'tentativaSimulado', id] as const
+  tentativaSimulado: (id: string) =>
+    [...raiz, 'tentativaSimulado', id] as const,
+  progresso: (ambienteId: string) => [...raiz, 'progresso', ambienteId] as const
 }
 
 /** Não insiste em recursos que não existem; tenta de novo outras falhas. */

@@ -45,6 +45,7 @@ import {
 } from './mapeadores'
 import { carregarTrechos } from './materiais'
 import { executarEmSegundoPlano } from './tarefas'
+import { concederXp, diaDeHoje } from './xp'
 
 export async function listarAtividades(
   { supabase }: Contexto,
@@ -286,10 +287,23 @@ export async function salvarTentativa(
 
   const { data: atividade } = await ctx.supabase
     .from('atividades')
-    .select('ambiente_id')
+    .select('ambiente_id, questoes')
     .eq('id', atividadeId)
     .maybeSingle()
-  if (atividade) await tocarAmbiente(ctx, atividade.ambiente_id as string)
+  if (atividade) {
+    await tocarAmbiente(ctx, atividade.ambiente_id as string)
+    // XP só na primeira conclusão. Os acertos vêm do navegador, então ficam
+    // limitados ao número de questões da atividade.
+    if (salva.concluida_em) {
+      const questoes = (atividade.questoes as unknown[]).length
+      await concederXp(ctx, {
+        ambienteId: atividade.ambiente_id as string,
+        tipo: 'ATIVIDADE',
+        referencia: atividadeId,
+        xp: 10 + 5 * Math.min(salva.acertos, questoes, 30)
+      })
+    }
+  }
   return mapearTentativaAtividade(salva)
 }
 
@@ -353,6 +367,14 @@ export async function avaliarFlashcard(
     flashcards: atividade.flashcards.map((item) =>
       item.id === flashcardId ? atualizado : item
     )
+  })
+  // Toda revisão vale XP, inclusive "De novo": errar com honestidade não pune.
+  // Um evento por cartão por dia.
+  await concederXp(ctx, {
+    ambienteId: atividade.ambiente_id,
+    tipo: 'FLASHCARD',
+    referencia: `${flashcardId}:${diaDeHoje()}`,
+    xp: 2
   })
   await tocarAmbiente(ctx, atividade.ambiente_id)
   return atualizado

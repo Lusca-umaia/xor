@@ -19,6 +19,7 @@ import {
 import { COLUNAS_RESUMO, mapearResumo, ResumoRow } from './mapeadores'
 import { carregarTrechos } from './materiais'
 import { executarEmSegundoPlano } from './tarefas'
+import { concederXp } from './xp'
 
 export async function listarResumos(
   { supabase }: Contexto,
@@ -116,6 +117,12 @@ export async function gerarResumo(
         conteudo,
         citacoes,
         status: 'PRONTO'
+      })
+      await concederXp(ctx, {
+        ambienteId,
+        tipo: 'RESUMO',
+        referencia: resumo.id,
+        xp: 15
       })
     },
     (mensagem) =>

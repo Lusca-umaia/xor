@@ -32,6 +32,7 @@ import {
 } from './mapeadores'
 import { carregarTrechos } from './materiais'
 import { executarEmSegundoPlano } from './tarefas'
+import { concederXp } from './xp'
 
 /** Tolerância para respostas salvas no último segundo (latência de rede). */
 const TOLERANCIA_PRAZO_MS = 3_000
@@ -260,6 +261,30 @@ async function entregar(
   })
   await tocarAmbiente(ctx, simulado.ambiente_id)
 
+  // XP: a primeira entrega de cada simulado vale mais que as refeitas. A parte
+  // da nota sai quando o resultado fica completo (depois das discursivas).
+  const { count: outrasEntregas } = await ctx.supabase
+    .from('tentativas_simulado')
+    .select('id', { count: 'exact', head: true })
+    .eq('simulado_id', simulado.id)
+    .not('entregue_em', 'is', null)
+    .neq('id', tentativa.id)
+  const primeira = (outrasEntregas ?? 0) === 0
+  await concederXp(ctx, {
+    ambienteId: simulado.ambiente_id,
+    tipo: 'SIMULADO',
+    referencia: tentativa.id,
+    xp: primeira ? 30 : 10
+  })
+  const xpDaNota = (linha: TentativaSimuladoRow) =>
+    concederXp(ctx, {
+      ambienteId: simulado.ambiente_id,
+      tipo: 'SIMULADO_NOTA',
+      referencia: tentativa.id,
+      xp: (linha.resultado?.notaFinal ?? 0) * (primeira ? 5 : 2)
+    })
+  if (!discursivas.length) await xpDaNota(entregue)
+
   if (discursivas.length) {
     executarEmSegundoPlano(
       `correcao ${tentativa.id}`,
@@ -270,13 +295,15 @@ async function entregar(
           const texto = resposta?.tipo === 'DISCURSIVA' ? resposta.texto : ''
           corrigidas[questao.id] = await corrigirDiscursiva(questao, texto)
         }
-        await atualizarTentativa(ctx, tentativa.id, {
-          resultado: calcularResultadoSimulado(
-            simulado.questoes,
-            tentativa.respostas,
-            corrigidas
-          )
-        })
+        await xpDaNota(
+          await atualizarTentativa(ctx, tentativa.id, {
+            resultado: calcularResultadoSimulado(
+              simulado.questoes,
+              tentativa.respostas,
+              corrigidas
+            )
+          })
+        )
       },
       async () => {
         // Sem correção da IA: as discursivas ficam com nota zero e um aviso.
@@ -290,13 +317,15 @@ async function entregar(
             }
           ])
         )
-        await atualizarTentativa(ctx, tentativa.id, {
-          resultado: calcularResultadoSimulado(
-            simulado.questoes,
-            tentativa.respostas,
-            semCorrecao
-          )
-        })
+        await xpDaNota(
+          await atualizarTentativa(ctx, tentativa.id, {
+            resultado: calcularResultadoSimulado(
+              simulado.questoes,
+              tentativa.respostas,
+              semCorrecao
+            )
+          })
+        )
       }
     )
   }
