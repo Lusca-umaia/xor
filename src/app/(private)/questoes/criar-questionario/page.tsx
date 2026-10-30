@@ -1,246 +1,406 @@
 'use client'
+import clsx from 'clsx'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useMemo, useState } from 'react'
+import { LuCirclePlus, LuSave, LuSparkles } from 'react-icons/lu'
+import { Dificuldade, QuestaoGerada } from '@/@types/Questionario'
 import Header from '@/components/Header/Header'
-import TextEditorWithPrefix from '@/components/TextEditorWithPrefix/TextEditorWithPrefix'
-import { classNames, numeroParaLetra } from '@/utils/auxiliars'
-import Image from 'next/image'
-import { useState } from 'react'
-import { FaXmark } from 'react-icons/fa6'
+import Select from '@/components/Select/Select'
+import Skeleton, { SkeletonCard } from '@/components/Skeleton/Skeleton'
+import { useSalvarQuestionario } from '@/hooks/mutations/useQuestionarios'
+import { useProgresso } from '@/hooks/queries/useProgresso'
+import { useQuestionario } from '@/hooks/queries/useQuestionarios'
+import { getErrorMessage } from '@/services/api'
+import { DIFICULDADE_OPCOES } from '@/utils/questionarios'
+import CampoTexto from '../components/CampoTexto'
+import EditorQuestao from '../components/EditorQuestao'
+import ModalGerarIa from '../components/ModalGerarIa'
+import {
+  QuestaoRascunho,
+  Rascunho,
+  duplicarQuestao,
+  novaQuestao,
+  questaoCompleta,
+  questaoDaIa,
+  rascunhoDoQuestionario,
+  rascunhoVazio,
+  validarRascunho
+} from '../components/rascunho'
 
-class Option {
-  public enunciado: string = 'Enunciado da alternativa'
-  public id: string = `${Date.now()}`
+const DIFICULDADES: { id: Dificuldade | ''; nome: string }[] = [
+  { id: '', nome: 'Não definida' },
+  ...DIFICULDADE_OPCOES
+]
+
+// Questão que o aluno ainda não começou a preencher.
+const emBranco = (q: QuestaoRascunho) =>
+  !q.enunciado.trim() && q.alternativas.every(({ texto }) => !texto.trim())
+
+// Erros de uma questão, com o caminho relativo a ela.
+function errosDaQuestao(erros: Record<string, string>, indice: number) {
+  const prefixo = `questoes.${indice}.`
+  return Object.fromEntries(
+    Object.entries(erros)
+      .filter(([caminho]) => caminho.startsWith(prefixo))
+      .map(([caminho, mensagem]) => [caminho.slice(prefixo.length), mensagem])
+  )
 }
 
-class Questao {
-  public id: string = `${Date.now()}`
-  public enunciado: string = 'Enunciado da questão'
-  public idItemCorreto: string | null = null
-  public opcoes: FormData['questoes'][number]['opcoes'] = [new Option()]
-}
+const rolarAte = (chave: string) =>
+  document
+    .getElementById(`questao-${chave}`)
+    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
-interface FormData {
-  titulo: string
-  questoes: {
-    id: string
-    enunciado: string
-    idItemCorreto: string | null
-    opcoes: {
-      id: string
-      enunciado: string
-    }[]
-  }[]
-}
+const EditorQuestionario = () => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const questionarioId = Number(searchParams.get('id')) || null
 
-const initialFormData = {
-  titulo: 'Título do questionário',
-  questoes: []
-}
+  const { data: questionario, isError } = useQuestionario(questionarioId)
+  const { data: progresso } = useProgresso()
+  const salvar = useSalvarQuestionario()
 
-const Questions = () => {
-  const [formData, setFormData] = useState<FormData>(initialFormData)
+  const [rascunho, setRascunho] = useState<Rascunho | null>(() =>
+    questionarioId
+      ? null
+      : {
+          ...rascunhoVazio(),
+          disciplinaId: Number(searchParams.get('disciplina')) || null
+        }
+  )
+  const [erros, setErros] = useState<Record<string, string>>({})
+  const [tentouSalvar, setTentouSalvar] = useState(false)
+  const [sujo, setSujo] = useState(false)
+  const [modalIa, setModalIa] = useState(searchParams.get('ia') === '1')
 
-  const handleAddQuestion = () => {
-    setFormData(({ questoes, ...prevFormData }) => ({
-      ...prevFormData,
-      questoes: [...questoes, new Questao()]
+  // Na edição, o rascunho nasce do questionário carregado (uma vez só,
+  // para um refetch não apagar o que está sendo editado).
+  useEffect(() => {
+    if (questionario && !rascunho) {
+      setRascunho(rascunhoDoQuestionario(questionario))
+    }
+  }, [questionario, rascunho])
+
+  useEffect(() => {
+    if (!sujo) return
+    const avisar = (e: BeforeUnloadEvent) => e.preventDefault()
+    window.addEventListener('beforeunload', avisar)
+    return () => window.removeEventListener('beforeunload', avisar)
+  }, [sujo])
+
+  const disciplinas = useMemo(
+    () =>
+      (progresso?.disciplinas ?? []).map(({ id, codigo, nome }) => ({
+        id,
+        nome: `${codigo} · ${nome}`
+      })),
+    [progresso]
+  )
+
+  // Depois da primeira tentativa de salvar, os erros acompanham a edição.
+  useEffect(() => {
+    if (tentouSalvar && rascunho) setErros(validarRascunho(rascunho).erros)
+  }, [rascunho, tentouSalvar])
+
+  const atualizar = (alterar: (r: Rascunho) => Rascunho) => {
+    setRascunho((anterior) => anterior && alterar(anterior))
+    setSujo(true)
+  }
+
+  const alterarQuestao = (indice: number, questao: QuestaoRascunho) =>
+    atualizar((r) => ({
+      ...r,
+      questoes: r.questoes.map((q, i) => (i === indice ? questao : q))
     }))
+
+  const adicionarQuestao = () => {
+    const questao = novaQuestao()
+    atualizar((r) => ({ ...r, questoes: [...r.questoes, questao] }))
+    setTimeout(() => rolarAte(questao.chave), 50)
   }
 
-  const handleAddOption = (indexQuestao: number) => {
-    setFormData(({ questoes, ...prevFormData }) => ({
-      ...prevFormData,
-      questoes: questoes.map(({ opcoes, ...questao }, index) => ({
-        ...questao,
-        opcoes: indexQuestao === index ? [...opcoes, new Option()] : opcoes
-      }))
+  const removerQuestao = (indice: number) =>
+    atualizar((r) => ({
+      ...r,
+      questoes: r.questoes.filter((_, i) => i !== indice)
     }))
-  }
 
-  const handleChangeQuestao = (value: string, indexQuestao: number) => {
-    setFormData(({ questoes, ...prevFormData }) => ({
-      ...prevFormData,
-      questoes: questoes.map(({ enunciado, ...questao }, index) => ({
-        ...questao,
-        enunciado: indexQuestao === index ? value : enunciado
-      }))
+  const duplicar = (indice: number) =>
+    atualizar((r) => ({
+      ...r,
+      questoes: r.questoes.flatMap((q, i) =>
+        i === indice ? [q, duplicarQuestao(q)] : [q]
+      )
     }))
-  }
 
-  const handleChangeTitulo = (value: string) => {
-    setFormData((prevFormData) => ({ ...prevFormData, titulo: value }))
-  }
+  const mover = (indice: number, direcao: -1 | 1) =>
+    atualizar((r) => {
+      const questoes = [...r.questoes]
+      const destino = indice + direcao
+      ;[questoes[indice], questoes[destino]] = [
+        questoes[destino],
+        questoes[indice]
+      ]
+      return { ...r, questoes }
+    })
 
-  const handleChangeOption = (
-    value: string,
-    idOpcao: string,
-    indexQuestao: number
-  ) => {
-    setFormData(({ questoes, ...prevFormData }) => ({
-      ...prevFormData,
-      questoes: questoes.map(({ opcoes, ...questao }, index) => ({
-        ...questao,
-        opcoes:
-          indexQuestao === index
-            ? opcoes.map((opcao) => ({
-                ...opcao,
-                enunciado: opcao.id === idOpcao ? value : opcao.enunciado
-              }))
-            : opcoes
-      }))
+  const receberDaIa = (geradas: QuestaoGerada[], tema: string) => {
+    const novas = geradas.map(questaoDaIa)
+    atualizar((r) => ({
+      ...r,
+      titulo: r.titulo.trim() ? r.titulo : tema,
+      origem: 'IA',
+      questoes: [...r.questoes.filter((q) => !emBranco(q)), ...novas]
     }))
+    setModalIa(false)
+    setTimeout(() => novas[0] && rolarAte(novas[0].chave), 300)
   }
 
-  const handleRemoveOption = (idOpcao: string, indexQuestao: number) => {
-    setFormData(({ questoes, ...prevFormData }) => ({
-      ...prevFormData,
-      questoes: questoes.map(({ opcoes, ...questao }, index) => ({
-        ...questao,
-        idItemCorreto:
-          idOpcao === questao.idItemCorreto ? null : questao.idItemCorreto,
-        opcoes:
-          indexQuestao === index
-            ? opcoes.filter((opcao) => opcao.id !== idOpcao)
-            : opcoes
-      }))
-    }))
+  const handleSalvar = () => {
+    if (!rascunho) return
+    setTentouSalvar(true)
+    const { dados, erros: novosErros } = validarRascunho(rascunho)
+    setErros(novosErros)
+
+    if (!dados) {
+      const primeira = Object.keys(novosErros)
+        .map((caminho) => caminho.match(/^questoes\.(\d+)/)?.[1])
+        .find(Boolean)
+      if (primeira !== undefined) {
+        rolarAte(rascunho.questoes[Number(primeira)].chave)
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+      return
+    }
+
+    salvar.mutate(
+      { questionarioId: questionarioId ?? undefined, dados },
+      {
+        onSuccess: () => {
+          setSujo(false)
+          router.push('/questoes/lista-questionario')
+        }
+      }
+    )
   }
 
-  const handleRemoveQuestao = (indexQuestao: number) => {
-    setFormData(({ questoes, ...prevFormData }) => ({
-      ...prevFormData,
-      questoes: questoes.filter((_, index) => index !== indexQuestao)
-    }))
+  if (isError) {
+    return (
+      <div>
+        <Header
+          title="Editar questionário"
+          backPath="/questoes/lista-questionario"
+        />
+        <p className="text-sm font-medium text-red-600">
+          Não foi possível carregar este questionário.
+        </p>
+      </div>
+    )
   }
 
-  const handleOpcaoCorreta = (idItemCorreto: string, indexQuestao: number) => {
-    setFormData(({ questoes, ...prevFormData }) => ({
-      ...prevFormData,
-      questoes: questoes.map((questao, index) => ({
-        ...questao,
-        idItemCorreto:
-          index === indexQuestao ? idItemCorreto : questao.idItemCorreto
-      }))
-    }))
+  if (!rascunho) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-72" />
+        <SkeletonCard className="h-40 p-6" />
+        <SkeletonCard className="h-64 p-6" />
+      </div>
+    )
   }
+
+  const completas = rascunho.questoes.filter(questaoCompleta).length
+  const totalErros = Object.keys(erros).length
 
   return (
-    <div className="flex flex-col gap-2">
+    <div>
       <Header
-        title="Criar lista de questões"
+        title={questionarioId ? 'Editar questionário' : 'Novo questionário'}
+        description="Escreva as questões à mão, peça sugestões para a IA ou combine os dois."
         backPath="/questoes/lista-questionario"
         actions={{
           primaryAction: {
-            title: 'Salvar',
-            onClick: () => {}
+            title: 'Gerar com IA',
+            onClick: () => setModalIa(true)
+          },
+          secondaryAction: {
+            title: salvar.isPending ? 'Salvando...' : 'Salvar',
+            disabled: salvar.isPending,
+            onClick: handleSalvar
           }
         }}
       />
-      <div className="bg-gray-100 border border-gray-100 rounded-2xl space-y-4 p-6">
-        <div className="max-w-5xl mx-auto bg-white border-2 border-gray-100 rounded-2xl space-y-4 shadow-md p-6">
-          <div className="flex justify-between gap-2 w-full items-center">
-            <TextEditorWithPrefix
-              title={formData.titulo}
-              handleChange={handleChangeTitulo}
-              type="QUESTIONARIO_TITLE"
-            />
-            <Image
-              src={'/simple_logo.png'}
-              width={500}
-              className="w-20 h-auto self-center"
-              quality={100}
-              alt="logo"
-              height={500}
-            />
-          </div>
-        </div>
-        {formData.questoes.map((questao, indexQuestao) => (
-          <div
-            key={indexQuestao}
-            className="max-w-5xl mx-auto bg-white border-2 border-gray-100 rounded-2xl space-y-4 shadow-md p-6"
-          >
-            <div className="flex flex-col gap-2">
-              <TextEditorWithPrefix
-                prefix={
-                  <span className="font-bold">{indexQuestao + 1} - </span>
+
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="space-y-4">
+          <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-md max-md:p-4">
+            <div>
+              <input
+                type="text"
+                value={rascunho.titulo}
+                aria-label="Título do questionário"
+                placeholder="Título do questionário"
+                onChange={(e) =>
+                  atualizar((r) => ({ ...r, titulo: e.target.value }))
                 }
-                title={questao.enunciado}
-                handleChange={(value) =>
-                  handleChangeQuestao(value, indexQuestao)
-                }
-                type="QUESTAO_TITLE"
+                className={clsx(
+                  'w-full border-b-2 bg-transparent pb-2 text-2xl font-bold tracking-tight text-gray-900 placeholder:text-gray-300 outline-none max-md:text-xl',
+                  erros.titulo
+                    ? 'border-red-300'
+                    : 'border-gray-100 focus:border-gray-900'
+                )}
               />
-              <div className="flex flex-col gap-3">
-                {questao.opcoes.map((opcao, indexOption) => (
-                  <div key={opcao.id} className="flex gap-2 items-center">
-                    <input
-                      name={questao.id}
-                      checked={opcao.id === questao.idItemCorreto}
-                      onChange={(e) =>
-                        handleOpcaoCorreta(e.target.value, indexQuestao)
-                      }
-                      value={opcao.id}
-                      type="radio"
-                      className="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-black checked:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
-                    />
-                    <div
-                      className={classNames(
-                        questao.idItemCorreto === opcao.id
-                          ? 'border-black'
-                          : 'border-gray-100',
-                        'flex-1 p-2.5 rounded-lg ring-1 ring-gray-100 shadow-md text-black hover:border-black duration-100 cursor-pointer'
-                      )}
-                    >
-                      <TextEditorWithPrefix
-                        prefix={
-                          <span className="font-bold">
-                            {numeroParaLetra(indexOption + 1)}){' '}
-                          </span>
-                        }
-                        title={opcao.enunciado}
-                        handleChange={(value) =>
-                          handleChangeOption(value, opcao.id, indexQuestao)
-                        }
-                        type="OPCAO_TITLE"
-                      />
-                    </div>
-                    {questao.opcoes.length > 1 && (
-                      <button
-                        onClick={() =>
-                          handleRemoveOption(opcao.id, indexQuestao)
-                        }
-                      >
-                        <FaXmark className="text-base cursor-pointer" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleAddOption(indexQuestao)}
-                  className="p-1.5 gap-2 flex justify-center text-sm items-center text-gray-800 text-md border-gray-800 font-semibold border-2 cursor-pointer border-dashed w-full rounded-lg"
-                >
-                  Adicionar Alternativa
-                </button>
-                <button
-                  onClick={() => handleRemoveQuestao(indexQuestao)}
-                  className="p-1.5 gap-2 flex justify-center text-sm items-center text-red-600 text-md border-red-600 font-semibold border-2 cursor-pointer border-dashed w-full rounded-lg"
-                >
-                  Remover Questão
-                </button>
-              </div>
+              {erros.titulo && (
+                <p className="mt-1 text-sm font-medium text-red-600">
+                  {erros.titulo}
+                </p>
+              )}
+            </div>
+            <CampoTexto
+              name="descricao"
+              placeholder="Descrição (opcional): o que este questionário cobre?"
+              value={rascunho.descricao}
+              error={erros.descricao}
+              handleChange={(descricao) =>
+                atualizar((r) => ({ ...r, descricao }))
+              }
+            />
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <Select
+                className="md:col-span-2"
+                label="Disciplina"
+                options={[{ id: 0, nome: 'Nenhuma' }, ...disciplinas]}
+                value={rascunho.disciplinaId ?? 0}
+                onChange={({ id }) =>
+                  atualizar((r) => ({ ...r, disciplinaId: id || null }))
+                }
+              />
+              <Select
+                label="Dificuldade"
+                options={DIFICULDADES}
+                value={rascunho.dificuldade ?? ''}
+                onChange={({ id }) =>
+                  atualizar((r) => ({ ...r, dificuldade: id || null }))
+                }
+              />
             </div>
           </div>
-        ))}
+
+          {rascunho.questoes.map((questao, indice) => (
+            <EditorQuestao
+              key={questao.chave}
+              questao={questao}
+              indice={indice}
+              total={rascunho.questoes.length}
+              erros={errosDaQuestao(erros, indice)}
+              onChange={(q) => alterarQuestao(indice, q)}
+              onRemover={() => removerQuestao(indice)}
+              onDuplicar={() => duplicar(indice)}
+              onMover={(direcao) => mover(indice, direcao)}
+            />
+          ))}
+
+          {erros.questoes && (
+            <p className="text-sm font-medium text-red-600">{erros.questoes}</p>
+          )}
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <button
+              type="button"
+              onClick={adicionarQuestao}
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-4 text-sm font-semibold text-gray-700 hover:border-gray-900 hover:text-gray-900"
+            >
+              <LuCirclePlus className="text-lg" /> Adicionar questão
+            </button>
+            <button
+              type="button"
+              onClick={() => setModalIa(true)}
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50/50 p-4 text-sm font-semibold text-violet-700 hover:border-violet-400"
+            >
+              <LuSparkles className="text-lg" /> Gerar questões com IA
+            </button>
+          </div>
+        </div>
+
+        <aside className="space-y-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-md xl:sticky xl:top-4">
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Resumo</p>
+            <p className="text-sm text-gray-500">
+              {completas} de {rascunho.questoes.length}{' '}
+              {rascunho.questoes.length === 1
+                ? 'questão pronta'
+                : 'questões prontas'}
+            </p>
+          </div>
+
+          {rascunho.questoes.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {rascunho.questoes.map((questao, indice) => {
+                const comErro =
+                  Object.keys(errosDaQuestao(erros, indice)).length > 0
+                return (
+                  <button
+                    key={questao.chave}
+                    type="button"
+                    title={`Ir para a questão ${indice + 1}`}
+                    onClick={() => rolarAte(questao.chave)}
+                    className={clsx(
+                      'size-8 cursor-pointer rounded-lg text-xs font-bold transition',
+                      comErro
+                        ? 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-200'
+                        : questaoCompleta(questao)
+                          ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200'
+                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                    )}
+                  >
+                    {indice + 1}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {totalErros > 0 && (
+            <p className="rounded-xl bg-red-50 p-3 text-sm font-medium text-red-700">
+              Corrija os campos destacados antes de salvar.
+            </p>
+          )}
+
+          {salvar.error && (
+            <p className="rounded-xl bg-red-50 p-3 text-sm font-medium text-red-700">
+              {getErrorMessage(salvar.error, 'Não foi possível salvar')}
+            </p>
+          )}
+
+          <button
+            type="button"
+            disabled={salvar.isPending}
+            onClick={handleSalvar}
+            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 disabled:opacity-60"
+          >
+            <LuSave />
+            {salvar.isPending ? 'Salvando...' : 'Salvar questionário'}
+          </button>
+        </aside>
       </div>
-      <button
-        onClick={handleAddQuestion}
-        className="p-1.5 text-base text-gray-800 border-gray-800 font-semibold border-2 cursor-pointer border-dashed w-full rounded-xl"
-      >
-        Adicionar questão
-      </button>
+
+      <ModalGerarIa
+        open={modalIa}
+        onClose={() => setModalIa(false)}
+        onGerar={receberDaIa}
+        disciplinas={disciplinas}
+        disciplinaId={rascunho.disciplinaId}
+        dificuldade={rascunho.dificuldade}
+        tema={rascunho.titulo}
+      />
     </div>
   )
 }
 
-export default Questions
+const Page = () => (
+  <Suspense>
+    <EditorQuestionario />
+  </Suspense>
+)
+
+export default Page
