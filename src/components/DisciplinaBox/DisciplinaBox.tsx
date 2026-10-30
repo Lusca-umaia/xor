@@ -2,13 +2,20 @@ import { ReactNode } from 'react'
 
 import clsx from 'clsx'
 import { VscVerified } from 'react-icons/vsc'
-import { LuCircle, LuCirclePlay, LuCircleX } from 'react-icons/lu'
+import {
+  LuCircle,
+  LuCircleMinus,
+  LuCirclePlay,
+  LuCircleX,
+  LuX
+} from 'react-icons/lu'
 
 export const STATUS_KEYS = {
   PENDENTE: 'PENDENTE',
   CONCLUIDA: 'CONCLUIDA',
   ANDAMENTO: 'ANDAMENTO',
-  REPROVADA: 'REPROVADA'
+  REPROVADA: 'REPROVADA',
+  TRANCADA: 'TRANCADA'
 } as const
 
 interface CourseCardProps {
@@ -26,6 +33,7 @@ interface CourseCardProps {
   docente?: string | null
   tipoComponente?: string | null
   editavel?: boolean
+  onRemover?: () => void
 }
 
 const CARD_ICON: Record<CourseCardProps['status'], ReactNode> = {
@@ -38,6 +46,9 @@ const CARD_ICON: Record<CourseCardProps['status'], ReactNode> = {
   ),
   [STATUS_KEYS.REPROVADA]: (
     <LuCircleX className="shrink-0 text-2xl text-red-600" />
+  ),
+  [STATUS_KEYS.TRANCADA]: (
+    <LuCircleMinus className="shrink-0 text-2xl text-amber-600" />
   )
 }
 
@@ -60,6 +71,11 @@ const CARD_BADGE: Record<CourseCardProps['status'], ReactNode> = {
   [STATUS_KEYS.REPROVADA]: (
     <span className="self-start shrink-0 inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
       Reprovada
+    </span>
+  ),
+  [STATUS_KEYS.TRANCADA]: (
+    <span className="self-start shrink-0 inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
+      Trancada
     </span>
   )
 }
@@ -104,7 +120,8 @@ const DisciplinaBox: React.FC<CourseCardProps> = ({
   carater,
   editavel = false,
   onClick,
-  handleChangeNota
+  handleChangeNota,
+  onRemover
 }) => {
   const interativo = Boolean(onClick)
   const exibeNota =
@@ -114,16 +131,31 @@ const DisciplinaBox: React.FC<CourseCardProps> = ({
     <div
       onClick={onClick}
       className={clsx(
-        'border-l-[6px] flex flex-col bg-white rounded-2xl rounded-l-lg space-y-3 shadow-md p-4',
+        'relative border-l-[6px] flex flex-col bg-white rounded-2xl rounded-l-lg space-y-3 shadow-md p-4',
         {
           'border-green-600': status === STATUS_KEYS.CONCLUIDA,
           'border-black': status === STATUS_KEYS.PENDENTE,
           'border-blue-600': status === STATUS_KEYS.ANDAMENTO,
           'border-red-600': status === STATUS_KEYS.REPROVADA,
+          'border-amber-500': status === STATUS_KEYS.TRANCADA,
           'cursor-pointer hover:scale-105 duration-200': interativo
         }
       )}
     >
+      {onRemover && (
+        <button
+          type="button"
+          title="Remover disciplina"
+          onClick={(e) => {
+            e.stopPropagation()
+            onRemover()
+          }}
+          className="absolute -top-2 -right-2 cursor-pointer rounded-full bg-white p-1 text-gray-500 shadow ring-1 ring-gray-200 hover:text-red-600"
+        >
+          <LuX className="text-sm" />
+        </button>
+      )}
+
       <div className="flex items-start justify-between gap-1.5">
         <span className="flex min-w-0 items-center gap-2">
           {CARD_ICON[status]}
