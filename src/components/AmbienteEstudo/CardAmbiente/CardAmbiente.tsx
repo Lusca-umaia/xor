@@ -13,13 +13,16 @@ import {
   LuTimer,
   LuTrash2
 } from 'react-icons/lu'
-import { AmbienteListagem } from '@/@types/AmbienteEstudo'
+import { AmbienteListagem, SituacaoCadeira } from '@/@types/AmbienteEstudo'
 import { CORES_AMBIENTE } from '@/utils/ambienteEstudo/cores'
 import { formatarDataRelativa } from '@/utils/ambienteEstudo/formatar'
 import MenuAcoes from '../MenuAcoes/MenuAcoes'
+import SeloSituacao from '../SeloSituacao/SeloSituacao'
 
 interface CardAmbienteProps {
   ambiente: AmbienteListagem
+  /** Situação da cadeira no histórico; null para ambiente livre. */
+  situacao?: SituacaoCadeira | null
   aoEditar: () => void
   aoAlternarArquivo: () => void
   aoExcluir: () => void
@@ -27,6 +30,7 @@ interface CardAmbienteProps {
 
 export default function CardAmbiente({
   ambiente,
+  situacao = null,
   aoEditar,
   aoAlternarArquivo,
   aoExcluir
@@ -79,25 +83,27 @@ export default function CardAmbiente({
       />
       <div className="flex items-center justify-between gap-2">
         <span className="truncate font-mono text-xs font-semibold text-gray-500">
-          {ambiente.disciplinaCodigo ?? 'Ambiente livre'}
+          {ambiente.disciplinaCodigo ?? 'Tema livre'}
         </span>
         <div className="relative z-10 flex items-center gap-1">
-          <span
-            className={clsx(
-              'inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset',
-              ambiente.arquivado
-                ? 'bg-gray-50 text-gray-600 ring-gray-200'
-                : 'bg-xor-navy/5 text-xor-navy ring-xor-navy/20'
-            )}
-          >
+          {situacao && !ambiente.arquivado ? (
+            <SeloSituacao situacao={situacao} />
+          ) : (
             <span
-              className={clsx('size-1.5 rounded-full', cor.solido)}
-              aria-hidden
-            />
-            {ambiente.arquivado
-              ? 'Arquivado'
-              : CORES_AMBIENTE[ambiente.cor].rotulo}
-          </span>
+              className={clsx(
+                'inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset',
+                ambiente.arquivado
+                  ? 'bg-gray-50 text-gray-600 ring-gray-200'
+                  : 'bg-xor-navy/5 text-xor-navy ring-xor-navy/20'
+              )}
+            >
+              <span
+                className={clsx('size-1.5 rounded-full', cor.solido)}
+                aria-hidden
+              />
+              {ambiente.arquivado ? 'Arquivado' : 'Ambiente livre'}
+            </span>
+          )}
           <MenuAcoes
             acoes={[
               { rotulo: 'Editar', icone: <LuPencil />, aoClicar: aoEditar },

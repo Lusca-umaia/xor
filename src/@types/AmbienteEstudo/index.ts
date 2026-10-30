@@ -45,9 +45,22 @@ export interface DadosAmbiente {
   disciplinaCodigo: string | null
 }
 
-export interface CadeiraAtual {
+/** Situação da cadeira no histórico acadêmico (não é gravada no ambiente). */
+export type SituacaoCadeira =
+  | 'ANDAMENTO'
+  | 'APROVADA'
+  | 'REPROVADA'
+  | 'TRANCADA'
+
+export interface CadeiraHistorico {
   codigo: string
   nome: string
+  situacao: SituacaoCadeira
+  nota: number | null
+  /** Período da tentativa que define a situação (ex.: 2024.1 ou 3º semestre). */
+  periodo: string | null
+  /** Chave numérica para ordenar os períodos (maior = mais recente). */
+  ordemPeriodo: number
 }
 
 export type TipoMaterial = 'PDF' | 'DOCX' | 'PPTX' | 'IMAGEM' | 'TEXTO'

@@ -11,7 +11,8 @@ import {
   CorAmbiente,
   DadosAmbiente
 } from '@/@types/AmbienteEstudo'
-import { useCadeirasAtuais } from '@/hooks/ambienteEstudo/useCadeirasAtuais'
+import { useHistoricoCadeiras } from '@/hooks/ambienteEstudo/useHistoricoCadeiras'
+import { SITUACOES } from '../SeloSituacao/SeloSituacao'
 import { CORES_AMBIENTE, LISTA_CORES } from '@/utils/ambienteEstudo/cores'
 import Botao from '../Botao/Botao'
 import { classeAjuda, classeCampo, classeErro, classeRotulo } from '../estilos'
@@ -46,7 +47,16 @@ export default function ModalAmbiente({
   salvando = false,
   ambiente
 }: ModalAmbienteProps) {
-  const cadeiras = useCadeirasAtuais()
+  const { cadeiras } = useHistoricoCadeiras()
+  // Agrupadas por situação; as mais recentes primeiro em cada grupo.
+  const grupos = (['ANDAMENTO', 'REPROVADA', 'TRANCADA', 'APROVADA'] as const)
+    .map((situacao) => ({
+      situacao,
+      cadeiras: cadeiras
+        .filter((cadeira) => cadeira.situacao === situacao)
+        .sort((a, b) => b.ordemPeriodo - a.ordemPeriodo)
+    }))
+    .filter((grupo) => grupo.cadeiras.length > 0)
 
   const {
     register,
@@ -118,15 +128,32 @@ export default function ModalAmbiente({
             })}
           >
             <option value="">Nenhuma: ambiente livre</option>
-            {cadeiras.map((cadeira) => (
-              <option key={cadeira.codigo} value={cadeira.codigo}>
-                {cadeira.nome} ({cadeira.codigo})
-              </option>
+            {grupos.map((grupo) => (
+              <optgroup
+                key={grupo.situacao}
+                label={SITUACOES[grupo.situacao].rotulo}
+              >
+                {grupo.cadeiras.map((cadeira) => (
+                  <option key={cadeira.codigo} value={cadeira.codigo}>
+                    {cadeira.nome} ({cadeira.codigo})
+                    {cadeira.periodo ? ` · ${cadeira.periodo}` : ''}
+                  </option>
+                ))}
+              </optgroup>
             ))}
+            {ambiente?.disciplinaCodigo &&
+              !cadeiras.some(
+                ({ codigo }) => codigo === ambiente.disciplinaCodigo
+              ) && (
+                <option value={ambiente.disciplinaCodigo}>
+                  {ambiente.disciplinaCodigo} (fora do histórico)
+                </option>
+              )}
           </select>
           <p className={classeAjuda}>
-            Vincule a uma cadeira em andamento ou deixe livre para outros temas
-            (concurso, idiomas, projeto pessoal...).
+            Vincule a uma cadeira do seu histórico (atual ou de semestres
+            passados) ou deixe livre para outros temas (concurso, idiomas,
+            projeto pessoal...).
           </p>
         </div>
 
