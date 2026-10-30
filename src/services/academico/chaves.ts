@@ -6,6 +6,7 @@ export const CHAVES = {
   playlists: 'xor:playlists',
   portfolio: 'xor:portfolio',
   avaliacoes: 'xor:avaliacoes',
+  planejador: 'xor:planejador',
   limites: 'xor:limites-sobrecarga',
   consentimentoIA: 'xor:consentimento-ia'
 } as const
