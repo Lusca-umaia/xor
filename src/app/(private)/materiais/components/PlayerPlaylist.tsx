@@ -128,7 +128,7 @@ const PlayerPlaylist: React.FC<Props> = ({
                 index: salvo.indice ?? 0,
                 startSeconds: salvo.segundos ?? 0
               })
-              setTaxas(p.getAvailablePlaybackRates())
+              setTaxas(p.getAvailablePlaybackRates?.() ?? [1])
               setPronto(true)
             },
             onStateChange: ({ data }) => {
