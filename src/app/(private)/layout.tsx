@@ -1,5 +1,11 @@
 import React from 'react'
+import type { Metadata } from 'next'
 import Navbar from '@/components/Navbar/Navbar'
+
+// Telas logadas não devem aparecer em buscadores.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false }
+}
 
 export default function RootLayout({
   children
