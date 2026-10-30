@@ -1,4 +1,5 @@
 'use client'
+import clsx from 'clsx'
 import { useMemo, useState } from 'react'
 import { LuChevronLeft, LuChevronRight, LuTriangleAlert } from 'react-icons/lu'
 import Header from '@/components/Header/Header'
@@ -15,6 +16,7 @@ import {
   sugerirRevisoes
 } from '@/utils/academico'
 import { Card } from '../academico/components/Comuns'
+import GradeMes from './components/GradeMes'
 import GradeSemana from './components/GradeSemana'
 import HorariosAulas from './components/HorariosAulas'
 import NovoEvento, { type Rascunho } from './components/NovoEvento'
@@ -35,6 +37,8 @@ const CalendarioPage = () => {
   } = useAgenda()
   const [inicio, setInicio] = useState(() => inicioDaSemana(new Date()))
   const [rascunho, setRascunho] = useState<Rascunho | null>(null)
+  const [modo, setModo] = useState<'semana' | 'mes'>('semana')
+  const [mes, setMes] = useState(() => new Date())
 
   const nomes = useMemo(
     () => new Map(ativas.map((d) => [d.codigo, d.nome])),
@@ -63,6 +67,19 @@ const CalendarioPage = () => {
     limites.itens
   )
   const titulo = `${dias[0].toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} a ${dias[6].toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}`
+
+  const semanal = modo === 'semana'
+  const tituloMes = mes.toLocaleDateString('pt-BR', {
+    month: 'long',
+    year: 'numeric'
+  })
+  const mover = (dias: number) => setInicio((d) => somarDias(d, dias))
+  const moverMes = (n: number) =>
+    setMes((d) => new Date(d.getFullYear(), d.getMonth() + n, 1))
+  const irParaHoje = () => {
+    setInicio(inicioDaSemana(new Date()))
+    setMes(new Date())
+  }
 
   const abrirNovo = (data: string, inicioMin: number) =>
     setRascunho({
@@ -123,47 +140,86 @@ const CalendarioPage = () => {
         )}
 
         <Card>
-          <div className="flex flex-wrap items-center gap-1">
-            <button
-              type="button"
-              aria-label="Semana anterior"
-              onClick={() => setInicio((d) => somarDias(d, -7))}
-              className="cursor-pointer rounded-md p-2 hover:bg-gray-100"
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-1">
+              <button
+                type="button"
+                aria-label={semanal ? 'Semana anterior' : 'Mês anterior'}
+                onClick={() => (semanal ? mover(-7) : moverMes(-1))}
+                className="cursor-pointer rounded-md p-2 hover:bg-gray-100"
+              >
+                <LuChevronLeft />
+              </button>
+              <h3 className="min-w-48 text-center text-base font-bold tracking-tight capitalize">
+                {semanal ? titulo : tituloMes}
+              </h3>
+              <button
+                type="button"
+                aria-label={semanal ? 'Próxima semana' : 'Próximo mês'}
+                onClick={() => (semanal ? mover(7) : moverMes(1))}
+                className="cursor-pointer rounded-md p-2 hover:bg-gray-100"
+              >
+                <LuChevronRight />
+              </button>
+              <button
+                type="button"
+                onClick={irParaHoje}
+                className="ml-1 cursor-pointer rounded-md px-2 py-1 text-xs font-semibold text-xor-navy hover:bg-gray-100"
+              >
+                Hoje
+              </button>
+            </div>
+            <div
+              role="tablist"
+              className="flex gap-1 rounded-full border border-gray-100 bg-white p-1 shadow-sm"
             >
-              <LuChevronLeft />
-            </button>
-            <h3 className="min-w-48 text-center text-base font-bold tracking-tight">
-              {titulo}
-            </h3>
-            <button
-              type="button"
-              aria-label="Próxima semana"
-              onClick={() => setInicio((d) => somarDias(d, 7))}
-              className="cursor-pointer rounded-md p-2 hover:bg-gray-100"
-            >
-              <LuChevronRight />
-            </button>
-            <button
-              type="button"
-              onClick={() => setInicio(inicioDaSemana(new Date()))}
-              className="ml-1 cursor-pointer rounded-md px-2 py-1 text-xs font-semibold text-xor-navy hover:bg-gray-100"
-            >
-              Hoje
-            </button>
+              {(['semana', 'mes'] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  role="tab"
+                  aria-selected={modo === m}
+                  onClick={() => setModo(m)}
+                  className={clsx(
+                    'cursor-pointer rounded-full px-3 py-1 text-xs font-semibold',
+                    modo === m
+                      ? 'bg-black text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  )}
+                >
+                  {m === 'semana' ? 'Semana' : 'Mês'}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <GradeSemana
-            dias={dias}
-            turmas={turmas}
-            nomes={nomes}
-            eventos={eventos}
-            atividades={atividades}
-            onSlot={abrirNovo}
-            onRemover={(id) => setEventos((l) => l.filter((e) => e.id !== id))}
-          />
+          {semanal ? (
+            <GradeSemana
+              dias={dias}
+              turmas={turmas}
+              nomes={nomes}
+              eventos={eventos}
+              atividades={atividades}
+              onSlot={abrirNovo}
+              onRemover={(id) =>
+                setEventos((l) => l.filter((e) => e.id !== id))
+              }
+            />
+          ) : (
+            <GradeMes
+              mes={mes}
+              turmas={turmas}
+              eventos={eventos}
+              atividades={atividades}
+              onDia={(dia) => {
+                setInicio(inicioDaSemana(dia))
+                setModo('semana')
+              }}
+            />
+          )}
           <p className="text-xs text-gray-500">
-            Os horários de aula são os que você cadastra abaixo. A visão mensal
-            ainda não foi implementada.
+            Os horários de aula são os que você cadastra abaixo.
+            {!semanal && ' Clique num dia para abrir a semana dele.'}
           </p>
         </Card>
 

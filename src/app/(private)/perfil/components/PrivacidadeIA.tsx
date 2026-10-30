@@ -10,12 +10,16 @@ const DADOS = [
   ['Atividades por disciplina', CHAVES.atividades],
   ['Eventos do calendário', CHAVES.eventos],
   ['Horários das aulas', CHAVES.turmas],
+  ['Playlists do YouTube', CHAVES.playlists],
+  ['Portfólio acadêmico', CHAVES.portfolio],
   ['Avaliações da calculadora de meta', CHAVES.avaliacoes],
   ['Limites do detector de sobrecarga', CHAVES.limites]
 ] as const
 
 const APAGAVEIS = [
   CHAVES.turmas,
+  CHAVES.playlists,
+  CHAVES.portfolio,
   CHAVES.atividades,
   CHAVES.eventos,
   CHAVES.avaliacoes,

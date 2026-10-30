@@ -2,6 +2,7 @@
 import {
   LuCalendarDays,
   LuClipboardList,
+  LuLibraryBig,
   LuGraduationCap,
   LuTimer,
   LuUserRound
@@ -38,6 +39,11 @@ export const options = [
     icon: <LuClipboardList />,
     path: '/atividades',
     name: 'Atividades'
+  },
+  {
+    icon: <LuLibraryBig />,
+    path: '/materiais',
+    name: 'Materiais de estudo'
   },
   {
     icon: <LuTimer />,
