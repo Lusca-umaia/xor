@@ -17,6 +17,8 @@ import {
   LuTrash2
 } from 'react-icons/lu'
 import CapaXor from '@/components/CapaXor/CapaXor'
+import { SITUACOES } from '@/components/AmbienteEstudo/SeloSituacao/SeloSituacao'
+import { useHistoricoCadeiras } from '@/hooks/ambienteEstudo/useHistoricoCadeiras'
 import AbasAmbiente from '@/components/AmbienteEstudo/AbasAmbiente/AbasAmbiente'
 import Botao, { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
 import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
@@ -44,6 +46,10 @@ export default function AmbienteLayout({ children }: { children: ReactNode }) {
   const excluir = useExcluirAmbiente()
   const [editando, setEditando] = useState(false)
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false)
+  const { porCodigo } = useHistoricoCadeiras()
+  const situacao = ambiente?.disciplinaCodigo
+    ? (porCodigo.get(ambiente.disciplinaCodigo)?.situacao ?? null)
+    : null
 
   // Realização de simulado: modo foco, sem cabeçalho nem abas.
   const modoFoco =
@@ -108,9 +114,11 @@ export default function AmbienteLayout({ children }: { children: ReactNode }) {
                         className={clsx('size-2 rounded-full', cor.solido)}
                         aria-hidden
                       />
-                      {ambiente.origem === 'CADEIRA'
-                        ? 'Cadeira em andamento'
-                        : 'Ambiente livre'}
+                      {situacao
+                        ? SITUACOES[situacao].rotulo
+                        : ambiente.disciplinaCodigo
+                          ? 'Cadeira'
+                          : 'Ambiente livre'}
                     </span>
                     {ambiente.arquivado && (
                       <span className="inline-flex rounded-md bg-xor-lime px-2 py-0.5 text-xs font-semibold text-xor-navy">

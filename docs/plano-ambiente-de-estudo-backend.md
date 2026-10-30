@@ -192,7 +192,7 @@ Todas sob `src/app/api/ambientes/` (e `/api/materiais`, `/api/chats`... onde o r
 
 | Serviço do front | Rota | Observações |
 |---|---|---|
-| `listarAmbientes` | `GET /api/ambientes` | Se o aluno não tem linha em `ambientes_config`: cria um ambiente por disciplina com `status = 'ANDAMENTO'` (reusar `buscarProgresso` de `src/lib/api/progresso.ts`), cor em rodízio, e grava `ambientes_config`. Devolve `AmbienteListagem[]` com contagens (`count` por tabela) e `ultimaAtividadeEm = atualizado_em`. **Sem conteúdo de demonstração.** |
+| `listarAmbientes` | `GET /api/ambientes` | Devolve só os ambientes que o aluno criou (nada é criado automaticamente; as cadeiras do histórico sem ambiente são mostradas pelo front, a partir do progresso). Devolve `AmbienteListagem[]` com contagens (`count` por tabela) e `ultimaAtividadeEm = atualizado_em`. **Sem conteúdo de demonstração.** |
 | `obterAmbiente` / `atualizarAmbiente` / `excluirAmbiente` | `GET/PATCH/DELETE /api/ambientes/:id` | Excluir também apaga os arquivos do Storage do ambiente. 404 → `ApiError(404, 'Ambiente não encontrado')`. |
 | `criarAmbiente` | `POST /api/ambientes` | `origem` derivada de `disciplinaCodigo`. |
 | `listarMateriais` | `GET /api/ambientes/:id/materiais` | |

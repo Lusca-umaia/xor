@@ -3,52 +3,11 @@ import 'server-only'
 import type {
   AmbienteEstudo,
   AmbienteListagem,
-  CorAmbiente,
   DadosAmbiente
 } from '@/@types/AmbienteEstudo'
-import { buscarProgresso } from '../progresso'
 import { Contexto, exigir, verificar } from './comum'
 import { AmbienteRow, COLUNAS_AMBIENTE, mapearAmbiente } from './mapeadores'
 import { removerArquivos } from './materiais'
-
-const CORES_INICIAIS: CorAmbiente[] = [
-  'azul',
-  'verde',
-  'roxo',
-  'laranja',
-  'rosa',
-  'ciano',
-  'ambar'
-]
-
-/**
- * No primeiro acesso, cria um ambiente por disciplina em andamento. A linha em
- * ambientes_config é inserida antes: se já existe (23505), o aluno já foi
- * semeado e nada é recriado, mesmo que ele tenha excluído os ambientes.
- */
-async function garantirAmbientesIniciais(ctx: Contexto) {
-  const { supabase, user } = ctx
-  const { error } = await supabase
-    .from('ambientes_config')
-    .insert({ aluno_id: user.id })
-  if (error?.code === '23505') return
-  verificar(error)
-
-  const { disciplinas } = await buscarProgresso(supabase, user)
-  const emAndamento = disciplinas.filter(({ status }) => status === 'ANDAMENTO')
-  if (emAndamento.length === 0) return
-
-  const { error: erroInsercao } = await supabase.from('ambientes').insert(
-    emAndamento.map((disciplina, indice) => ({
-      aluno_id: user.id,
-      nome: disciplina.nome.slice(0, 80),
-      cor: CORES_INICIAIS[indice % CORES_INICIAIS.length],
-      origem: 'CADEIRA',
-      disciplina_codigo: disciplina.codigo
-    }))
-  )
-  verificar(erroInsercao)
-}
 
 const contarPorAmbiente = async (
   { supabase }: Contexto,
@@ -66,8 +25,6 @@ const contarPorAmbiente = async (
 export async function listarAmbientes(
   ctx: Contexto
 ): Promise<AmbienteListagem[]> {
-  await garantirAmbientesIniciais(ctx)
-
   const [{ data, error }, materiais, chats, resumos, atividades, simulados] =
     await Promise.all([
       ctx.supabase
