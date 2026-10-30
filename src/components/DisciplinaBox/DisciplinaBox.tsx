@@ -1,12 +1,11 @@
 import { ReactNode } from 'react'
 
 import clsx from 'clsx'
-import { VscVerified } from 'react-icons/vsc'
 import {
-  LuCircle,
-  LuCircleMinus,
-  LuCirclePlay,
-  LuCircleX,
+  LuCalendar,
+  LuClock,
+  LuHistory,
+  LuUserCheck,
   LuX
 } from 'react-icons/lu'
 
@@ -36,48 +35,41 @@ interface CourseCardProps {
   onRemover?: () => void
 }
 
-const CARD_ICON: Record<CourseCardProps['status'], ReactNode> = {
-  [STATUS_KEYS.CONCLUIDA]: (
-    <VscVerified className="shrink-0 text-2xl text-green-600" />
-  ),
-  [STATUS_KEYS.PENDENTE]: <LuCircle className="shrink-0 text-xl text-black" />,
-  [STATUS_KEYS.ANDAMENTO]: (
-    <LuCirclePlay className="shrink-0 text-2xl text-blue-600" />
-  ),
-  [STATUS_KEYS.REPROVADA]: (
-    <LuCircleX className="shrink-0 text-2xl text-red-600" />
-  ),
-  [STATUS_KEYS.TRANCADA]: (
-    <LuCircleMinus className="shrink-0 text-2xl text-amber-600" />
-  )
-}
-
-const CARD_BADGE: Record<CourseCardProps['status'], ReactNode> = {
-  [STATUS_KEYS.CONCLUIDA]: (
-    <span className="self-start shrink-0 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-      Concluída
-    </span>
-  ),
-  [STATUS_KEYS.PENDENTE]: (
-    <span className="self-start shrink-0 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-      Pendente
-    </span>
-  ),
-  [STATUS_KEYS.ANDAMENTO]: (
-    <span className="self-start shrink-0 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-      Em andamento
-    </span>
-  ),
-  [STATUS_KEYS.REPROVADA]: (
-    <span className="self-start shrink-0 inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
-      Reprovada
-    </span>
-  ),
-  [STATUS_KEYS.TRANCADA]: (
-    <span className="self-start shrink-0 inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
-      Trancada
-    </span>
-  )
+// Cor de destaque, selo e ponto de cada status.
+const STATUS_ESTILO: Record<
+  CourseCardProps['status'],
+  { label: string; destaque: string; selo: string; ponto: string }
+> = {
+  [STATUS_KEYS.CONCLUIDA]: {
+    label: 'Concluída',
+    destaque: 'bg-xor-lime',
+    selo: 'bg-lime-50 text-lime-800 ring-lime-600/20',
+    ponto: 'bg-lime-500'
+  },
+  [STATUS_KEYS.ANDAMENTO]: {
+    label: 'Em andamento',
+    destaque: 'bg-xor-navy',
+    selo: 'bg-xor-navy/5 text-xor-navy ring-xor-navy/20',
+    ponto: 'bg-xor-navy'
+  },
+  [STATUS_KEYS.PENDENTE]: {
+    label: 'Pendente',
+    destaque: 'bg-xor-slate/40',
+    selo: 'bg-gray-50 text-gray-600 ring-gray-500/15',
+    ponto: 'bg-gray-400'
+  },
+  [STATUS_KEYS.REPROVADA]: {
+    label: 'Reprovada',
+    destaque: 'bg-red-500',
+    selo: 'bg-red-50 text-red-700 ring-red-600/20',
+    ponto: 'bg-red-500'
+  },
+  [STATUS_KEYS.TRANCADA]: {
+    label: 'Trancada',
+    destaque: 'bg-amber-400',
+    selo: 'bg-amber-50 text-amber-800 ring-amber-600/20',
+    ponto: 'bg-amber-500'
+  }
 }
 
 const CARATER_LABEL: Record<CourseCardProps['carater'], string> = {
@@ -95,15 +87,11 @@ function formatarSituacao(situacao: string): string {
   return texto.charAt(0).toUpperCase() + texto.slice(1)
 }
 
-const InfoItem = ({ label, value }: { label: string; value: string }) => (
-  <div className="min-w-0">
-    <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
-      {label}
-    </p>
-    <p title={value} className="truncate text-xs font-semibold text-gray-700">
-      {value}
-    </p>
-  </div>
+const Meta = ({ icon, children }: { icon: ReactNode; children: string }) => (
+  <span title={children} className="flex min-w-0 items-center gap-1">
+    <span className="shrink-0 text-gray-400">{icon}</span>
+    <span className="truncate">{children}</span>
+  </span>
 )
 
 const DisciplinaBox: React.FC<CourseCardProps> = ({
@@ -126,22 +114,25 @@ const DisciplinaBox: React.FC<CourseCardProps> = ({
   const interativo = Boolean(onClick)
   const exibeNota =
     status === STATUS_KEYS.CONCLUIDA || status === STATUS_KEYS.REPROVADA
+  const estilo = STATUS_ESTILO[status]
 
   return (
     <div
       onClick={onClick}
       className={clsx(
-        'relative border-l-[6px] flex flex-col bg-white rounded-2xl rounded-l-lg space-y-3 shadow-md p-4',
-        {
-          'border-green-600': status === STATUS_KEYS.CONCLUIDA,
-          'border-black': status === STATUS_KEYS.PENDENTE,
-          'border-blue-600': status === STATUS_KEYS.ANDAMENTO,
-          'border-red-600': status === STATUS_KEYS.REPROVADA,
-          'border-amber-500': status === STATUS_KEYS.TRANCADA,
-          'cursor-pointer hover:scale-105 duration-200': interativo
-        }
+        'relative flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-4 pt-5 shadow-sm',
+        interativo &&
+          'cursor-pointer transition duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-lg'
       )}
     >
+      <span
+        aria-hidden="true"
+        className={clsx(
+          'absolute top-0 left-4 h-1 w-10 rounded-b-full',
+          estilo.destaque
+        )}
+      />
+
       {onRemover && (
         <button
           type="button"
@@ -156,43 +147,66 @@ const DisciplinaBox: React.FC<CourseCardProps> = ({
         </button>
       )}
 
-      <div className="flex items-start justify-between gap-1.5">
-        <span className="flex min-w-0 items-center gap-2">
-          {CARD_ICON[status]}
-          <div className="min-w-0 space-y-1">
-            <h3
-              title={nome}
-              className="line-clamp-2 font-semibold leading-none tracking-tight"
-            >
-              {nome}
-            </h3>
-            <p className="flex flex-wrap items-center gap-1.5 text-sm leading-none font-medium text-gray-600">
-              <span>{codigo}</span>
-              <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-                {CARATER_LABEL[carater]}
-              </span>
-            </p>
-          </div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className="truncate font-mono text-xs font-semibold text-gray-500">
+            {codigo}
+          </span>
+          <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+            {CARATER_LABEL[carater]}
+          </span>
+        </div>
+        <span
+          className={clsx(
+            'inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset',
+            estilo.selo
+          )}
+        >
+          <span className={clsx('size-1.5 rounded-full', estilo.ponto)} />
+          {estilo.label}
         </span>
-        {CARD_BADGE[status]}
       </div>
 
-      <div className="grid grid-cols-2 gap-x-3 gap-y-2 rounded-xl bg-gray-50/80 p-2.5">
-        <InfoItem label="Carga horária" value={`${cargaHoraria}h`} />
-        {periodo && <InfoItem label="Período" value={periodo} />}
-        {situacao && (
-          <InfoItem label="Situação" value={formatarSituacao(situacao)} />
-        )}
-        {typeof frequencia === 'number' && (
-          <InfoItem label="Frequência" value={`${frequencia}%`} />
-        )}
+      <h3
+        title={nome}
+        className="line-clamp-2 font-semibold leading-snug tracking-tight text-gray-900"
+      >
+        {nome}
+      </h3>
+
+      <div className="mt-auto flex items-end justify-between gap-3 border-t border-gray-100 pt-3">
+        <div className="flex min-w-0 flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-gray-500">
+          <Meta icon={<LuClock />}>{`${cargaHoraria}h`}</Meta>
+          {periodo && <Meta icon={<LuCalendar />}>{periodo}</Meta>}
+          {typeof frequencia === 'number' && (
+            <Meta icon={<LuUserCheck />}>{`${frequencia}%`}</Meta>
+          )}
+        </div>
         {exibeNota && (
-          <InfoItem
-            label="Nota"
-            value={typeof nota === 'number' ? formatarNota(nota) : '—'}
-          />
+          <div className="flex shrink-0 flex-col items-end leading-none">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+              Nota
+            </span>
+            <span
+              className={clsx(
+                'mt-1 text-lg font-bold',
+                status === STATUS_KEYS.REPROVADA
+                  ? 'text-red-600'
+                  : 'text-gray-900'
+              )}
+            >
+              {typeof nota === 'number' ? formatarNota(nota) : '—'}
+            </span>
+          </div>
         )}
       </div>
+
+      {situacao && (
+        <p className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+          <LuHistory className="shrink-0 text-gray-400" />
+          {formatarSituacao(situacao)}
+        </p>
+      )}
 
       {exibeNota && editavel && (
         <div className="flex items-center justify-between gap-2">
@@ -209,7 +223,7 @@ const DisciplinaBox: React.FC<CourseCardProps> = ({
             onChange={(e) =>
               handleChangeNota && handleChangeNota(e.target.value)
             }
-            className="block w-16 rounded-md border-0 p-1.5 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 outline-indigo-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+            className="block w-16 rounded-md border-0 p-1.5 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 outline-xor-navy placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy"
           />
         </div>
       )}
@@ -222,7 +236,7 @@ const DisciplinaBox: React.FC<CourseCardProps> = ({
       )}
 
       {tipoComponente && (
-        <span className="inline-flex w-fit items-center rounded-md bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-600 ring-1 ring-inset ring-indigo-600/10">
+        <span className="inline-flex w-fit items-center rounded-md bg-xor-navy/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-xor-navy ring-1 ring-inset ring-xor-navy/10">
           {tipoComponente}
         </span>
       )}
