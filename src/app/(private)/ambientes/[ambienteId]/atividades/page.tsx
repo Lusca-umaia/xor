@@ -1,5 +1,6 @@
 'use client'
 
+import clsx from 'clsx'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { LuListChecks, LuPlus } from 'react-icons/lu'
@@ -53,22 +54,43 @@ export default function AtividadesPage() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
-          {FILTROS.map((opcao) => (
-            <button
-              key={opcao}
-              type="button"
-              onClick={() => setFiltro(opcao)}
-              aria-pressed={filtro === opcao}
-              className={
-                filtro === opcao
-                  ? 'shrink-0 rounded-full bg-black px-3 py-1.5 text-xs font-semibold text-white'
-                  : 'shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50 cursor-pointer'
-              }
-            >
-              {opcao === 'TODAS' ? 'Todas' : ROTULO_TIPO_ATIVIDADE[opcao]}
-            </button>
-          ))}
+        <div
+          role="tablist"
+          className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-full border border-gray-100 bg-white p-1 shadow-lg [scrollbar-width:none]"
+        >
+          {FILTROS.map((opcao) => {
+            const ativa = filtro === opcao
+            const quantidade = (atividades ?? []).filter(
+              ({ tipo }) => opcao === 'TODAS' || tipo === opcao
+            ).length
+            return (
+              <button
+                key={opcao}
+                type="button"
+                role="tab"
+                aria-selected={ativa}
+                onClick={() => setFiltro(opcao)}
+                className={clsx(
+                  'flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold duration-200 max-md:px-3',
+                  ativa
+                    ? 'bg-black text-white'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                )}
+              >
+                {opcao === 'TODAS' ? 'Todas' : ROTULO_TIPO_ATIVIDADE[opcao]}
+                <span
+                  className={clsx(
+                    'rounded-full px-1.5 py-0.5 text-[11px] leading-none',
+                    ativa
+                      ? 'bg-white/20 text-white'
+                      : 'bg-gray-100 text-gray-600'
+                  )}
+                >
+                  {quantidade}
+                </span>
+              </button>
+            )
+          })}
         </div>
         <Botao
           variante="primario"

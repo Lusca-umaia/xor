@@ -302,7 +302,7 @@ export default function JanelaChat({
         onDrop={aoSoltar}
       >
         {arrastando && (
-          <div className="pointer-events-none absolute inset-3 z-10 flex items-center justify-center rounded-2xl border-2 border-dashed border-black bg-white/80 text-sm font-semibold">
+          <div className="pointer-events-none absolute inset-3 z-10 flex items-center justify-center rounded-2xl border-2 border-dashed border-xor-navy bg-white/80 text-sm font-semibold">
             <LuUpload className="mr-2" aria-hidden /> Solte para anexar à
             mensagem
           </div>
@@ -312,7 +312,7 @@ export default function JanelaChat({
 
           {mensagens?.length === 0 && !pendente && (
             <div className="py-8 text-center">
-              <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-black text-2xl text-white">
+              <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-xor-navy text-2xl text-white">
                 <LuSparkles aria-hidden />
               </span>
               <h3 className="mt-3 text-lg font-bold">

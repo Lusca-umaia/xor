@@ -46,7 +46,7 @@ export function PainelCitacao({
     >
       {citacao && (
         <div className="space-y-4">
-          <blockquote className="rounded-xl border-l-4 border-black bg-gray-50 p-4 text-sm text-gray-800">
+          <blockquote className="rounded-xl border-l-4 border-xor-navy bg-gray-50 p-4 text-sm text-gray-800">
             <Markdown conteudo={citacao.trecho} />
           </blockquote>
           <p className="text-xs text-gray-500">

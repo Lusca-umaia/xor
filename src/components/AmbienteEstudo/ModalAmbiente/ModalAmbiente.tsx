@@ -177,7 +177,7 @@ export default function ModalAmbiente({
                     className={clsx(
                       'flex size-8 items-center justify-center rounded-full text-white ring-offset-2 cursor-pointer',
                       CORES_AMBIENTE[cor].solido,
-                      field.value === cor && 'ring-2 ring-black'
+                      field.value === cor && 'ring-2 ring-xor-navy'
                     )}
                   >
                     {field.value === cor && <LuCheck aria-hidden />}

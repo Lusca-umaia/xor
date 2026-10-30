@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { LuLibrary, LuSearch, LuShieldCheck } from 'react-icons/lu'
 import { Material } from '@/@types/AmbienteEstudo'
+import IconeTile from '@/components/IconeTile/IconeTile'
 import Botao from '@/components/AmbienteEstudo/Botao/Botao'
 import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
 import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
@@ -79,8 +80,20 @@ export default function MateriaisPage() {
         />
       ) : (
         <section className={clsx(classeCartao, 'overflow-hidden')}>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-4 py-3">
-            <h2 className="font-bold">Biblioteca ({materiais?.length ?? 0})</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-6 py-4 max-md:px-4">
+            <header className="flex items-center gap-3">
+              <IconeTile>
+                <LuLibrary />
+              </IconeTile>
+              <div>
+                <h2 className="text-lg font-bold leading-tight tracking-tight max-md:text-base">
+                  Biblioteca
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {materiais?.length ?? 0} material(is) usados como base da IA
+                </p>
+              </div>
+            </header>
             <div className="relative w-full sm:w-64">
               <LuSearch className="absolute left-3 top-1/2 mt-0.5 -translate-y-1/2 text-gray-400" />
               <input

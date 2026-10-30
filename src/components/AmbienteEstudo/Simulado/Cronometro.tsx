@@ -6,7 +6,7 @@ import { EstadoCronometro } from '@/hooks/ambienteEstudo/useCronometro'
 import { formatarCronometro } from '@/utils/ambienteEstudo/formatar'
 
 const ESTILOS: Record<EstadoCronometro, string> = {
-  NORMAL: 'bg-gray-900 text-white',
+  NORMAL: 'bg-xor-navy text-white',
   ALERTA_10: 'bg-amber-100 text-amber-900 ring-2 ring-amber-400',
   ALERTA_5: 'bg-red-100 text-red-900 ring-2 ring-red-500',
   ESGOTADO: 'bg-red-600 text-white'

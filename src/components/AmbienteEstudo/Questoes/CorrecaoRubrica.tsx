@@ -54,7 +54,7 @@ export default function CorrecaoRubrica({
           aria-valuemax={100}
         >
           <div
-            className="h-full rounded-full bg-gray-900"
+            className="h-full rounded-full bg-xor-navy"
             style={{ width: `${Math.max(3, proporcao * 100)}%` }}
           />
         </div>

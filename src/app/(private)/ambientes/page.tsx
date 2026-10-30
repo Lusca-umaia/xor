@@ -1,9 +1,16 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { LuGraduationCap, LuPlus } from 'react-icons/lu'
+import { ReactNode, useMemo, useState } from 'react'
+import {
+  LuArchive,
+  LuBookOpen,
+  LuGraduationCap,
+  LuLayers,
+  LuPlus
+} from 'react-icons/lu'
 import { AmbienteListagem, DadosAmbiente } from '@/@types/AmbienteEstudo'
 import Header from '@/components/Header/Header'
+import IconeTile from '@/components/IconeTile/IconeTile'
 import CardAmbiente from '@/components/AmbienteEstudo/CardAmbiente/CardAmbiente'
 import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
 import { EsqueletoCards } from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
@@ -26,14 +33,17 @@ type EstadoModal =
   | { tipo: 'editar'; ambiente: AmbienteListagem }
   | null
 
+// Seção no estilo dos grupos de disciplinas da progressão de curso.
 function GradeAmbientes({
   titulo,
+  icone,
   ambientes,
   aoEditar,
   aoAlternarArquivo,
   aoExcluir
 }: {
   titulo: string
+  icone: ReactNode
   ambientes: AmbienteListagem[]
   aoEditar: (ambiente: AmbienteListagem) => void
   aoAlternarArquivo: (ambiente: AmbienteListagem) => void
@@ -41,11 +51,17 @@ function GradeAmbientes({
 }) {
   if (ambientes.length === 0) return null
   return (
-    <section className="space-y-3">
-      <h3 className="text-sm font-bold uppercase tracking-wide text-gray-500">
-        {titulo}
-      </h3>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <section className="space-y-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-lg max-md:p-4">
+      <header className="flex flex-wrap items-center gap-3">
+        <IconeTile>{icone}</IconeTile>
+        <h2 className="text-lg font-bold tracking-tight max-md:text-base">
+          {titulo}
+        </h2>
+        <span className="inline-flex items-center rounded-full bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-200">
+          {pluralizar(ambientes.length, 'ambiente', 'ambientes')}
+        </span>
+      </header>
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {ambientes.map((ambiente) => (
           <CardAmbiente
             key={ambiente.id}
@@ -121,8 +137,8 @@ export default function AmbientesPage() {
       />
 
       {cadeirasSemAmbiente.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-gray-200 bg-white p-4">
-          <span className="text-sm font-semibold text-gray-700">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-xor-navy/5 p-4 ring-1 ring-inset ring-xor-navy/10">
+          <span className="text-sm font-semibold text-xor-navy">
             Cadeiras em andamento sem ambiente:
           </span>
           {cadeirasSemAmbiente.map((cadeira, indice) => (
@@ -175,11 +191,13 @@ export default function AmbientesPage() {
 
       <GradeAmbientes
         titulo="Minhas cadeiras"
+        icone={<LuBookOpen />}
         ambientes={ativos.filter(({ origem }) => origem === 'CADEIRA')}
         {...propsGrade}
       />
       <GradeAmbientes
         titulo="Outros ambientes"
+        icone={<LuLayers />}
         ambientes={ativos.filter(({ origem }) => origem === 'LIVRE')}
         {...propsGrade}
       />
@@ -196,6 +214,7 @@ export default function AmbientesPage() {
           {mostrarArquivados && (
             <GradeAmbientes
               titulo="Arquivados"
+              icone={<LuArchive />}
               ambientes={arquivados}
               {...propsGrade}
             />

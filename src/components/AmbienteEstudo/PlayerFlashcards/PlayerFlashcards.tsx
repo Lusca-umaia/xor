@@ -232,7 +232,7 @@ export default function PlayerFlashcards({
       <div className="flex items-center gap-3">
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-200">
           <div
-            className="h-full rounded-full bg-black transition-all"
+            className="h-full rounded-full bg-xor-navy transition-all"
             style={{ width: `${(feitos / total) * 100}%` }}
           />
         </div>
@@ -270,7 +270,7 @@ export default function PlayerFlashcards({
             </span>
           </div>
           <div
-            className="flashcard-face flashcard-verso col-start-1 row-start-1 flex flex-col items-center justify-center rounded-2xl border border-gray-800 bg-gray-900 p-8 text-center text-white shadow-lg"
+            className="flashcard-face flashcard-verso col-start-1 row-start-1 flex flex-col items-center justify-center rounded-2xl border border-xor-navy bg-xor-navy p-8 text-center text-white shadow-lg"
             aria-hidden={!virado}
           >
             <span className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">

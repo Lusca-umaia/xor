@@ -45,7 +45,7 @@ export default function CardAtividade({
   return (
     <div className={clsx(classeCartao, 'relative flex flex-col gap-3 p-5')}>
       <div className="flex items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-lg">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-xor-navy/5 text-xl text-xor-navy ring-1 ring-inset ring-xor-navy/10">
           {gerando ? (
             <LuLoader className="animate-spin" aria-hidden />
           ) : (

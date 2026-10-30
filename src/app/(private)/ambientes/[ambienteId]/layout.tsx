@@ -16,6 +16,7 @@ import {
   LuPencil,
   LuTrash2
 } from 'react-icons/lu'
+import CapaXor from '@/components/CapaXor/CapaXor'
 import AbasAmbiente from '@/components/AmbienteEstudo/AbasAmbiente/AbasAmbiente'
 import Botao, { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
 import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
@@ -90,67 +91,75 @@ export default function AmbienteLayout({ children }: { children: ReactNode }) {
         </Link>
 
         {isLoading || !ambiente || !cor ? (
-          <div className="space-y-2">
-            <Esqueleto className="h-8 w-64" />
-            <Esqueleto className="h-4 w-40" />
-          </div>
+          <Esqueleto className="h-36 rounded-3xl" />
         ) : (
-          <div className="flex items-start gap-3">
-            <span
-              className={clsx(
-                'mt-1.5 size-4 shrink-0 rounded-full',
-                cor.solido
-              )}
-              aria-hidden
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-bold text-gray-900 max-md:text-lg sm:text-3xl">
-                  {ambiente.nome}
-                </h1>
-                {ambiente.arquivado && (
-                  <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold">
-                    Arquivado
-                  </span>
-                )}
+          <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg">
+            <CapaXor className="px-6 py-6 max-md:px-4 max-md:py-5">
+              <div className="flex items-start gap-3">
+                <div className="min-w-0 flex-1 space-y-2 pr-28 max-md:pr-16">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {ambiente.disciplinaCodigo && (
+                      <span className="inline-flex rounded-md bg-white/10 px-2 py-0.5 font-mono text-xs font-semibold text-white/90 ring-1 ring-inset ring-white/20">
+                        {ambiente.disciplinaCodigo}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1.5 rounded-md bg-white/10 px-2 py-0.5 text-xs font-semibold text-white/90 ring-1 ring-inset ring-white/20">
+                      <span
+                        className={clsx('size-2 rounded-full', cor.solido)}
+                        aria-hidden
+                      />
+                      {ambiente.origem === 'CADEIRA'
+                        ? 'Cadeira em andamento'
+                        : 'Ambiente livre'}
+                    </span>
+                    {ambiente.arquivado && (
+                      <span className="inline-flex rounded-md bg-xor-lime px-2 py-0.5 text-xs font-semibold text-xor-navy">
+                        Arquivado
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-2xl font-bold tracking-tight text-white max-md:text-lg sm:text-3xl">
+                    {ambiente.nome}
+                  </h1>
+                  {ambiente.descricao && (
+                    <p className="text-sm font-medium text-white/70">
+                      {ambiente.descricao}
+                    </p>
+                  )}
+                </div>
+                <MenuAcoes
+                  claro
+                  rotulo="Ações do ambiente"
+                  acoes={[
+                    {
+                      rotulo: 'Editar',
+                      icone: <LuPencil />,
+                      aoClicar: () => setEditando(true)
+                    },
+                    {
+                      rotulo: ambiente.arquivado ? 'Desarquivar' : 'Arquivar',
+                      icone: ambiente.arquivado ? (
+                        <LuArchiveRestore />
+                      ) : (
+                        <LuArchive />
+                      ),
+                      aoClicar: () =>
+                        atualizar.mutate({
+                          id: ambiente.id,
+                          dados: { arquivado: !ambiente.arquivado }
+                        })
+                    },
+                    {
+                      rotulo: 'Excluir',
+                      icone: <LuTrash2 />,
+                      perigosa: true,
+                      aoClicar: () => setConfirmandoExclusao(true)
+                    }
+                  ]}
+                />
               </div>
-              <p className="text-sm font-medium text-gray-500">
-                {ambiente.disciplinaCodigo
-                  ? `Cadeira ${ambiente.disciplinaCodigo}`
-                  : 'Ambiente livre'}
-                {ambiente.descricao && ` · ${ambiente.descricao}`}
-              </p>
-            </div>
-            <MenuAcoes
-              rotulo="Ações do ambiente"
-              acoes={[
-                {
-                  rotulo: 'Editar',
-                  icone: <LuPencil />,
-                  aoClicar: () => setEditando(true)
-                },
-                {
-                  rotulo: ambiente.arquivado ? 'Desarquivar' : 'Arquivar',
-                  icone: ambiente.arquivado ? (
-                    <LuArchiveRestore />
-                  ) : (
-                    <LuArchive />
-                  ),
-                  aoClicar: () =>
-                    atualizar.mutate({
-                      id: ambiente.id,
-                      dados: { arquivado: !ambiente.arquivado }
-                    })
-                },
-                {
-                  rotulo: 'Excluir',
-                  icone: <LuTrash2 />,
-                  perigosa: true,
-                  aoClicar: () => setConfirmandoExclusao(true)
-                }
-              ]}
-            />
-          </div>
+            </CapaXor>
+          </section>
         )}
         <AbasAmbiente ambienteId={ambienteId} />
       </header>

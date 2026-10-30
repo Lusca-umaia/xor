@@ -47,7 +47,7 @@ export default function QuestaoLacunas({
                 autoComplete="off"
                 spellCheck={false}
                 className={clsx(
-                  'mx-1 inline-block w-36 rounded-md border-b-2 bg-gray-50 px-2 py-0.5 text-center text-base font-semibold outline-none focus:bg-white focus:ring-2 focus:ring-black max-sm:w-28',
+                  'mx-1 inline-block w-36 rounded-md border-b-2 bg-gray-50 px-2 py-0.5 text-center text-base font-semibold outline-none focus:bg-white focus:ring-2 focus:ring-xor-navy max-sm:w-28',
                   !corrigida && 'border-gray-400',
                   corrigida &&
                     acertou &&

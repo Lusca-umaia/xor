@@ -297,7 +297,7 @@ export default function PlayerQuestoes({
           aria-label="Progresso da atividade"
         >
           <div
-            className="h-full rounded-full bg-black transition-all"
+            className="h-full rounded-full bg-xor-navy transition-all"
             style={{ width: `${progresso}%` }}
           />
         </div>

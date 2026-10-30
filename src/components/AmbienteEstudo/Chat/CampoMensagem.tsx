@@ -140,7 +140,7 @@ export default function CampoMensagem({
           )}
         </div>
       )}
-      <div className="flex items-end gap-2 rounded-xl border border-gray-300 bg-white p-1.5 focus-within:border-black">
+      <div className="flex items-end gap-2 rounded-xl border border-gray-300 bg-white p-1.5 focus-within:border-xor-navy">
         <button
           type="button"
           onClick={() => entradaArquivo.current?.click()}
@@ -165,7 +165,7 @@ export default function CampoMensagem({
           <button
             type="button"
             onClick={aoParar}
-            className="rounded-lg bg-gray-900 p-2 text-white hover:bg-gray-700 cursor-pointer"
+            className="rounded-lg bg-xor-navy p-2 text-white hover:bg-xor-navy/90 cursor-pointer"
             aria-label="Parar resposta"
             title="Parar resposta"
           >
@@ -179,7 +179,7 @@ export default function CampoMensagem({
             className={clsx(
               'rounded-lg p-2 text-white transition-colors',
               podeEnviar
-                ? 'bg-black hover:bg-gray-800 cursor-pointer'
+                ? 'bg-xor-navy hover:bg-xor-navy/90 cursor-pointer'
                 : 'bg-gray-300'
             )}
             aria-label="Enviar mensagem"

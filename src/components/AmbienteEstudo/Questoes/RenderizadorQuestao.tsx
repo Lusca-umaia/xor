@@ -34,7 +34,7 @@ export default function RenderizadorQuestao({
     >
       <header className="flex flex-wrap items-center gap-2 text-xs">
         {numero !== undefined && (
-          <span className="rounded-md bg-black px-2 py-0.5 font-bold text-white">
+          <span className="rounded-md bg-xor-navy px-2 py-0.5 font-bold text-white">
             Questão {numero}
           </span>
         )}

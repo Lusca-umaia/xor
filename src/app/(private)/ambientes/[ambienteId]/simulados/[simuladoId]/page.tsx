@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import {
   LuArrowLeft,
+  LuInfo,
+  LuHistory,
   LuBan,
   LuBookmark,
   LuClock,
@@ -14,6 +16,7 @@ import {
   LuPlay,
   LuTimer
 } from 'react-icons/lu'
+import IconeTile from '@/components/IconeTile/IconeTile'
 import Botao, { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
 import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
 import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
@@ -98,7 +101,9 @@ export default function SimuladoPage() {
         <div className="mx-auto max-w-2xl space-y-4">
           <section className={clsx(classeCartao, 'space-y-5 p-6 max-md:p-4')}>
             <div>
-              <h2 className="text-2xl font-bold">{simulado.titulo}</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                {simulado.titulo}
+              </h2>
               <p className="text-sm text-gray-500">
                 {simulado.config.tiposQuestao
                   .map((tipo) => ROTULO_TIPO_QUESTAO[tipo])
@@ -140,9 +145,18 @@ export default function SimuladoPage() {
               </p>
             )}
 
-            <div>
-              <h3 className="font-bold">Antes de começar</h3>
-              <ul className="mt-2 space-y-2 text-sm text-gray-700">
+            <div className="space-y-3">
+              <header className="flex items-center gap-3">
+                <IconeTile>
+                  <LuInfo />
+                </IconeTile>
+                <div>
+                  <h3 className="text-lg font-bold leading-tight tracking-tight max-md:text-base">
+                    Antes de começar
+                  </h3>
+                </div>
+              </header>
+              <ul className="space-y-2 text-sm text-gray-700">
                 {simulado.config.duracaoMinutos ? (
                   <>
                     <li className="flex gap-2">
@@ -202,9 +216,18 @@ export default function SimuladoPage() {
           </section>
 
           {entregues.length > 0 && (
-            <section className={clsx(classeCartao, 'p-5')}>
-              <h3 className="font-bold">Tentativas anteriores</h3>
-              <ul className="mt-2 divide-y divide-gray-100">
+            <section className={clsx(classeCartao, 'space-y-3 p-6 max-md:p-4')}>
+              <header className="flex items-center gap-3">
+                <IconeTile>
+                  <LuHistory />
+                </IconeTile>
+                <div>
+                  <h3 className="text-lg font-bold leading-tight tracking-tight max-md:text-base">
+                    Tentativas anteriores
+                  </h3>
+                </div>
+              </header>
+              <ul className="divide-y divide-gray-100">
                 {entregues.map((tentativa) => (
                   <li key={tentativa.id}>
                     <Link

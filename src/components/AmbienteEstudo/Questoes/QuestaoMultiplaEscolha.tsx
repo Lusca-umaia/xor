@@ -36,7 +36,7 @@ export default function QuestaoMultiplaEscolha({
             className={clsx(
               'flex items-start gap-3 rounded-xl p-3 ring-1 transition-colors',
               !desabilitada && 'cursor-pointer hover:bg-gray-50',
-              !corrigida && marcada && 'bg-gray-50 ring-2 ring-black',
+              !corrigida && marcada && 'bg-xor-navy/5 ring-2 ring-xor-navy',
               !corrigida && !marcada && 'ring-gray-200',
               destacarCorreta && 'bg-green-50 ring-2 ring-green-600',
               destacarErro && 'bg-red-50 ring-2 ring-red-600',
@@ -55,7 +55,7 @@ export default function QuestaoMultiplaEscolha({
                   opcaoId: opcao.id
                 } as Resposta)
               }
-              className="mt-1 size-4 shrink-0 accent-black"
+              className="mt-1 size-4 shrink-0 accent-xor-navy"
             />
             <span className="w-5 shrink-0 font-bold">
               {numeroParaLetra(indice + 1)})

@@ -90,7 +90,7 @@ export default function ItemMaterial({
             </p>
             <div className="h-1 w-40 max-w-full overflow-hidden rounded-full bg-gray-100">
               <div
-                className={`h-full bg-gray-900 transition-all duration-700 ${material.status === 'ENVIANDO' ? 'w-1/3' : 'w-3/4 animate-pulse'}`}
+                className={`h-full bg-xor-navy transition-all duration-700 ${material.status === 'ENVIANDO' ? 'w-1/3' : 'w-3/4 animate-pulse'}`}
               />
             </div>
           </div>

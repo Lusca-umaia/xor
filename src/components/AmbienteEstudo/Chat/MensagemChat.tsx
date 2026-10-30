@@ -21,7 +21,7 @@ export function Avatar({ papel }: { papel: TipoMensagem['papel'] }) {
     <span
       className={clsx(
         'flex size-8 shrink-0 items-center justify-center rounded-full text-white',
-        papel === 'ALUNO' ? 'bg-gray-700' : 'bg-black'
+        papel === 'ALUNO' ? 'bg-xor-slate' : 'bg-xor-navy'
       )}
       aria-hidden
     >
@@ -97,7 +97,7 @@ export default function MensagemChat({
           className={clsx(
             'rounded-2xl px-4 py-3 text-sm',
             aluno
-              ? 'rounded-br-md bg-gray-700 text-white [&_.conteudo-markdown_code]:text-gray-900'
+              ? 'rounded-br-md bg-xor-navy text-white [&_.conteudo-markdown_code]:text-gray-900'
               : 'rounded-bl-md border border-gray-200 bg-white text-gray-800 shadow-sm'
           )}
         >

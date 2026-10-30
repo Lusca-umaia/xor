@@ -35,7 +35,7 @@ export default function QuestaoVerdadeiroFalso({
               !desabilitada && 'cursor-pointer hover:bg-gray-50',
               !corrigida &&
                 marcada &&
-                'bg-gray-900 text-white ring-2 ring-black hover:bg-gray-900',
+                'bg-xor-navy text-white ring-2 ring-xor-navy hover:bg-xor-navy',
               !corrigida && !marcada && 'ring-gray-200',
               corrigida &&
                 correta &&
