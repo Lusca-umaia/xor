@@ -52,7 +52,7 @@ const SemestreBloco: React.FC<SemestreBlocoProps> = ({
             onChange={(e) =>
               atualizarPeriodoSemestre(semestre.id, e.target.value)
             }
-            className="w-40 rounded-md border-0 px-2 py-1 text-xs font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+            className="w-40 rounded-md border-0 px-2 py-1 text-xs font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy"
           />
           <span className="text-xs font-medium text-gray-500">
             {semestre.cursadas.length} disciplina(s)
@@ -63,7 +63,7 @@ const SemestreBloco: React.FC<SemestreBlocoProps> = ({
             <button
               type="button"
               onClick={() => setAdicionando(true)}
-              className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-xor-navy hover:bg-xor-navy/5"
             >
               <LuPlus /> Adicionar disciplina
             </button>
@@ -206,7 +206,7 @@ const CadastroManual: React.FC<CadastroManualProps> = ({
         <button
           type="button"
           onClick={adicionarSemestreManual}
-          className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed border-gray-300 px-4 py-3 text-sm font-semibold text-gray-600 hover:border-indigo-400 hover:text-indigo-600"
+          className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed border-gray-300 px-4 py-3 text-sm font-semibold text-gray-600 hover:border-xor-slate hover:text-xor-navy"
         >
           <LuPlus /> Adicionar semestre
         </button>

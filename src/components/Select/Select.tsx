@@ -49,7 +49,7 @@ const Select = <T extends string | number>({
           </Label>
         )}
         <div className={label ? 'relative mt-1' : 'relative'}>
-          <ListboxButton className="grid disabled:pointer-events-none disabled:bg-gray-50 w-full font-medium cursor-default grid-cols-1 rounded-md bg-white py-1.5 pl-3 pr-2 text-left text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 text-sm">
+          <ListboxButton className="grid disabled:pointer-events-none disabled:bg-gray-50 w-full font-medium cursor-default grid-cols-1 rounded-md bg-white py-1.5 pl-3 pr-2 text-left text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-xor-navy text-sm">
             <span className="col-start-1 row-start-1 truncate pr-6">
               &nbsp;
               {data && data.nome}
@@ -70,13 +70,13 @@ const Select = <T extends string | number>({
               <ListboxOption
                 key={option.id}
                 value={option}
-                className="group relative cursor-default select-none py-2 pl-8 pr-4 text-gray-900 data-[focus]:bg-indigo-600 data-[focus]:text-white data-[focus]:outline-none"
+                className="group relative cursor-default select-none py-2 pl-8 pr-4 text-gray-900 data-[focus]:bg-xor-navy data-[focus]:text-white data-[focus]:outline-none"
               >
                 <span className="block truncate font-semibold group-data-[selected]:font-semibold">
                   {option.nome}
                 </span>
 
-                <span className="absolute inset-y-0 left-0 flex items-center pl-1.5 text-indigo-600 group-[&:not([data-selected])]:hidden group-data-[focus]:text-white">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-1.5 text-xor-navy group-[&:not([data-selected])]:hidden group-data-[focus]:text-white">
                   <FaCheck className="size-4" />
                 </span>
               </ListboxOption>

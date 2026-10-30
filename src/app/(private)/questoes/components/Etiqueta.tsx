@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 
 const TONS = {
   neutro: 'bg-gray-50 text-gray-700 ring-gray-200',
-  ia: 'bg-violet-50 text-violet-700 ring-violet-200',
+  ia: 'bg-xor-lime/15 text-xor-navy ring-xor-lime/60',
   sucesso: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   alerta: 'bg-amber-50 text-amber-700 ring-amber-200',
   erro: 'bg-red-50 text-red-700 ring-red-200'

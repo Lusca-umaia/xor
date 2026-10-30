@@ -315,7 +315,7 @@ const EditorQuestionario = () => {
             <button
               type="button"
               onClick={() => setModalIa(true)}
-              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50/50 p-4 text-sm font-semibold text-violet-700 hover:border-violet-400"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-xor-lime/60 bg-xor-lime/10 p-4 text-sm font-semibold text-xor-navy hover:border-xor-lime"
             >
               <LuSparkles className="text-lg" /> Gerar questões com IA
             </button>

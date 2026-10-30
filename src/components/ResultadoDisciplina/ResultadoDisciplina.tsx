@@ -57,7 +57,7 @@ const ResultadoDisciplina: React.FC<ResultadoDisciplinaProps> = ({
             step=".1"
             max={10}
             onChange={(e) => onChange({ ...value, nota: e.target.value })}
-            className="block w-16 rounded-md outline-indigo-700 border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 font-medium text-sm"
+            className="block w-16 rounded-md outline-xor-navy border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy font-medium text-sm"
           />
         </label>
       )}

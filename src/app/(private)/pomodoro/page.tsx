@@ -437,7 +437,7 @@ const Pomodoro = () => {
                     }
                   }}
                   placeholder="Ex.: resolver a lista 3 de Cálculo"
-                  className="mt-1 block w-full rounded-md border-0 p-1.5 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                  className="mt-1 block w-full rounded-md border-0 p-1.5 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy"
                 />
               </div>
             </div>

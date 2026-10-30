@@ -46,7 +46,7 @@ const FormInput: React.FC<FormInputProps> = ({
           <IMaskInput
             id={name}
             onAccept={(value: string) => handleChange(value)}
-            className="block w-full rounded-md outline-indigo-700 border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 font-medium text-sm"
+            className="block w-full rounded-md outline-xor-navy border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy font-medium text-sm"
             mask={mask}
             value={value}
             lazy={false}
@@ -62,7 +62,7 @@ const FormInput: React.FC<FormInputProps> = ({
             onChange={(e) => handleChange(e.target.value)}
             id={name}
             disabled={disabled}
-            className="block w-full rounded-md outline-indigo-700 border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 font-medium text-sm"
+            className="block w-full rounded-md outline-xor-navy border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy font-medium text-sm"
             required={required}
           />
         )}

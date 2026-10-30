@@ -79,7 +79,7 @@ export default function PerfilPage() {
               {ABAS.map((item) => (
                 <Tab
                   key={item.label}
-                  className="group flex shrink-0 cursor-pointer items-center gap-3 rounded-full px-3 py-2 text-left text-gray-900 outline-none duration-200 hover:bg-gray-100 data-focus:ring-2 data-focus:ring-indigo-600 data-selected:bg-black data-selected:text-white data-selected:hover:bg-black lg:rounded-xl lg:py-3"
+                  className="group flex shrink-0 cursor-pointer items-center gap-3 rounded-full px-3 py-2 text-left text-gray-900 outline-none duration-200 hover:bg-gray-100 data-focus:ring-2 data-focus:ring-xor-navy data-selected:bg-black data-selected:text-white data-selected:hover:bg-black lg:rounded-xl lg:py-3"
                 >
                   <span className="text-xl">{item.icon}</span>
                   <span>

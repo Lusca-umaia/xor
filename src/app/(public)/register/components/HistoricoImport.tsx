@@ -112,15 +112,15 @@ const HistoricoImport = () => {
           onDrop={handleDrop}
           className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-colors ${
             arrastando
-              ? 'border-indigo-500 bg-indigo-50'
-              : 'border-gray-300 bg-gray-50/60 hover:border-indigo-400 hover:bg-indigo-50/40'
+              ? 'border-xor-navy bg-xor-navy/5'
+              : 'border-gray-300 bg-gray-50/60 hover:border-xor-slate hover:bg-xor-navy/5'
           }`}
         >
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-inset ring-gray-200">
             {carregando ? (
-              <LuLoaderCircle className="animate-spin text-2xl text-indigo-600" />
+              <LuLoaderCircle className="animate-spin text-2xl text-xor-navy" />
             ) : (
-              <LuUpload className="text-2xl text-indigo-600" />
+              <LuUpload className="text-2xl text-xor-navy" />
             )}
           </div>
           <div>
