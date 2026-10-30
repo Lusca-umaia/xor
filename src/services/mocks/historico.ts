@@ -5,12 +5,24 @@ import type { Avaliacao, TentativaHistorico } from '@/@types/Academico'
 // só para demonstração. Trocar pelo retorno da API quando o banco for integrado.
 export const ALUNO_DEMO = { nome: 'Aluno Exemplo', periodoAtual: '2026.2' }
 
+// Semestre do aluno a partir do período, com ingresso em 2024.1.
+const ordemDe = (periodo: string) => {
+  const [ano, sem] = periodo.split('.').map(Number)
+  return (ano - 2024) * 2 + sem
+}
+
 const t = (
   codigo: string,
   periodo: string,
   status: TentativaHistorico['status'],
   nota: number | null
-): TentativaHistorico => ({ codigo, periodo, status, nota })
+): TentativaHistorico => ({
+  codigo,
+  periodo,
+  ordem: ordemDe(periodo),
+  status,
+  nota
+})
 
 export const HISTORICO_DEMO: TentativaHistorico[] = [
   t('CB0534', '2024.1', 'APROVADA', 8.1),

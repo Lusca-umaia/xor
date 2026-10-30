@@ -60,7 +60,7 @@ const RelatorioTab: React.FC<Props> = ({
     const evolucao = evolucaoIRA(historico, porCodigo)
     const ultimo = evolucao.at(-1)
     const anterior = evolucao.at(-2)
-    const noUltimo = historico.filter((t) => t.periodo === ultimo?.periodo)
+    const noUltimo = historico.filter((t) => t.ordem === ultimo?.ordem)
 
     const conquistas: string[] = []
     for (const t of noUltimo) {
@@ -76,7 +76,7 @@ const RelatorioTab: React.FC<Props> = ({
       const delta = ultimo.iraAcumulado - anterior.iraAcumulado
       if (delta > 0)
         conquistas.push(
-          `IRA acumulado subiu${formatarNota(delta)} em ${ultimo.periodo}.`
+          `IRA acumulado subiu ${formatarNota(delta)} em ${ultimo.periodo}.`
         )
     }
     for (const t of historico.filter((x) => x.status === 'APROVADA')) {
@@ -96,7 +96,7 @@ const RelatorioTab: React.FC<Props> = ({
         t.status === 'APROVADA' &&
         t.nota !== null &&
         t.nota < LIMITE_NOTA_BAIXA &&
-        t.periodo === ultimo?.periodo
+        t.ordem === ultimo?.ordem
       )
         dificuldades.push(
           `Aprovação apertada em ${nome(t.codigo)} (${formatarNota(t.nota)}).`
