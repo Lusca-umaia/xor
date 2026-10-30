@@ -1,5 +1,6 @@
 import type {
   AtividadeListagem,
+  EventoXp,
   Chat,
   Material,
   Resumo,
@@ -7,9 +8,10 @@ import type {
   TentativaSimulado
 } from '@/@types/AmbienteEstudo'
 
-// Gamificação da visão geral. Tudo é calculado a partir do que já existe no
-// ambiente (nada é gravado), então os números se recompõem a cada visita e
-// não dá para "farmar" XP repetindo a mesma ação.
+// Gamificação da visão geral. O XP e os dias de estudo vêm do registro de
+// eventos do servidor (xp_eventos): cada ação conta uma vez, nunca é retirada
+// e há um limite por dia. Missões, conquistas e domínio por tópico são
+// derivados do estado atual do ambiente.
 
 export interface DadosGamificacao {
   materiais: Material[]
@@ -23,21 +25,17 @@ const DIA_MS = 86_400_000
 
 // ---------- XP e nível ----------
 
+// Espelho das regras do servidor (src/lib/api/ambienteEstudo/xp.ts).
 export const REGRAS_XP = [
-  { acao: 'Material processado', xp: 20 },
-  { acao: 'Chat com a IA', xp: 10 },
-  { acao: 'Resumo gerado', xp: 15 },
-  { acao: 'Atividade gerada', xp: 10 },
-  { acao: 'Acerto na melhor tentativa de uma atividade', xp: 5 },
-  { acao: 'Revisão de flashcard (até 5 por cartão)', xp: 3 },
-  { acao: 'Simulado entregue', xp: 30 },
-  { acao: 'Cada ponto da nota no simulado', xp: 5 }
+  { acao: 'Material processado', xp: '+20' },
+  { acao: 'Resposta da IA no chat', xp: '+2' },
+  { acao: 'Resumo gerado', xp: '+15' },
+  { acao: 'Atividade concluída (1ª vez)', xp: '+10' },
+  { acao: 'Cada acerto nessa conclusão', xp: '+5' },
+  { acao: 'Revisão de flashcard (por cartão, por dia)', xp: '+2' },
+  { acao: 'Simulado entregue (refeito: +10)', xp: '+30' },
+  { acao: 'Cada ponto da nota (refeito: +2)', xp: '+5' }
 ] as const
-
-const flashcardsRevisados = (atividades: AtividadeListagem[]) =>
-  atividades.flatMap(({ flashcards }) =>
-    flashcards.filter(({ revisao }) => revisao.repeticoes > 0)
-  )
 
 export const tentativasEntregues = (simulados: SimuladoListagem[]) =>
   simulados
@@ -51,30 +49,6 @@ export const tentativasEntregues = (simulados: SimuladoListagem[]) =>
     .sort((a, b) =>
       a.tentativa.entregueEm.localeCompare(b.tentativa.entregueEm)
     )
-
-export function calcularXp(dados: DadosGamificacao) {
-  const prontas = <T extends { status: string }>(lista: T[]) =>
-    lista.filter(({ status }) => status === 'PRONTO')
-  return (
-    prontas(dados.materiais).length * 20 +
-    dados.chats.length * 10 +
-    prontas(dados.resumos).length * 15 +
-    prontas(dados.atividades).reduce(
-      (soma, { melhorResultado }) =>
-        soma + 10 + (melhorResultado?.acertos ?? 0) * 5,
-      0
-    ) +
-    flashcardsRevisados(dados.atividades).reduce(
-      (soma, { revisao }) => soma + Math.min(revisao.repeticoes, 5) * 3,
-      0
-    ) +
-    tentativasEntregues(dados.simulados).reduce(
-      (soma, { tentativa }) =>
-        soma + 30 + Math.round((tentativa.resultado?.notaFinal ?? 0) * 5),
-      0
-    )
-  )
-}
 
 const TITULOS = [
   'Iniciante',
@@ -106,29 +80,13 @@ export function nivelDe(xp: number) {
 const chaveDia = (data: Date) =>
   `${data.getFullYear()}-${data.getMonth()}-${data.getDate()}`
 
-/** Dias (no fuso do aluno) em que houve alguma ação de estudo no ambiente. */
-export function diasDeEstudo(dados: DadosGamificacao): Set<string> {
-  const datas: string[] = [
-    ...dados.materiais.map(({ criadoEm }) => criadoEm),
-    ...dados.chats.flatMap(({ criadoEm, atualizadoEm }) => [
-      criadoEm,
-      atualizadoEm
-    ]),
-    ...dados.resumos.map(({ criadoEm }) => criadoEm),
-    ...dados.atividades.map(({ criadoEm }) => criadoEm),
-    ...dados.simulados.flatMap(({ tentativas }) =>
-      tentativas.flatMap(({ iniciadaEm, entregueEm }) =>
-        entregueEm ? [iniciadaEm, entregueEm] : [iniciadaEm]
-      )
-    )
-  ]
-  // A última revisão de um cartão foi intervaloDias antes da próxima.
-  for (const { revisao } of flashcardsRevisados(dados.atividades)) {
-    const proxima = new Date(revisao.proximaRevisao).getTime()
-    datas.push(new Date(proxima - revisao.intervaloDias * DIA_MS).toISOString())
-  }
-  return new Set(datas.map((data) => chaveDia(new Date(data))))
-}
+/** Dias (no fuso do aluno) em que ele ganhou XP no ambiente. */
+export const diasDeEstudo = (eventos: EventoXp[]): Set<string> =>
+  new Set(eventos.map(({ criadoEm }) => chaveDia(new Date(criadoEm))))
+
+/** Flashcards revisados: cada revisão registrada vale 2 XP. */
+export const revisoesDeFlashcard = (xpDeFlashcard = 0) =>
+  Math.floor(xpDeFlashcard / 2)
 
 /**
  * Dias seguidos com estudo. Se hoje ainda não teve estudo, a sequência que
@@ -212,7 +170,7 @@ export interface Conquista {
 
 export function conquistas(
   dados: DadosGamificacao,
-  sequencia: number
+  { sequencia, revisoes }: { sequencia: number; revisoes: number }
 ): Conquista[] {
   const entregues = tentativasEntregues(dados.simulados)
   const notas = entregues.map(
@@ -253,7 +211,7 @@ export function conquistas(
       id: 'memoria',
       nome: 'Memória afiada',
       descricao: 'Revise 20 flashcards',
-      atual: flashcardsRevisados(dados.atividades).length,
+      atual: revisoes,
       meta: 20
     },
     {

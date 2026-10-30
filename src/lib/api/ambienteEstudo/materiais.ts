@@ -14,6 +14,7 @@ import { embeddingsDeDocumentos, paraVetor } from './ia/busca'
 import type { TrechoContexto } from './ia/contexto'
 import { COLUNAS_MATERIAL, MaterialRow, mapearMaterial } from './mapeadores'
 import { executarEmSegundoPlano } from './tarefas'
+import { concederXp } from './xp'
 
 const BUCKET = 'materiais'
 const TAMANHO_MAXIMO_BYTES = 25 * 1024 * 1024
@@ -157,6 +158,12 @@ export async function enviarMaterial(
       const { trechos, paginas } = await extrairTexto(tipo, bytes)
       await gravarTrechos(ctx, material.id, trechos)
       await atualizarStatus(ctx, material.id, { status: 'PRONTO', paginas })
+      await concederXp(ctx, {
+        ambienteId,
+        tipo: 'MATERIAL',
+        referencia: material.id,
+        xp: 20
+      })
     },
     (mensagem) =>
       atualizarStatus(ctx, material.id, {
@@ -192,6 +199,12 @@ export async function criarMaterialTexto(
   const material = data as MaterialRow
   await gravarTrechos(ctx, material.id, dividirTexto(texto))
   await tocarAmbiente(ctx, ambienteId)
+  await concederXp(ctx, {
+    ambienteId,
+    tipo: 'MATERIAL',
+    referencia: material.id,
+    xp: 20
+  })
   return mapearMaterial(material)
 }
 

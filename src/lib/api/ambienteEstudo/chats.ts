@@ -19,6 +19,7 @@ import { chatStream, MensagemIa } from './ia/cliente'
 import { ordenarPorRelevancia } from './ia/busca'
 import { montarContexto } from './ia/contexto'
 import { mensagensChat } from './ia/geracao'
+import { concederXp } from './xp'
 import {
   ChatRow,
   COLUNAS_CHAT,
@@ -285,6 +286,14 @@ export async function enviarMensagem(
         })
         .eq('id', mensagemAssistente.id)
       if (error) console.error('[chat] salvar resposta', error)
+      // XP por resposta completa da IA; chat vazio ou interrompido não conta.
+      else if (!falhou && !interrompida && recebido.trim())
+        await concederXp(ctx, {
+          ambienteId: chat.ambiente_id,
+          tipo: 'MENSAGEM',
+          referencia: mensagemAssistente.id,
+          xp: 2
+        })
     }
   }
 

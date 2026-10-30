@@ -366,3 +366,27 @@ export interface ReporteConteudoIA {
   comentario: string | null
   criadoEm: string
 }
+
+// ---------- XP ----------
+
+export type TipoXp =
+  | 'MATERIAL'
+  | 'MENSAGEM'
+  | 'RESUMO'
+  | 'ATIVIDADE'
+  | 'FLASHCARD'
+  | 'SIMULADO'
+  | 'SIMULADO_NOTA'
+
+export interface EventoXp {
+  tipo: TipoXp
+  xp: number
+  criadoEm: string
+}
+
+export interface ProgressoXp {
+  xp: number
+  porTipo: Partial<Record<TipoXp, number>>
+  /** Eventos dos últimos 60 dias, do mais recente para o mais antigo. */
+  eventos: EventoXp[]
+}

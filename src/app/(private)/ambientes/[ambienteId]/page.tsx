@@ -39,10 +39,10 @@ import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
 import { useAtividades } from '@/hooks/ambienteEstudo/useAtividades'
 import { useChats } from '@/hooks/ambienteEstudo/useChats'
 import { useMateriais } from '@/hooks/ambienteEstudo/useMateriais'
+import { useProgressoXp } from '@/hooks/ambienteEstudo/useProgressoXp'
 import { useResumos } from '@/hooks/ambienteEstudo/useResumos'
 import { useSimulados } from '@/hooks/ambienteEstudo/useSimulados'
 import {
-  calcularXp,
   conquistas,
   DadosGamificacao,
   diasDeEstudo,
@@ -50,6 +50,7 @@ import {
   missoesDoDia,
   nivelDe,
   REGRAS_XP,
+  revisoesDeFlashcard,
   semana,
   sequenciaDeDias,
   tentativasEntregues
@@ -156,6 +157,7 @@ export default function VisaoGeralPage() {
   const resumos = useResumos(ambienteId)
   const atividades = useAtividades(ambienteId)
   const simulados = useSimulados(ambienteId)
+  const progresso = useProgressoXp(ambienteId)
   const base = `/ambientes/${ambienteId}`
 
   const carregando =
@@ -163,7 +165,8 @@ export default function VisaoGeralPage() {
     chats.isLoading ||
     resumos.isLoading ||
     atividades.isLoading ||
-    simulados.isLoading
+    simulados.isLoading ||
+    progresso.isLoading
 
   const painel = useMemo(() => {
     const dados: DadosGamificacao = {
@@ -173,8 +176,13 @@ export default function VisaoGeralPage() {
       atividades: atividades.data ?? [],
       simulados: simulados.data ?? []
     }
-    const xp = calcularXp(dados)
-    const dias = diasDeEstudo(dados)
+    const xp = progresso.data?.xp ?? 0
+    const eventos = progresso.data?.eventos ?? []
+    const dias = diasDeEstudo(eventos)
+    const hoje = new Date().toDateString()
+    const xpHoje = eventos
+      .filter(({ criadoEm }) => new Date(criadoEm).toDateString() === hoje)
+      .reduce((soma, evento) => soma + evento.xp, 0)
     const { sequencia, estudouHoje } = sequenciaDeDias(dias)
 
     const continuar: ItemContinuar[] = [
@@ -221,12 +229,16 @@ export default function VisaoGeralPage() {
 
     return {
       xp,
+      xpHoje,
       nivel: nivelDe(xp),
       sequencia,
       estudouHoje,
       semana: semana(dias),
       missoes: missoesDoDia(dados, base, { estudouHoje, sequencia }),
-      conquistas: conquistas(dados, sequencia),
+      conquistas: conquistas(dados, {
+        sequencia,
+        revisoes: revisoesDeFlashcard(progresso.data?.porTipo.FLASHCARD)
+      }),
       dominio: dominioPorTopico(dados.simulados),
       entregues: tentativasEntregues(dados.simulados),
       continuar,
@@ -251,6 +263,7 @@ export default function VisaoGeralPage() {
     resumos.data,
     atividades.data,
     simulados.data,
+    progresso.data,
     base
   ])
 
@@ -294,7 +307,7 @@ export default function VisaoGeralPage() {
           </AnelProgresso>
           <div className="min-w-0 flex-1 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-              Seu domínio nesta cadeira
+              Seu nível nesta cadeira
             </p>
             <h2 className="text-2xl font-bold tracking-tight text-gray-900 max-sm:text-xl">
               {nivel.titulo}
@@ -322,6 +335,11 @@ export default function VisaoGeralPage() {
               <span>
                 Faltam {nivel.faltam} XP para o nível {nivel.nivel + 1}
               </span>
+              {painel.xpHoje > 0 && (
+                <span className="rounded-full bg-xor-lime/30 px-2 py-0.5 text-xs font-semibold text-xor-navy">
+                  +{painel.xpHoje} XP hoje
+                </span>
+              )}
               <details className="relative">
                 <summary className="cursor-pointer list-none font-semibold text-xor-navy hover:text-xor-slate [&::-webkit-details-marker]:hidden">
                   Como ganhar XP?
@@ -331,10 +349,14 @@ export default function VisaoGeralPage() {
                     <li key={acao} className="flex justify-between gap-3">
                       <span>{acao}</span>
                       <span className="shrink-0 font-semibold text-gray-900">
-                        +{xp}
+                        {xp}
                       </span>
                     </li>
                   ))}
+                  <li className="border-t border-gray-100 pt-2 text-gray-500">
+                    Cada ação conta uma vez e há um limite por dia. Excluir
+                    conteúdo não tira o XP já ganho.
+                  </li>
                 </ul>
               </details>
             </div>
