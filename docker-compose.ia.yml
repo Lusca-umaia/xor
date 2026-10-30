@@ -13,7 +13,9 @@ services:
     image: ollama/ollama:0.40.13
     container_name: xor-ollama
     ports:
-      - '11434:11434'
+      # Outra porta se o Ollama já estiver instalado na máquina:
+      #   XOR_IA_PORTA=11435 docker compose -f docker-compose.ia.yml up -d
+      - '${XOR_IA_PORTA:-11434}:11434'
     volumes:
       - ollama:/root/.ollama
     restart: unless-stopped

@@ -85,7 +85,7 @@ O Ambiente de Estudo usa uma IA que roda na própria máquina, pelo [Ollama](htt
    - Windows: `winget install Ollama.Ollama` (ou o instalador em ollama.com/download)
    - macOS: `brew install ollama` e `ollama serve` (ou o app em ollama.com/download)
    - Linux: `curl -fsSL https://ollama.com/install.sh | sh`
-   - Sem instalar nada além do Docker: `docker compose -f docker-compose.ia.yml up -d`
+   - Sem instalar nada além do Docker: `docker compose -f docker-compose.ia.yml up -d` (se o Ollama também estiver instalado, use outra porta: `XOR_IA_PORTA=11435 docker compose -f docker-compose.ia.yml up -d` e `LM_STUDIO_URL=http://localhost:11435/v1`)
 2. Rode `npm run ia:setup`. O script baixa os modelos (só na primeira vez), cria o `xor-estudo` e testa o chat e os embeddings.
 3. Reinicie o `npm run dev` se ele já estava rodando.
 
