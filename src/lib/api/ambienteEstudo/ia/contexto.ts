@@ -4,6 +4,7 @@ import type { Citacao } from '@/@types/AmbienteEstudo'
 import { normalizarTexto } from '@/utils/historicoAcademico'
 
 export interface TrechoContexto {
+  id: number
   materialId: string
   materialNome: string
   pagina: number | null
@@ -20,10 +21,19 @@ export interface ContextoMontado {
 
 // O modelo local tem 8192 tokens de contexto: o material ocupa no máximo
 // ~12 mil caracteres, deixando espaço para instruções e resposta.
-const LIMITE_PADRAO = 12_000
+export const LIMITE_PADRAO = 12_000
 const LIMITE_POR_TRECHO = 2_500
 
-const palavras = (texto: string) =>
+const tamanhoNoPrompt = (trecho: TrechoContexto) =>
+  Math.min(trecho.texto.replace(/\s+/g, ' ').trim().length, LIMITE_POR_TRECHO)
+
+/** Indica se todos os trechos cabem no prompt. */
+export const cabeNoContexto = (
+  trechos: TrechoContexto[],
+  limite = LIMITE_PADRAO
+) => trechos.reduce((total, t) => total + tamanhoNoPrompt(t), 0) <= limite
+
+export const palavras = (texto: string) =>
   new Set(
     normalizarTexto(texto)
       .split(' ')
@@ -31,32 +41,16 @@ const palavras = (texto: string) =>
   )
 
 /**
- * Numera os trechos para o prompt. Com `pergunta`, coloca primeiro os trechos
- * com mais palavras em comum (busca simples, sem embeddings).
+ * Numera os trechos para o prompt, na ordem recebida, até o limite. Quem
+ * chama decide a ordem (por relevância, por tópico ou a do documento).
  */
 export function montarContexto(
   trechos: TrechoContexto[],
-  {
-    pergunta,
-    limite = LIMITE_PADRAO
-  }: { pergunta?: string; limite?: number } = {}
+  { limite = LIMITE_PADRAO }: { limite?: number } = {}
 ): ContextoMontado {
-  let ordenados = trechos
-  if (pergunta) {
-    const alvo = palavras(pergunta)
-    ordenados = trechos
-      .map((trecho, indice) => ({
-        trecho,
-        indice,
-        pontos: [...palavras(trecho.texto)].filter((p) => alvo.has(p)).length
-      }))
-      .sort((a, b) => b.pontos - a.pontos || a.indice - b.indice)
-      .map(({ trecho }) => trecho)
-  }
-
   const usados: TrechoContexto[] = []
   let total = 0
-  for (const trecho of ordenados) {
+  for (const trecho of trechos) {
     const texto = trecho.texto
       .replace(/\s+/g, ' ')
       .trim()

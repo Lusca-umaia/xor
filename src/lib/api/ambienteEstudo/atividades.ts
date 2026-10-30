@@ -28,7 +28,7 @@ import {
   verificar,
   verificarInsercao
 } from './comum'
-import { montarContexto } from './ia/contexto'
+import { contextoParaGeracao } from './ia/busca'
 import {
   corrigirDiscursiva as corrigirComIa,
   explicarDeOutroJeito as explicarComIa,
@@ -168,7 +168,10 @@ export async function gerarAtividade(
         temaDoAmbiente(ctx, ambienteId)
       ])
       const parametros = {
-        contexto: montarContexto(trechos),
+        contexto: await contextoParaGeracao(ctx, trechos, {
+          tema,
+          topico: config.topico
+        }),
         tema,
         quantidade: config.quantidade,
         dificuldade: config.dificuldade,

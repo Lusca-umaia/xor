@@ -46,6 +46,7 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
    # IA local com API compatível com a OpenAI (Ollama ou LM Studio)
    LM_STUDIO_URL=http://localhost:11434/v1
    LM_STUDIO_MODEL=xor-estudo
+   EMBEDDING_MODEL=nomic-embed-text-v2-moe
    TOGETHER_API_KEY=<chave da Together AI>
    ```
 
@@ -57,6 +58,7 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
    | `NEXT_PUBLIC_SITE_URL` | Links absolutos do Open Graph (prévia ao compartilhar o link) | Não. O padrão é `http://localhost:3000` |
    | `LM_STUDIO_URL` | IA local: questionários e Ambiente de Estudo (Ollama em `http://localhost:11434/v1` ou LM Studio em `http://localhost:1234/v1`) | Não. Sem ela, a geração responde 503 |
    | `LM_STUDIO_MODEL` | Modelo usado. Com o Ollama: `xor-estudo` (veja [docs/plano-ambiente-de-estudo-backend.md](docs/plano-ambiente-de-estudo-backend.md)) | Não |
+   | `EMBEDDING_MODEL` | Embeddings da busca semântica nos materiais (no mesmo servidor de `LM_STUDIO_URL`; baixe com `ollama pull nomic-embed-text-v2-moe`) | Não. O padrão é `nomic-embed-text-v2-moe`; sem o modelo, a busca usa só palavras |
    | `TOGETHER_API_KEY` | Chat com IA | Só para o chat |
 
    A chave secreta ignora o RLS. Ela nunca pode ganhar o prefixo `NEXT_PUBLIC_`, senão vai parar no bundle do navegador.
