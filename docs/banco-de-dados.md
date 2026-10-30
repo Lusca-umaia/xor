@@ -9,6 +9,7 @@ O banco é o Postgres do Supabase. O schema fica versionado em [supabase/migrati
 | `20261029020000_questionarios.sql` | `questionarios`, `questoes`, `resolucoes`, `salvar_questionario` |
 | `20261029020000_sessoes_foco.sql` | `sessoes_foco` (Pomodoro) |
 | `20261030000000_ambiente_estudo.sql` | Ambiente de Estudo: `ambientes`, `materiais`, `trechos`, `chats`, `mensagens`, `resumos`, `atividades`, `simulados`, tentativas, `reportes_ia` e o bucket `materiais` |
+| `20261031000000_embeddings_trechos.sql` | `pgvector`: colunas `embedding` e `modelo_embedding` em `trechos`, índice HNSW e a função `buscar_trechos` |
 
 ## Princípios
 
@@ -93,7 +94,7 @@ Um ambiente por cadeira (ou tema livre), com o conteúdo de estudo gerado pela I
 | `ambientes_config` | Uma linha por aluno: marca que os ambientes iniciais (um por disciplina em andamento) já foram criados |
 | `ambientes` | Nome, cor, disciplina vinculada (`disciplina_codigo`, opcional) e `arquivado` |
 | `materiais` | Arquivos enviados ou texto colado. `status` vai de `PROCESSANDO` a `PRONTO` (ou `ERRO`) depois da extração do texto. O arquivo fica no Storage em `storage_path` |
-| `trechos` | Texto extraído dos materiais, por página, usado como contexto da IA |
+| `trechos` | Texto extraído dos materiais, por página, usado como contexto da IA, com o embedding (768 dimensões) para a busca semântica |
 | `chats`, `mensagens` | Conversas com a IA. `chats.material_ids` são os materiais usados como contexto; `mensagens.citacoes` guarda as fontes |
 | `resumos` | Resumos gerados. `status` `GERANDO` enquanto a IA trabalha |
 | `atividades`, `tentativas_atividade` | Quiz, V/F, lacunas, discursiva e flashcards (`questoes` e `flashcards` em jsonb) e o andamento de cada tentativa |
