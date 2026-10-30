@@ -126,6 +126,12 @@ const CalendarioPage = () => {
           </div>
         )}
 
+        <HorariosAulas
+          disciplinas={ativas}
+          turmas={turmas}
+          setTurmas={setTurmas}
+        />
+
         {rascunho && (
           <NovoEvento
             key={`${rascunho.data}-${rascunho.inicio}`}
@@ -222,12 +228,6 @@ const CalendarioPage = () => {
             {!semanal && ' Clique num dia para abrir a semana dele.'}
           </p>
         </Card>
-
-        <HorariosAulas
-          disciplinas={ativas}
-          turmas={turmas}
-          setTurmas={setTurmas}
-        />
 
         <PainelSemana
           carga={carga}
