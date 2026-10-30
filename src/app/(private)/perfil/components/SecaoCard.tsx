@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { ReactNode } from 'react'
 import { LuCircleAlert, LuCircleCheck, LuMailWarning } from 'react-icons/lu'
 import type { ZodError } from 'zod'
+import IconeTile from '@/components/IconeTile/IconeTile'
 
 interface SecaoCardProps {
   icon: ReactNode
@@ -22,9 +23,7 @@ export const SecaoCard: React.FC<SecaoCardProps> = ({
   <section className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg">
     <div className="space-y-6 p-6 max-md:space-y-4 max-md:p-4">
       <header className="flex items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-xor-navy/5 text-xl text-xor-navy ring-1 ring-inset ring-xor-navy/10">
-          {icon}
-        </span>
+        <IconeTile>{icon}</IconeTile>
         <div className="space-y-0.5">
           <h3 className="text-lg font-bold leading-tight tracking-tight max-md:text-base">
             {titulo}
@@ -90,7 +89,7 @@ export const errosPorCampo = (error: ZodError) =>
   ) as Record<string, string>
 
 export const BOTAO_PRIMARIO =
-  'inline-flex cursor-pointer items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+  'inline-flex cursor-pointer items-center gap-2 rounded-md bg-xor-navy px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-xor-navy/90 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-xor-navy'
 
 export const BOTAO_SECUNDARIO =
   'inline-flex cursor-pointer items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60'
