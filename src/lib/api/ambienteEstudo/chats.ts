@@ -16,6 +16,7 @@ import {
   verificarInsercao
 } from './comum'
 import { chatStream, MensagemIa } from './ia/cliente'
+import { ordenarPorRelevancia } from './ia/busca'
 import { montarContexto } from './ia/contexto'
 import { mensagensChat } from './ia/geracao'
 import {
@@ -199,7 +200,9 @@ export async function enviarMensagem(
     carregarTrechos(ctx, materialIds),
     temaDoAmbiente(ctx, chat.ambiente_id)
   ])
-  const contexto = montarContexto(trechos, { pergunta: ultimaPergunta })
+  const contexto = montarContexto(
+    await ordenarPorRelevancia(ctx, trechos, ultimaPergunta)
+  )
   const citacoes = [1, 2, 3]
     .map((n) => contexto.citacaoDe(n))
     .filter((citacao): citacao is Citacao => Boolean(citacao))

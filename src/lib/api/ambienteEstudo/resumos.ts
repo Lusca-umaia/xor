@@ -10,8 +10,12 @@ import {
   verificar,
   verificarInsercao
 } from './comum'
-import { montarContexto } from './ia/contexto'
-import { gerarResumo as gerarConteudoResumo } from './ia/geracao'
+import { partesParaResumo } from './ia/busca'
+import { cabeNoContexto, montarContexto } from './ia/contexto'
+import {
+  gerarResumo as gerarConteudoResumo,
+  gerarResumoEmEtapas
+} from './ia/geracao'
 import { COLUNAS_RESUMO, mapearResumo, ResumoRow } from './mapeadores'
 import { carregarTrechos } from './materiais'
 import { executarEmSegundoPlano } from './tarefas'
@@ -96,11 +100,18 @@ export async function gerarResumo(
         carregarTrechos(ctx, config.materialIds),
         temaDoAmbiente(ctx, ambienteId)
       ])
-      const { conteudo, citacoes } = await gerarConteudoResumo(
-        montarContexto(trechos),
-        tema,
-        config.formato
-      )
+      // Material que não cabe no prompt é resumido em etapas.
+      const { conteudo, citacoes } = cabeNoContexto(trechos)
+        ? await gerarConteudoResumo(
+            montarContexto(trechos),
+            tema,
+            config.formato
+          )
+        : await gerarResumoEmEtapas(
+            partesParaResumo(trechos),
+            tema,
+            config.formato
+          )
       await atualizarCampos(ctx, resumo.id, {
         conteudo,
         citacoes,

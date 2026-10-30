@@ -52,6 +52,59 @@ async function chamar(corpo: Record<string, unknown>, sinal?: AbortSignal) {
   return resposta
 }
 
+// Modelo de embeddings (no mesmo servidor da IA).
+//   EMBEDDING_MODEL ex.: nomic-embed-text-v2-moe (768 dimensões)
+export const DIMENSOES_EMBEDDING = 768
+const LOTE_EMBEDDINGS = 32
+
+export const modeloEmbedding = () =>
+  process.env.EMBEDDING_MODEL || 'nomic-embed-text-v2-moe'
+
+/**
+ * Vetores dos textos, na mesma ordem. Devolve null se o modelo de embeddings
+ * não estiver disponível: quem chama cai na busca por palavras.
+ */
+export async function gerarEmbeddings(
+  textos: string[]
+): Promise<number[][] | null> {
+  const url = process.env.LM_STUDIO_URL?.replace(/\/$/, '')
+  if (!url || textos.length === 0) return textos.length ? null : []
+
+  const vetores: number[][] = []
+  try {
+    for (let inicio = 0; inicio < textos.length; inicio += LOTE_EMBEDDINGS) {
+      const resposta = await fetch(`${url}/embeddings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(TEMPO_LIMITE_MS),
+        body: JSON.stringify({
+          model: modeloEmbedding(),
+          input: textos.slice(inicio, inicio + LOTE_EMBEDDINGS)
+        })
+      })
+      if (!resposta.ok) {
+        console.error('[ia] embeddings', resposta.status, await resposta.text())
+        return null
+      }
+      const corpo = (await resposta.json()) as {
+        data: { index: number; embedding: number[] }[]
+      }
+      const lote = [...corpo.data].sort((a, b) => a.index - b.index)
+      if (
+        lote.some(({ embedding }) => embedding.length !== DIMENSOES_EMBEDDING)
+      ) {
+        console.error('[ia] embeddings com dimensão inesperada')
+        return null
+      }
+      vetores.push(...lote.map(({ embedding }) => embedding))
+    }
+  } catch (erro) {
+    console.error('[ia] embeddings sem conexão', erro)
+    return null
+  }
+  return vetores
+}
+
 // Alguns modelos embrulham o JSON em ```json ... ```.
 function extrairJson(texto: string) {
   const bloco = texto.match(/```(?:json)?\s*([\s\S]*?)```/)

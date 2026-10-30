@@ -20,7 +20,7 @@ import {
   verificar,
   verificarInsercao
 } from './comum'
-import { montarContexto } from './ia/contexto'
+import { contextoParaGeracao } from './ia/busca'
 import { corrigirDiscursiva, gerarQuestoes } from './ia/geracao'
 import {
   COLUNAS_SIMULADO,
@@ -144,7 +144,7 @@ export async function gerarSimulado(
         carregarTrechos(ctx, config.materialIds),
         temaDoAmbiente(ctx, ambienteId)
       ])
-      const contexto = montarContexto(trechos)
+      const contexto = await contextoParaGeracao(ctx, trechos, { tema })
 
       // Uma chamada por tipo, em sequência (o modelo local atende uma por vez).
       const questoes: Questao[] = []

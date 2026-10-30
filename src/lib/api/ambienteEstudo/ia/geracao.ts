@@ -16,7 +16,7 @@ import type {
 } from '@/@types/AmbienteEstudo'
 import { novoId } from '../comum'
 import { chatJson, MensagemIa } from './cliente'
-import { blocoMaterial, ContextoMontado } from './contexto'
+import { blocoMaterial, ContextoMontado, montarContexto } from './contexto'
 
 const DIFICULDADES = ['FACIL', 'MEDIA', 'DIFICIL'] as const
 const ROTULO_DIFICULDADE: Record<DificuldadeConfig, string> = {
@@ -551,6 +551,107 @@ export async function gerarResumo(
       .map((n) => contexto.citacaoDe(n))
       .filter((c): c is Citacao => Boolean(c))
   }
+}
+
+// ---------- Material longo: resumo em etapas e lista de tópicos ----------
+
+const LIMITE_ANOTACOES = 1_400
+
+/**
+ * Resumo de material que não cabe no prompt (map-reduce): cada parte vira
+ * anotações curtas e o resumo final é escrito a partir delas. As citações
+ * apontam para os trechos originais usados em cada parte.
+ */
+export async function gerarResumoEmEtapas(
+  partes: ContextoMontado[],
+  tema: string,
+  formato: FormatoResumo
+): Promise<{ conteudo: string; citacoes: Citacao[] }> {
+  const anotacoes: string[] = []
+  const citacoesUsadas = new Map<string, Citacao>()
+
+  // Em sequência: o modelo local atende uma chamada por vez.
+  for (const parte of partes) {
+    const dados = await chatJson({
+      nome: 'anotacoes',
+      sistema: SISTEMA_PROFESSOR,
+      usuario: [
+        blocoMaterial(parte, tema),
+        `Anote, em até ${LIMITE_ANOTACOES} caracteres, os conceitos, definições, fórmulas e exemplos importantes destes trechos.`,
+        'Em "trechosUsados", liste os números n dos trechos que você usou.'
+      ].join('\n'),
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['anotacoes', 'trechosUsados'],
+        properties: {
+          anotacoes: { type: 'string' },
+          trechosUsados: { type: 'array', items: { type: 'integer' } }
+        }
+      },
+      validar: z.object({
+        anotacoes: z.string(),
+        trechosUsados: z.array(z.number().int())
+      })
+    })
+    if (dados.anotacoes.trim())
+      anotacoes.push(dados.anotacoes.trim().slice(0, LIMITE_ANOTACOES))
+    for (const n of dados.trechosUsados) {
+      const citacao = parte.citacaoDe(n)
+      if (citacao)
+        citacoesUsadas.set(
+          `${citacao.materialId}:${citacao.pagina}:${citacao.trecho.slice(0, 80)}`,
+          citacao
+        )
+    }
+  }
+
+  const contextoAnotacoes = montarContexto(
+    anotacoes.map((texto, indice) => ({
+      id: -indice - 1,
+      materialId: '',
+      materialNome: `Anotações da parte ${indice + 1}`,
+      pagina: null,
+      texto
+    }))
+  )
+  const { conteudo } = await gerarResumo(contextoAnotacoes, tema, formato)
+  return { conteudo, citacoes: [...citacoesUsadas.values()] }
+}
+
+/** Assuntos principais de uma amostra do material, para a busca por tópico. */
+export async function listarTopicos(
+  amostra: ContextoMontado,
+  tema: string,
+  quantidade: number
+): Promise<string[]> {
+  const dados = await chatJson({
+    nome: 'topicos',
+    sistema: SISTEMA_PROFESSOR,
+    usuario: [
+      blocoMaterial(amostra, tema),
+      `Liste até ${quantidade} assuntos diferentes tratados no material, cada um com até 6 palavras.`
+    ].join('\n'),
+    schema: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['topicos'],
+      properties: {
+        topicos: {
+          type: 'array',
+          minItems: 1,
+          maxItems: quantidade,
+          items: { type: 'string' }
+        }
+      }
+    },
+    validar: z.object({ topicos: z.array(z.string()) }),
+    temperatura: 0.2
+  })
+  return [...new Set(dados.topicos.map((t) => t.trim()).filter(Boolean))].slice(
+    0,
+    quantidade
+  )
 }
 
 // ---------- Correção discursiva e explicação alternativa ----------

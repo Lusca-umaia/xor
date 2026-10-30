@@ -10,6 +10,7 @@ import {
   verificarInsercao
 } from './comum'
 import { dividirTexto, extrairTexto, TrechoExtraido } from './extracao'
+import { embeddingsDeDocumentos, paraVetor } from './ia/busca'
 import type { TrechoContexto } from './ia/contexto'
 import { COLUNAS_MATERIAL, MaterialRow, mapearMaterial } from './mapeadores'
 import { executarEmSegundoPlano } from './tarefas'
@@ -47,15 +48,29 @@ async function gravarTrechos(
   trechos: TrechoExtraido[]
 ) {
   if (trechos.length === 0) return
-  const { error } = await supabase.from('trechos').insert(
-    trechos.map((trecho, ordem) => ({
-      aluno_id: user.id,
-      material_id: materialId,
-      pagina: trecho.pagina,
-      ordem,
-      texto: trecho.texto
-    }))
+  const linhas = trechos.map((trecho, ordem) => ({
+    aluno_id: user.id,
+    material_id: materialId,
+    pagina: trecho.pagina,
+    ordem,
+    texto: trecho.texto
+  }))
+  // Sem o modelo de embeddings, os vetores são gerados depois, na primeira busca.
+  const embeddings = await embeddingsDeDocumentos(
+    trechos.map(({ texto }) => texto)
   )
+  if (embeddings) {
+    const { error } = await supabase.from('trechos').insert(
+      linhas.map((linha, i) => ({
+        ...linha,
+        embedding: paraVetor(embeddings.vetores[i]),
+        modelo_embedding: embeddings.modelo
+      }))
+    )
+    if (!error) return
+    console.warn('[materiais] trechos gravados sem embedding', error.message)
+  }
+  const { error } = await supabase.from('trechos').insert(linhas)
   verificar(error)
 }
 
@@ -282,7 +297,7 @@ export async function carregarTrechos(
   )
   const { data: trechos, error: erroTrechos } = await supabase
     .from('trechos')
-    .select('material_id, pagina, ordem, texto')
+    .select('id, material_id, pagina, ordem, texto')
     .in('material_id', [...nomes.keys()])
     .order('ordem')
   verificar(erroTrechos)
@@ -291,6 +306,7 @@ export async function carregarTrechos(
   const ordemMaterial = new Map(materialIds.map((id, indice) => [id, indice]))
   return (
     (trechos ?? []) as {
+      id: number
       material_id: string
       pagina: number | null
       texto: string
@@ -302,6 +318,7 @@ export async function carregarTrechos(
         (ordemMaterial.get(b.material_id) ?? 0)
     )
     .map((trecho) => ({
+      id: Number(trecho.id),
       materialId: trecho.material_id,
       materialNome: nomes.get(trecho.material_id) ?? 'Material',
       pagina: trecho.pagina,
