@@ -5,9 +5,15 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { classNames } from '@/utils/auxiliars'
 import { options } from './Navbar'
+import { useMe } from '@/hooks/queries/useMe'
+import { useLogout } from '@/hooks/mutations/useLogout'
+import Skeleton from '../Skeleton/Skeleton'
+import Avatar from '../Avatar/Avatar'
 
 export default function NavbarDescktop() {
   const pathname = usePathname()
+  const { data: me } = useMe()
+  const { mutate: sair, isPending: saindo } = useLogout()
 
   const getFirstPath = () => {
     return '/' + pathname.split('/')[1]
@@ -23,15 +29,23 @@ export default function NavbarDescktop() {
         quality={100}
         alt="Logo"
       />
-      <div className=" flex gap-2 border border-gray-100 rounded-full shadow-lg p-3">
-        <div className="aspect-square h-full rounded-full bg-gray-200"></div>
-        <div className="flex flex-col">
-          <p className="font-semibold text-sm">Lucas Maia</p>
+      <Link
+        href="/perfil"
+        title="Meu perfil"
+        className="flex items-center gap-2 border border-gray-100 rounded-full shadow-lg p-3 hover:border-gray-200 hover:shadow-xl duration-200"
+      >
+        <Avatar nome={me?.nome} className="size-10 text-sm" />
+        <div className="flex min-w-0 flex-col">
+          {me ? (
+            <p className="truncate font-semibold text-sm">{me.nome}</p>
+          ) : (
+            <Skeleton className="h-4 w-32 my-0.5" />
+          )}
           <span className="text-xs bg-gray-100 w-fit px-2 py-0.5 rounded-sm">
             Estudante
           </span>
         </div>
-      </div>
+      </Link>
       <div className="flex flex-col overflow-auto gap-2">
         {options.map((option) => (
           <Link
@@ -48,10 +62,17 @@ export default function NavbarDescktop() {
         ))}
       </div>
       <div className="mt-auto">
-        <Link href={'/'} className="flex gap-1 items-center">
+        <button
+          type="button"
+          disabled={saindo}
+          onClick={() => sair()}
+          className="flex cursor-pointer gap-1 items-center disabled:opacity-60"
+        >
           <HiOutlineLogout className="text-2xl" />
-          <span className="text-sm font-semibold">Sair</span>
-        </Link>
+          <span className="text-sm font-semibold">
+            {saindo ? 'Saindo...' : 'Sair'}
+          </span>
+        </button>
       </div>
     </nav>
   )

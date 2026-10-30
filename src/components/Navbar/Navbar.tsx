@@ -1,5 +1,5 @@
 'use client'
-import { LuTimer } from 'react-icons/lu'
+import { LuTimer, LuUserRound } from 'react-icons/lu'
 import { FaTasks } from 'react-icons/fa'
 import { GiProgression } from 'react-icons/gi'
 import { FaHome } from 'react-icons/fa'
@@ -32,6 +32,11 @@ export const options = [
     icon: <FaTasks />,
     path: '/questoes/lista-questionario',
     name: 'Questões'
+  },
+  {
+    icon: <LuUserRound />,
+    path: '/perfil',
+    name: 'Meu perfil'
   }
 ]
 
