@@ -49,11 +49,8 @@ export function inicioDaSemana(data: Date) {
 }
 
 // ---- Histórico, IRA e integralização ----
-export function numeroDoPeriodo(periodo: string) {
-  const m = periodo.match(/^(\d{4})\.(\d)$/)
-  return m ? Number(m[1]) * 10 + Number(m[2]) : 0
-}
-
+// `ordem` é o semestre do aluno em que a tentativa ocorreu (1 = primeiro); `periodo` é só
+// o rótulo exibido (ex.: "2025.1"), pois no banco ele é texto livre e pode faltar.
 export function indexarCurriculo(curriculo: DisciplinaCurriculo[]) {
   return new Map(curriculo.map((d) => [d.codigo, d]))
 }
@@ -86,47 +83,28 @@ export const PENALIDADE_TRANCAMENTO = 0.5
 // Atividades complementares de ensino não entram no IRA.
 const FORA_DO_IRA = new Set(['CCP0001'])
 
-function indiceDoPeriodo(periodo: string) {
-  const m = periodo.match(/^(\d{4})\.(\d)$/)
-  return m ? Number(m[1]) * 2 + Number(m[2]) - 1 : null
-}
-
-// Primeiro semestre do aluno no histórico (índice absoluto de semestres).
-export function ingressoDe(historico: TentativaHistorico[]) {
-  const indices = historico
-    .map((t) => indiceDoPeriodo(t.periodo))
-    .filter((i): i is number => i !== null)
-  return indices.length ? Math.min(...indices) : null
-}
-
 // Entram: tentativas aprovadas ou reprovadas com nota (reprovada conta cada vez que consta)
 // e trancamentos (só em T e C). Ficam de fora: em andamento, aproveitamentos e atividades
 // complementares. O app não distingue trancamento parcial de total (o total não afeta o
 // IRA) nem reprovação por falta (nota 0): todo trancamento é tratado como parcial.
 export function iraIndividual(
   historico: TentativaHistorico[],
-  porCodigo: Map<string, DisciplinaCurriculo>,
-  ingresso = ingressoDe(historico)
+  porCodigo: Map<string, DisciplinaCurriculo>
 ) {
-  if (ingresso === null) return null
   let trancada = 0
   let cursada = 0
   let soma = 0
   let pesos = 0
   for (const t of historico) {
     const d = porCodigo.get(t.codigo)
-    const indice = indiceDoPeriodo(t.periodo)
-    if (!d || indice === null || FORA_DO_IRA.has(t.codigo)) continue
+    if (!d || t.ordem <= 0 || FORA_DO_IRA.has(t.codigo)) continue
     if (t.status === 'TRANCADA') {
       trancada += d.cargaHoraria
       cursada += d.cargaHoraria
       continue
     }
     if (t.status === 'ANDAMENTO' || t.nota === null) continue
-    const pi = Math.max(
-      1,
-      Math.min(SEMESTRE_MAXIMO_PESO, indice - ingresso + 1)
-    )
+    const pi = Math.max(1, Math.min(SEMESTRE_MAXIMO_PESO, t.ordem))
     cursada += d.cargaHoraria
     soma += pi * d.cargaHoraria * t.nota
     pesos += pi * d.cargaHoraria
@@ -140,6 +118,7 @@ export function iraIndividual(
 }
 
 export interface PontoIRA {
+  ordem: number
   periodo: string
   iraPeriodo: number | null
   iraAcumulado: number | null
@@ -149,44 +128,42 @@ export function evolucaoIRA(
   historico: TentativaHistorico[],
   porCodigo: Map<string, DisciplinaCurriculo>
 ): PontoIRA[] {
-  const ingresso = ingressoDe(historico)
-  const periodos = [...new Set(historico.map((t) => t.periodo))]
-    .filter((p) =>
-      historico.some((t) => t.periodo === p && t.status !== 'ANDAMENTO')
+  const ordens = [...new Set(historico.map((t) => t.ordem))]
+    .filter((o) => o > 0)
+    .filter((o) =>
+      historico.some((t) => t.ordem === o && t.status !== 'ANDAMENTO')
     )
-    .sort((a, b) => numeroDoPeriodo(a) - numeroDoPeriodo(b))
-  return periodos.map((periodo) => ({
-    periodo,
+    .sort((a, b) => a - b)
+  return ordens.map((ordem) => ({
+    ordem,
+    periodo: historico.find((t) => t.ordem === ordem)?.periodo ?? `${ordem}º`,
     iraPeriodo: iraIndividual(
-      historico.filter((t) => t.periodo === periodo),
-      porCodigo,
-      ingresso
+      historico.filter((t) => t.ordem === ordem),
+      porCodigo
     ),
     iraAcumulado: iraIndividual(
-      historico.filter(
-        (t) => numeroDoPeriodo(t.periodo) <= numeroDoPeriodo(periodo)
-      ),
-      porCodigo,
-      ingresso
+      historico.filter((t) => t.ordem <= ordem),
+      porCodigo
     )
   }))
 }
 
+// Integralização sobre as obrigatórias (quando o caráter é conhecido).
 export function resumoCurso(
   curriculo: DisciplinaCurriculo[],
   sit: Map<string, SituacaoCurricular>
 ) {
-  const total = curriculo.reduce((s, d) => s + d.cargaHoraria, 0)
-  const concluida = curriculo
-    .filter((d) => sit.get(d.codigo) === 'CONCLUIDA')
-    .reduce((s, d) => s + d.cargaHoraria, 0)
+  const obrigatorias = curriculo.filter((d) => d.carater !== 'OPTATIVA')
+  const concluidas = obrigatorias.filter(
+    (d) => sit.get(d.codigo) === 'CONCLUIDA'
+  )
+  const total = obrigatorias.reduce((s, d) => s + d.cargaHoraria, 0)
+  const concluida = concluidas.reduce((s, d) => s + d.cargaHoraria, 0)
   return {
     cargaTotal: total,
     cargaConcluida: concluida,
     percentual: total ? (concluida / total) * 100 : 0,
-    disciplinasConcluidas: curriculo.filter(
-      (d) => sit.get(d.codigo) === 'CONCLUIDA'
-    ).length
+    disciplinasConcluidas: concluidas.length
   }
 }
 

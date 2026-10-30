@@ -14,10 +14,11 @@ import { useAcademico } from '@/hooks/queries/useAcademico'
 import { useDisciplinasAtivas } from '@/hooks/useDisciplinasAtivas'
 import { CHAVES } from '@/services/academico/chaves'
 import { AVALIACOES_DEMO } from '@/services/mocks/historico'
+import { CURRICULO_CC } from '@/services/mocks/curriculoCC'
 import { situacoes } from '@/utils/academico'
 import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
 import CalculadoraTab from './components/CalculadoraTab'
-import { AvisoDemo } from './components/Comuns'
+import { AvisoDemo, Card } from './components/Comuns'
 import DesempenhoTab from './components/DesempenhoTab'
 import PreRequisitosTab from './components/PreRequisitosTab'
 import RelatorioTab from './components/RelatorioTab'
@@ -33,7 +34,7 @@ type TabKey = (typeof TABS)[number]['key']
 
 const AcademicoPage = () => {
   const [tab, setTab] = useState<TabKey>('desempenho')
-  const { data, isLoading } = useAcademico()
+  const { data, isLoading, isError } = useAcademico()
   const { ativas, isLoading: carregandoAtivas } = useDisciplinasAtivas()
   // O padrão precisa existir já no primeiro render (o hook o captura uma vez).
   const [avaliacoes, setAvaliacoes, avaliacoesOk] = useArmazenado<
@@ -55,12 +56,12 @@ const AcademicoPage = () => {
   const situacao = useMemo(
     () =>
       data
-        ? situacoes(data.curriculo, data.historico)
+        ? situacoes(CURRICULO_CC, data.historico)
         : new Map<string, SituacaoCurricular>(),
     [data]
   )
 
-  if (isLoading || carregandoAtivas || !data) {
+  if (isLoading || carregandoAtivas) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-80 max-w-full" />
@@ -69,6 +70,19 @@ const AcademicoPage = () => {
       </div>
     )
   }
+
+  if (isError || !data) {
+    return (
+      <p className="text-sm font-medium text-red-600">
+        Não foi possível carregar seus dados acadêmicos.
+      </p>
+    )
+  }
+
+  // O mapa usa a matriz de CC; para outros cursos não há dados de pré-requisitos.
+  const codigosCC = new Set(CURRICULO_CC.map((d) => d.codigo))
+  const temMatrizCC =
+    data.demonstracao || data.curriculo.some((d) => codigosCC.has(d.codigo))
 
   return (
     <div>
@@ -107,6 +121,7 @@ const AcademicoPage = () => {
           <DesempenhoTab
             curriculo={data.curriculo}
             historico={data.historico}
+            semPeriodo={data.semPeriodo}
           />
         )}
         {tab === 'calculadora' && (
@@ -116,9 +131,18 @@ const AcademicoPage = () => {
             setAvaliacoes={setAvaliacoes}
           />
         )}
-        {tab === 'prerequisitos' && (
-          <PreRequisitosTab curriculo={data.curriculo} situacao={situacao} />
-        )}
+        {tab === 'prerequisitos' &&
+          (temMatrizCC ? (
+            <PreRequisitosTab curriculo={CURRICULO_CC} situacao={situacao} />
+          ) : (
+            <Card>
+              <p className="text-sm text-gray-600">
+                O mapa de pré-requisitos só está disponível para o curso de
+                Ciência da Computação (matriz 2024.1). Nenhuma das suas
+                disciplinas corresponde a essa matriz.
+              </p>
+            </Card>
+          ))}
         {tab === 'relatorio' && (
           <RelatorioTab
             curriculo={data.curriculo}
