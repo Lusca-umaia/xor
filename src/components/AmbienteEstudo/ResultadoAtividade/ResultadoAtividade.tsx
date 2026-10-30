@@ -1,7 +1,9 @@
 'use client'
 
 import clsx from 'clsx'
-import { LuRotateCcw, LuTarget } from 'react-icons/lu'
+import { LuChartBar, LuClock, LuRotateCcw, LuTarget } from 'react-icons/lu'
+import IconeTile from '@/components/IconeTile/IconeTile'
+import AnelProgresso from '@/components/AnelProgresso/AnelProgresso'
 import { Atividade, TentativaAtividade } from '@/@types/AmbienteEstudo'
 import {
   calcularDesempenhoPorTopico,
@@ -59,44 +61,73 @@ export default function ResultadoAtividade({
 
   return (
     <div className="space-y-5">
-      <section className={clsx(classeCartao, 'p-6 text-center')}>
-        <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-          Resultado
-        </p>
-        <p className="mt-1 text-5xl font-bold">
-          {tentativa.acertos}
-          <span className="text-2xl text-gray-400">/{tentativa.total}</span>
-        </p>
-        <p className="mt-2 text-gray-700">{mensagem}</p>
-        <p className="mt-1 text-xs text-gray-500">
-          Tempo: {formatarDuracao(duracao)}
-        </p>
-        <div className="mt-5 flex flex-wrap justify-center gap-2">
-          {paraRevisar.length > 0 && (
-            <Botao
-              variante="primario"
-              icone={<LuTarget aria-hidden />}
-              onClick={aoRefazerErradas}
-              carregando={gerandoErradas}
-            >
-              Praticar só as {paraRevisar.length} para revisar
-            </Botao>
-          )}
-          <Botao
-            icone={<LuRotateCcw aria-hidden />}
-            onClick={aoRefazer}
-            carregando={refazendo}
+      <section className={clsx(classeCartao, 'p-6 max-md:p-4')}>
+        <div className="flex flex-col items-center gap-6 text-center lg:flex-row lg:text-left">
+          <AnelProgresso
+            percentual={proporcao * 100}
+            espessura={4}
+            className="size-32 max-md:size-24"
           >
-            Refazer tudo
-          </Botao>
-          <LinkBotao href={voltarHref}>Voltar às atividades</LinkBotao>
+            <span className="text-3xl font-bold leading-none text-gray-900 max-md:text-2xl">
+              {tentativa.acertos}
+              <span className="text-lg text-gray-400">/{tentativa.total}</span>
+            </span>
+            <span className="mt-1 text-[11px] font-medium text-gray-500">
+              acertos
+            </span>
+          </AnelProgresso>
+          <div className="min-w-0 flex-1 space-y-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Resultado
+              </p>
+              <h2 className="text-xl font-bold tracking-tight text-gray-900">
+                {mensagem}
+              </h2>
+              <p className="mt-1 flex items-center gap-1 text-sm text-gray-500 max-lg:justify-center">
+                <LuClock aria-hidden /> {formatarDuracao(duracao)}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 max-lg:justify-center">
+              {paraRevisar.length > 0 && (
+                <Botao
+                  variante="primario"
+                  icone={<LuTarget aria-hidden />}
+                  onClick={aoRefazerErradas}
+                  carregando={gerandoErradas}
+                >
+                  Praticar só as {paraRevisar.length} para revisar
+                </Botao>
+              )}
+              <Botao
+                icone={<LuRotateCcw aria-hidden />}
+                onClick={aoRefazer}
+                carregando={refazendo}
+              >
+                Refazer tudo
+              </Botao>
+              <LinkBotao href={voltarHref}>Voltar às atividades</LinkBotao>
+            </div>
+          </div>
         </div>
       </section>
 
       {porTopico.length > 0 && (
-        <section className={clsx(classeCartao, 'p-5')}>
-          <h2 className="font-bold">Desempenho por tópico</h2>
-          <ul className="mt-3 space-y-3">
+        <section className={clsx(classeCartao, 'space-y-4 p-6 max-md:p-4')}>
+          <header className="flex items-center gap-3">
+            <IconeTile>
+              <LuChartBar />
+            </IconeTile>
+            <div>
+              <h2 className="text-lg font-bold leading-tight tracking-tight max-md:text-base">
+                Desempenho por tópico
+              </h2>
+              <p className="text-sm text-gray-500">
+                Do mais fraco para o mais forte.
+              </p>
+            </div>
+          </header>
+          <ul className="space-y-3">
             {porTopico.map(({ topico, acertos, total }) => (
               <li key={topico}>
                 <div className="flex justify-between text-sm">
@@ -107,7 +138,7 @@ export default function ResultadoAtividade({
                 </div>
                 <div className="mt-1 h-2 overflow-hidden rounded-full bg-gray-100">
                   <div
-                    className="h-full rounded-full bg-gray-900"
+                    className="h-full rounded-full bg-xor-navy"
                     style={{
                       width: `${Math.max(3, (acertos / total) * 100)}%`
                     }}

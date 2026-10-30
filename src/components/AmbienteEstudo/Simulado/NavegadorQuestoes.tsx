@@ -44,9 +44,9 @@ export default function NavegadorQuestoes({
                 className={clsx(
                   'relative flex aspect-square w-full items-center justify-center rounded-lg text-sm font-bold transition-colors cursor-pointer',
                   respondida
-                    ? 'bg-gray-900 text-white'
+                    ? 'bg-xor-navy text-white'
                     : 'bg-white text-gray-700 ring-1 ring-gray-300',
-                  atual && 'ring-2 ring-offset-2 ring-black'
+                  atual && 'ring-2 ring-offset-2 ring-xor-navy'
                 )}
               >
                 {indice + 1}
@@ -63,7 +63,7 @@ export default function NavegadorQuestoes({
       </ol>
       <ul className="space-y-1 text-xs text-gray-500">
         <li className="flex items-center gap-2">
-          <span className="size-3 rounded bg-gray-900" /> Respondida
+          <span className="size-3 rounded bg-xor-navy" /> Respondida
         </li>
         <li className="flex items-center gap-2">
           <span className="size-3 rounded ring-1 ring-gray-300" /> Em branco

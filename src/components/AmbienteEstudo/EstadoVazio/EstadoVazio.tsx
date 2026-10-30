@@ -7,6 +7,8 @@ interface EstadoVazioProps {
   acao?: ReactNode
 }
 
+// Mesmo visual do EstadoVazio compartilhado (src/components/EstadoVazio),
+// com descrição opcional e aceitando conteúdo rico.
 export default function EstadoVazio({
   icone,
   titulo,
@@ -14,15 +16,17 @@ export default function EstadoVazio({
   acao
 }: EstadoVazioProps) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border-2 border-dashed border-gray-200 bg-white px-6 py-12 text-center">
-      <div className="mb-3 flex size-14 items-center justify-center rounded-full bg-gray-100 text-2xl text-gray-700">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-gray-200 bg-white/60 px-6 py-12 text-center">
+      <span className="flex size-12 items-center justify-center rounded-full bg-xor-navy/5 text-2xl text-xor-navy">
         {icone}
+      </span>
+      <div className="space-y-1">
+        <p className="font-semibold text-gray-900">{titulo}</p>
+        {descricao && (
+          <p className="max-w-md text-sm text-gray-500">{descricao}</p>
+        )}
       </div>
-      <h3 className="text-base font-bold text-gray-900">{titulo}</h3>
-      {descricao && (
-        <p className="mt-1 max-w-md text-sm text-gray-500">{descricao}</p>
-      )}
-      {acao && <div className="mt-5">{acao}</div>}
+      {acao}
     </div>
   )
 }

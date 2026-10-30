@@ -49,10 +49,11 @@ const ABAS = [
 export default function AbasAmbiente({ ambienteId }: { ambienteId: string }) {
   const segmentoAtivo = useSelectedLayoutSegment()
 
+  // Abas em pílula, no mesmo estilo das abas da progressão de curso.
   return (
     <nav
       aria-label="Seções do ambiente"
-      className="-mx-1 flex gap-1 overflow-x-auto border-b border-gray-200 px-1 [scrollbar-width:none]"
+      className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-full border border-gray-100 bg-white p-1 shadow-lg [scrollbar-width:none]"
     >
       {ABAS.map(({ segmento, caminho, rotulo, icone: Icone }) => {
         const ativa = segmentoAtivo === segmento
@@ -62,13 +63,13 @@ export default function AbasAmbiente({ ambienteId }: { ambienteId: string }) {
             href={`/ambientes/${ambienteId}${caminho}`}
             aria-current={ativa ? 'page' : undefined}
             className={clsx(
-              '-mb-px flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-semibold transition-colors',
+              'flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold duration-200 max-md:px-3',
               ativa
-                ? 'border-black text-gray-900'
-                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800'
+                ? 'bg-black text-white'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             )}
           >
-            <Icone aria-hidden />
+            <Icone className="text-base max-sm:hidden" aria-hidden />
             {rotulo}
           </Link>
         )

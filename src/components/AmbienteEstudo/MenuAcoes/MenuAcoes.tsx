@@ -14,15 +14,23 @@ export interface AcaoMenu {
 
 export default function MenuAcoes({
   acoes,
-  rotulo = 'Mais ações'
+  rotulo = 'Mais ações',
+  claro = false
 }: {
   acoes: AcaoMenu[]
   rotulo?: string
+  /** Botão claro, para fundos escuros (ex.: CapaXor). */
+  claro?: boolean
 }) {
   return (
     <Menu as="div" className="relative">
       <MenuButton
-        className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+        className={clsx(
+          'rounded-md p-1.5 cursor-pointer',
+          claro
+            ? 'text-white/80 hover:bg-white/10 hover:text-white'
+            : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+        )}
         aria-label={rotulo}
         onClick={(evento) => evento.stopPropagation()}
       >

@@ -89,7 +89,7 @@ export default function BotaoReportar({
                   value={opcao}
                   checked={motivo === opcao}
                   onChange={() => setMotivo(opcao)}
-                  className="size-4 accent-black"
+                  className="size-4 accent-xor-navy"
                 />
                 {ROTULO_MOTIVO_REPORTE[opcao]}
               </label>

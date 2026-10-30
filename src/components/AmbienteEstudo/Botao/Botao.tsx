@@ -4,7 +4,7 @@ import { ButtonHTMLAttributes, ComponentProps, ReactNode } from 'react'
 import { LuLoader } from 'react-icons/lu'
 
 const VARIANTES = {
-  primario: 'bg-black text-white hover:bg-gray-800 disabled:bg-gray-300',
+  primario: 'bg-xor-navy text-white hover:bg-xor-navy/90 disabled:bg-gray-300',
   secundario:
     'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:text-gray-400',
   fantasma:
@@ -23,7 +23,7 @@ type Tamanho = keyof typeof TAMANHOS
 
 export const classesBotao = (variante: Variante, tamanho: Tamanho) =>
   clsx(
-    'inline-flex items-center justify-center rounded-md font-semibold shadow-sm transition-colors not-disabled:cursor-pointer disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black',
+    'inline-flex items-center justify-center rounded-md font-semibold shadow-sm transition-colors not-disabled:cursor-pointer disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-xor-navy',
     VARIANTES[variante],
     TAMANHOS[tamanho]
   )

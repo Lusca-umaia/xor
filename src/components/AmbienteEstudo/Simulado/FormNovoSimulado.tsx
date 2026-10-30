@@ -198,7 +198,7 @@ export default function FormNovoSimulado({
             type="checkbox"
             checked={treino}
             onChange={(evento) => setTreino(evento.target.checked)}
-            className="size-4 accent-black"
+            className="size-4 accent-xor-navy"
           />
           Modo treino (sem cronômetro)
         </label>
@@ -252,7 +252,7 @@ export default function FormNovoSimulado({
             type="checkbox"
             checked={embaralhar}
             onChange={(evento) => setEmbaralhar(evento.target.checked)}
-            className="size-4 accent-black"
+            className="size-4 accent-xor-navy"
           />
           Embaralhar alternativas
         </label>

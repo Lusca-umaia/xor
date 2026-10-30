@@ -93,7 +93,7 @@ export default function SeletorMateriais({
                   checked={selecionados.includes(material.id)}
                   onChange={() => alternar(material.id)}
                   disabled={!pronto}
-                  className="size-4 accent-black"
+                  className="size-4 accent-xor-navy"
                 />
                 <IconeMaterial
                   tipo={material.tipo}

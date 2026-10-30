@@ -37,7 +37,9 @@ export default function ZonaUpload({
       onDrop={aoSoltar}
       className={clsx(
         'flex flex-col items-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-colors',
-        arrastando ? 'border-black bg-gray-100' : 'border-gray-300 bg-white'
+        arrastando
+          ? 'border-xor-navy bg-xor-navy/5'
+          : 'border-gray-300 bg-white'
       )}
     >
       <span className="flex size-12 items-center justify-center rounded-full bg-gray-100 text-xl">
