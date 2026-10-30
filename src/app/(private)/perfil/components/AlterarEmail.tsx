@@ -7,7 +7,7 @@ import FormInput from '@/components/FormInput/FormInput'
 import { useAlterarEmail } from '@/hooks/mutations/usePerfil'
 import { alterarEmailSchema } from '@/lib/api/schemas'
 import { getErrorMessage } from '@/services/api'
-import CampoSenha from './CampoSenha'
+import CampoSenha from '@/components/CampoSenha/CampoSenha'
 import { Aviso, BOTAO_PRIMARIO, SecaoCard, errosPorCampo } from './SecaoCard'
 
 const CAMPOS_VAZIOS = { email: '', senhaAtual: '' }

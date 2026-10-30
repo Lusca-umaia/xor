@@ -44,7 +44,7 @@ const CampoSenha: React.FC<CampoSenhaProps> = ({
           value={value}
           autoComplete={autoComplete}
           onChange={(e) => handleChange(e.target.value)}
-          className="block w-full rounded-md border-0 p-1.5 pr-9 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 outline-indigo-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+          className="block w-full rounded-md border-0 p-1.5 pr-9 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 outline-xor-navy placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-xor-navy"
         />
         <button
           type="button"
