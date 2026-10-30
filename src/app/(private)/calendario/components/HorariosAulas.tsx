@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { LuCircleCheck, LuClock, LuTrash2 } from 'react-icons/lu'
 import type { DisciplinaCurriculo, Turma } from '@/@types/Academico'
+import { HORARIOS_PADRAO_CC } from '@/services/mocks/horariosPadraoCC'
 import { paraMinutos } from '@/utils/academico'
 import { Card } from '../../academico/components/Comuns'
 
@@ -35,6 +36,32 @@ const HorariosAulas: React.FC<Props> = ({ disciplinas, turmas, setTurmas }) => {
   const semHorario = disciplinas.filter(
     (d) => !turmas.some((t) => t.codigo === d.codigo)
   )
+
+  // Sugestões da grade padrão do curso para as disciplinas que ainda não têm horário.
+  // Se as horas semanais x 16 semanas não batem com a carga horária da matriz, a grade
+  // provavelmente é de um currículo anterior: a sugestão fica marcada e fora do "aplicar a todas".
+  const desatualizado = (d: DisciplinaCurriculo) => {
+    const horasSemana = (HORARIOS_PADRAO_CC[d.codigo] ?? []).reduce(
+      (soma, h) =>
+        soma +
+        (h.dias.length * (paraMinutos(h.fim) - paraMinutos(h.inicio))) / 60,
+      0
+    )
+    return Math.abs(horasSemana * 16 - d.cargaHoraria) > 16
+  }
+  const comSugestao = semHorario.filter((d) => HORARIOS_PADRAO_CC[d.codigo])
+  const seguras = comSugestao.filter((d) => !desatualizado(d))
+  const aplicarPadrao = (codigos: string[]) =>
+    setTurmas((l) => [
+      ...l,
+      ...codigos.flatMap((c) =>
+        (HORARIOS_PADRAO_CC[c] ?? []).map((h) => ({
+          id: crypto.randomUUID(),
+          codigo: c,
+          ...h
+        }))
+      )
+    ])
 
   const alternar = (dia: number) =>
     setDias((atual) =>
@@ -91,8 +118,38 @@ const HorariosAulas: React.FC<Props> = ({ disciplinas, turmas, setTurmas }) => {
 
         <p className="text-sm text-gray-500">
           O SIGAA não informa os horários no histórico, então eles não entram
-          sozinhos. Escolha a disciplina, os dias e o horário.
+          sozinhos. Escolha a disciplina, os dias e o horário, ou use a sugestão
+          da grade do curso quando houver.
         </p>
+
+        {comSugestao.length > 0 && (
+          <div className="space-y-2 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+            <p>
+              <strong>Horário padrão do curso:</strong> encontrei sugestão para{' '}
+              {comSugestao.length} das suas disciplinas, na{' '}
+              <a
+                href="https://cc.ufc.br/pt/grade-de-horarios/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline"
+              >
+                Grade de Horários do curso de CC
+              </a>
+              . A página não tem data de atualização e a sua turma pode ter
+              outro horário: confira no SIGAA depois de aplicar.
+            </p>
+            {seguras.length > 0 && (
+              <button
+                type="button"
+                onClick={() => aplicarPadrao(seguras.map((d) => d.codigo))}
+                className="cursor-pointer rounded-md bg-blue-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800"
+              >
+                Aplicar a {seguras.length}{' '}
+                {seguras.length === 1 ? 'disciplina' : 'disciplinas'}
+              </button>
+            )}
+          </div>
+        )}
 
         <ul className="divide-y divide-gray-100">
           {disciplinas.map((d) => {
@@ -110,6 +167,23 @@ const HorariosAulas: React.FC<Props> = ({ disciplinas, turmas, setTurmas }) => {
                       <strong>{d.codigo}</strong> {d.nome}
                     </span>
                   </span>
+                  {dela.length === 0 && HORARIOS_PADRAO_CC[d.codigo] && (
+                    <button
+                      type="button"
+                      onClick={() => aplicarPadrao([d.codigo])}
+                      title={HORARIOS_PADRAO_CC[d.codigo]
+                        .map(
+                          (h) =>
+                            `${h.dias.map((x) => ROTULO_DIA.get(x)).join(', ')} ${h.inicio} às ${h.fim}`
+                        )
+                        .join(' · ')}
+                      className="cursor-pointer rounded-md px-2 py-1 text-xs font-semibold text-blue-900 ring-1 ring-blue-300 ring-inset hover:bg-blue-50"
+                    >
+                      {desatualizado(d)
+                        ? 'Usar padrão (pode estar desatualizado)'
+                        : 'Usar horário padrão'}
+                    </button>
+                  )}
                   {dela.length === 0 && (
                     <button
                       type="button"
