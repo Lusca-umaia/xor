@@ -43,8 +43,9 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
 
    # Opcionais
    NEXT_PUBLIC_SITE_URL=https://<domínio do app>
-   LM_STUDIO_URL=http://localhost:1234/v1
-   LM_STUDIO_MODEL=<modelo carregado no LM Studio>
+   # IA local com API compatível com a OpenAI (Ollama ou LM Studio)
+   LM_STUDIO_URL=http://localhost:11434/v1
+   LM_STUDIO_MODEL=xor-estudo
    TOGETHER_API_KEY=<chave da Together AI>
    ```
 
@@ -54,8 +55,8 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Cliente Supabase com a sessão do usuário | Sim |
    | `SUPABASE_SECRET_KEY` | Cliente admin, só no servidor (cadastro e troca de email) | Sim |
    | `NEXT_PUBLIC_SITE_URL` | Links absolutos do Open Graph (prévia ao compartilhar o link) | Não. O padrão é `http://localhost:3000` |
-   | `LM_STUDIO_URL` | Geração de questões com IA | Não. Sem ela, a geração responde 503 |
-   | `LM_STUDIO_MODEL` | Modelo usado pelo LM Studio | Não |
+   | `LM_STUDIO_URL` | IA local: questionários e Ambiente de Estudo (Ollama em `http://localhost:11434/v1` ou LM Studio em `http://localhost:1234/v1`) | Não. Sem ela, a geração responde 503 |
+   | `LM_STUDIO_MODEL` | Modelo usado. Com o Ollama: `xor-estudo` (veja [docs/plano-ambiente-de-estudo-backend.md](docs/plano-ambiente-de-estudo-backend.md)) | Não |
    | `TOGETHER_API_KEY` | Chat com IA | Só para o chat |
 
    A chave secreta ignora o RLS. Ela nunca pode ganhar o prefixo `NEXT_PUBLIC_`, senão vai parar no bundle do navegador.

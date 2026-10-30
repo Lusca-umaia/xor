@@ -33,22 +33,3 @@ export default function SeloIA({
     </span>
   )
 }
-
-export const MODO_DEMONSTRACAO =
-  process.env.NEXT_PUBLIC_AMBIENTE_MOCK !== 'false'
-
-/** Avisa que o conteúdo vem do mock enquanto o back não está integrado. */
-export function SeloDemonstracao({ className }: { className?: string }) {
-  if (!MODO_DEMONSTRACAO) return null
-  return (
-    <span
-      className={clsx(
-        'inline-flex items-center gap-1 rounded-full bg-gray-900 px-2 py-0.5 text-xs font-semibold text-white',
-        className
-      )}
-      title="Os dados ficam só neste navegador e o conteúdo gerado é de demonstração, até a integração com o servidor."
-    >
-      Dados de demonstração
-    </span>
-  )
-}

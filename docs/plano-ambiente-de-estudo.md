@@ -1,6 +1,6 @@
 # Plano — Ambiente de Estudo (fase 1: front-end)
 
-> Responsável: Andrey. Status: **fases F1 a F9 implementadas** na branch `feat/ambiente-estudo` (aguardando revisão).
+> Responsável: Andrey. Status: **fase 1 concluída**. O mock foi substituído pelo back real com IA local na fase 2 — veja [plano-ambiente-de-estudo-backend.md](plano-ambiente-de-estudo-backend.md). As seções sobre o mock abaixo descrevem a fase 1.
 > Relacionado ao [BACKLOG.md](BACKLOG.md): E2 (Ambientes de estudo), parte de E6 (rótulos de IA, citações, reporte) e T4.10 (sem mecânicas punitivas).
 
 ## Notas da implementação

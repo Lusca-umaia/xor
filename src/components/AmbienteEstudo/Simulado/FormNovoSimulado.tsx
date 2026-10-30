@@ -21,7 +21,6 @@ import {
   classeRotulo
 } from '../estilos'
 import SeletorMateriais from '../SeletorMateriais/SeletorMateriais'
-import { MODO_DEMONSTRACAO } from '../SeloIA/SeloIA'
 
 const TIPOS = Object.keys(ROTULO_TIPO_QUESTAO) as TipoQuestao[]
 const DIFICULDADES = Object.keys(ROTULO_DIFICULDADE) as DificuldadeConfig[]
@@ -259,12 +258,9 @@ export default function FormNovoSimulado({
         </label>
       </div>
 
-      {MODO_DEMONSTRACAO && (
-        <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900">
-          Modo demonstração: o banco de conteúdo é pequeno, então o simulado
-          pode vir com menos questões do que o pedido.
-        </p>
-      )}
+      <p className="text-xs text-gray-500">
+        A geração roda na IA local e pode levar alguns minutos.
+      </p>
 
       <div className="flex justify-end gap-2 border-t border-gray-100 pt-5">
         <Botao onClick={aoCancelar}>Cancelar</Botao>

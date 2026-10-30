@@ -11,15 +11,10 @@ import ModalAmbiente from '@/components/AmbienteEstudo/ModalAmbiente/ModalAmbien
 import ModalConfirmacao from '@/components/AmbienteEstudo/ModalConfirmacao/ModalConfirmacao'
 import Botao from '@/components/AmbienteEstudo/Botao/Botao'
 import {
-  MODO_DEMONSTRACAO,
-  SeloDemonstracao
-} from '@/components/AmbienteEstudo/SeloIA/SeloIA'
-import {
   useAmbientes,
   useAtualizarAmbiente,
   useCriarAmbiente,
-  useExcluirAmbiente,
-  useRestaurarDemonstracao
+  useExcluirAmbiente
 } from '@/hooks/ambienteEstudo/useAmbientes'
 import { useCadeirasAtuais } from '@/hooks/ambienteEstudo/useCadeirasAtuais'
 import { LISTA_CORES } from '@/utils/ambienteEstudo/cores'
@@ -70,11 +65,9 @@ export default function AmbientesPage() {
   const criar = useCriarAmbiente()
   const atualizar = useAtualizarAmbiente()
   const excluir = useExcluirAmbiente()
-  const restaurar = useRestaurarDemonstracao()
 
   const [modal, setModal] = useState<EstadoModal>(null)
   const [paraExcluir, setParaExcluir] = useState<AmbienteListagem | null>(null)
-  const [confirmarRestauracao, setConfirmarRestauracao] = useState(false)
   const [mostrarArquivados, setMostrarArquivados] = useState(false)
 
   const ativos = ambientes?.filter(({ arquivado }) => !arquivado) ?? []
@@ -119,19 +112,13 @@ export default function AmbientesPage() {
         title="Ambientes de estudo"
         description="Seus materiais, chats com IA, resumos, atividades e simulados, organizados por cadeira ou tema."
         actions={{
-          primaryAction: MODO_DEMONSTRACAO
-            ? {
-                title: 'Restaurar demonstração',
-                onClick: () => setConfirmarRestauracao(true)
-              }
-            : { title: 'Atualizar', onClick: () => refetch() },
+          primaryAction: { title: 'Atualizar', onClick: () => refetch() },
           secondaryAction: {
             title: 'Novo ambiente',
             onClick: () => setModal({ tipo: 'criar' })
           }
         }}
       />
-      <SeloDemonstracao />
 
       {cadeirasSemAmbiente.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-gray-200 bg-white p-4">
@@ -268,21 +255,6 @@ export default function AmbientesPage() {
             </>
           )
         }
-      />
-
-      <ModalConfirmacao
-        aberto={confirmarRestauracao}
-        aoFechar={() => setConfirmarRestauracao(false)}
-        titulo="Restaurar dados de demonstração?"
-        perigoso
-        textoConfirmar="Apagar e restaurar"
-        carregando={restaurar.isPending}
-        aoConfirmar={() =>
-          restaurar.mutate(undefined, {
-            onSuccess: () => setConfirmarRestauracao(false)
-          })
-        }
-        mensagem="Todos os ambientes deste navegador serão apagados e substituídos pelos ambientes de demonstração das suas cadeiras atuais."
       />
     </div>
   )
