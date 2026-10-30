@@ -85,6 +85,23 @@ export interface Evento {
   horas: number
 }
 
+// Plano do próximo semestre (planejador de matrícula), guardado no navegador.
+export interface DisciplinaPersonalizada {
+  codigo: string
+  nome: string
+  cargaHoraria: number
+  carater: 'OBRIGATORIA' | 'OPTATIVA'
+  horario: { dias: number[]; inicio: string; fim: string } | null
+}
+
+export interface PlanoSemestre {
+  codigos: string[]
+  personalizadas: DisciplinaPersonalizada[]
+  // Carga horária total do semestre, em horas. Valores do próprio aluno.
+  minimo: number
+  maximo: number
+}
+
 export interface Limites {
   horas: number
   itens: number
