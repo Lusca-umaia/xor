@@ -4,27 +4,31 @@ import { useMemo } from 'react'
 import {
   LuArrowRight,
   LuBookOpen,
-  LuBot,
   LuCirclePlay,
-  LuListChecks,
+  LuGraduationCap,
   LuTimer,
   LuTrendingUp
 } from 'react-icons/lu'
+import type { ResumoCadeira } from '@/@types/AmbienteEstudo'
 import DisciplineCard from '@/components/DisciplineCard/DisciplineCard'
 import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
 import IconeTile from '@/components/IconeTile/IconeTile'
 import ModuleCard from '@/components/ModuleCard/ModuleCard'
 import Skeleton, { SkeletonCard } from '@/components/Skeleton/Skeleton'
 import { STATUS_KEYS } from '@/components/CourseCard/CourseCard'
+import { useResumoCadeiras } from '@/hooks/ambienteEstudo/useAmbientes'
 import { useProgresso } from '@/hooks/queries/useProgresso'
 import { useSessoesFoco } from '@/hooks/queries/useSessoesFoco'
+import { useAgenda } from '@/hooks/useAgenda'
 import GraficoSemana from '../pomodoro/components/GraficoSemana'
 import { CONFIG_PADRAO } from '../pomodoro/consts'
 import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
 import { resumirSessoes } from '../pomodoro/utils/estatisticas'
 import BoasVindas, { BoasVindasSkeleton } from './components/BoasVindas'
+import ContinuarEstudo from './components/ContinuarEstudo'
+import { AcaoEstudo, EstudoDaCadeira } from './components/EstudoCadeira'
 import FocoHoje from './components/FocoHoje'
-import QuestionariosRecentes from './components/QuestionariosRecentes'
+import { proximoPasso, situacaoDoEstudo } from './utils/estudoCadeira'
 
 const moduleCard = [
   {
@@ -42,17 +46,17 @@ const moduleCard = [
       'Alterne períodos de foco e pausas para manter a produtividade em alta.'
   },
   {
-    nome: 'Assistente com IA',
-    icon: <LuBot />,
-    path: '/chat',
+    nome: 'Ambientes de estudo',
+    icon: <LuGraduationCap />,
+    path: '/ambientes',
     descricao:
-      'Tire dúvidas, revise conteúdos e peça sugestões de estudo para a IA.'
+      'Materiais, chats, resumos e simulados de cada cadeira em um só lugar.'
   },
   {
-    nome: 'Questões',
-    icon: <LuListChecks />,
-    path: '/questoes/lista-questionario',
-    descricao: 'Resolva questionários para testar e fixar o conteúdo.'
+    nome: 'Vida acadêmica',
+    icon: <LuBookOpen />,
+    path: '/academico',
+    descricao: 'Veja seu desempenho, os pré-requisitos e o relatório do curso.'
   }
 ]
 
@@ -60,6 +64,8 @@ const HomePage = () => {
   const { data, isLoading, isError } = useProgresso()
   const { data: sessoes } = useSessoesFoco()
   const [configPomodoro] = useArmazenado('xor:pomodoro:config', CONFIG_PADRAO)
+  const resumos = useResumoCadeiras()
+  const agenda = useAgenda()
 
   // Só calcula depois de carregar: depende da data local do navegador.
   const foco = useMemo(
@@ -71,6 +77,23 @@ const HomePage = () => {
     data?.disciplinas.filter(
       ({ status }) => status === STATUS_KEYS.ANDAMENTO
     ) ?? []
+
+  // Com mais de um ambiente para a mesma cadeira, vale o estudado por último.
+  const resumoPorCodigo = useMemo(() => {
+    const mapa = new Map<string, ResumoCadeira>()
+    for (const resumo of resumos.data ?? []) {
+      const atual = mapa.get(resumo.disciplinaCodigo)
+      if (
+        !atual ||
+        (resumo.ultimoEstudoEm ?? '') > (atual.ultimoEstudoEm ?? '')
+      )
+        mapa.set(resumo.disciplinaCodigo, resumo)
+    }
+    return mapa
+  }, [resumos.data])
+
+  const nomeDaCadeira = (codigo: string) =>
+    data?.disciplinas.find((d) => d.codigo === codigo)?.nome
 
   return (
     <div className="space-y-4">
@@ -149,17 +172,44 @@ const HomePage = () => {
 
             {cadeirasAtivas.length > 0 && (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {cadeirasAtivas.map((cadeira) => (
-                  <DisciplineCard
-                    key={cadeira.id}
-                    id={cadeira.id}
-                    nome={cadeira.nome}
-                    codigo={cadeira.codigo}
-                    cargaHoraria={cadeira.cargaHoraria}
-                    periodo={cadeira.periodo}
-                    status={STATUS_KEYS.ANDAMENTO}
-                  />
-                ))}
+                {cadeirasAtivas.map((cadeira) => {
+                  const resumo = resumoPorCodigo.get(cadeira.codigo)
+                  return (
+                    <DisciplineCard
+                      key={cadeira.id}
+                      nome={cadeira.nome}
+                      codigo={cadeira.codigo}
+                      cargaHoraria={cadeira.cargaHoraria}
+                      periodo={cadeira.periodo}
+                      status={STATUS_KEYS.ANDAMENTO}
+                      estudo={
+                        resumos.data && (
+                          <EstudoDaCadeira
+                            situacao={resumo && situacaoDoEstudo(resumo)}
+                            passo={proximoPasso({
+                              codigo: cadeira.codigo,
+                              resumo,
+                              eventos: agenda.eventos,
+                              atividades: agenda.atividades
+                            })}
+                          />
+                        )
+                      }
+                      acaoEstudo={
+                        resumos.isLoading ? (
+                          <Skeleton className="h-9 flex-1 rounded-md" />
+                        ) : (
+                          <AcaoEstudo
+                            ambienteId={resumo?.ambienteId}
+                            codigo={cadeira.codigo}
+                            nome={cadeira.nome}
+                            indisponivel={resumos.isError}
+                          />
+                        )
+                      }
+                    />
+                  )
+                })}
               </div>
             )}
           </section>
@@ -187,7 +237,12 @@ const HomePage = () => {
           ) : (
             <Skeleton className="h-64 rounded-2xl" />
           )}
-          <QuestionariosRecentes />
+          {resumos.data && (
+            <ContinuarEstudo
+              resumos={resumos.data}
+              nomeDaCadeira={nomeDaCadeira}
+            />
+          )}
         </aside>
       </div>
     </div>

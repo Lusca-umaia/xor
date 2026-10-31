@@ -9,12 +9,10 @@ import {
   LuTimer,
   LuUserRound
 } from 'react-icons/lu'
-import { FaTasks } from 'react-icons/fa'
 import { GiProgression } from 'react-icons/gi'
 import { FaHome } from 'react-icons/fa'
 import NavbarMobile from './NavbarMobile'
 import NavbarDescktop from './NavbarDescktop'
-import { TbMessageChatbot } from 'react-icons/tb'
 
 export const options = [
   {
@@ -61,16 +59,6 @@ export const options = [
     icon: <LuTimer />,
     path: '/pomodoro',
     name: 'Pomodoro'
-  },
-  {
-    icon: <TbMessageChatbot />,
-    path: '/chat',
-    name: 'Assistente com IA'
-  },
-  {
-    icon: <FaTasks />,
-    path: '/questoes/lista-questionario',
-    name: 'Questões'
   },
   {
     icon: <LuUserRound />,

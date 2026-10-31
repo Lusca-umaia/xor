@@ -70,3 +70,10 @@ export const CORES_AMBIENTE: Record<
 }
 
 export const LISTA_CORES = Object.keys(CORES_AMBIENTE) as CorAmbiente[]
+
+// Cor estável por cadeira, para o ambiente criado a partir dela.
+export const corDaCadeira = (codigo: string) =>
+  LISTA_CORES[
+    [...codigo].reduce((soma, letra) => soma + letra.charCodeAt(0), 0) %
+      LISTA_CORES.length
+  ]
