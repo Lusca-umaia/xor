@@ -48,12 +48,12 @@ export const options = [
   {
     icon: <LuClipboardList />,
     path: '/atividades',
-    name: 'Atividades'
+    name: 'Tarefas e prazos'
   },
   {
     icon: <LuLibraryBig />,
     path: '/materiais',
-    name: 'Materiais de estudo'
+    name: 'Biblioteca'
   },
   {
     icon: <LuTimer />,

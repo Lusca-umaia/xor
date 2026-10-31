@@ -31,7 +31,7 @@ const MateriaisPage = () => {
   return (
     <div>
       <Header
-        title="Materiais de estudo"
+        title="Biblioteca"
         description="Playlists do YouTube e livros de acesso livre para as suas disciplinas."
       />
       <div className="space-y-4">
