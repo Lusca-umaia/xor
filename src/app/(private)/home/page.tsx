@@ -17,13 +17,17 @@ import ModuleCard from '@/components/ModuleCard/ModuleCard'
 import Skeleton, { SkeletonCard } from '@/components/Skeleton/Skeleton'
 import { STATUS_KEYS } from '@/components/CourseCard/CourseCard'
 import { useResumoCadeiras } from '@/hooks/ambienteEstudo/useAmbientes'
+import { useDiasDeEstudo } from '@/hooks/ambienteEstudo/useProgressoXp'
 import { useProgresso } from '@/hooks/queries/useProgresso'
 import { useSessoesFoco } from '@/hooks/queries/useSessoesFoco'
 import { useAgenda } from '@/hooks/useAgenda'
 import GraficoSemana from '../pomodoro/components/GraficoSemana'
 import { CONFIG_PADRAO } from '../pomodoro/consts'
 import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
-import { resumirSessoes } from '../pomodoro/utils/estatisticas'
+import {
+  resumirSessoes,
+  sequenciaDeEstudo
+} from '../pomodoro/utils/estatisticas'
 import BoasVindas, { BoasVindasSkeleton } from './components/BoasVindas'
 import ContinuarEstudo from './components/ContinuarEstudo'
 import { AcaoEstudo, EstudoDaCadeira } from './components/EstudoCadeira'
@@ -65,6 +69,7 @@ const HomePage = () => {
   const { data: sessoes } = useSessoesFoco()
   const [configPomodoro] = useArmazenado('xor:pomodoro:config', CONFIG_PADRAO)
   const resumos = useResumoCadeiras()
+  const diasAmbientes = useDiasDeEstudo()
   const agenda = useAgenda()
 
   // Só calcula depois de carregar: depende da data local do navegador.
@@ -72,6 +77,13 @@ const HomePage = () => {
     () => (sessoes ? resumirSessoes(sessoes) : undefined),
     [sessoes]
   )
+  // Sem os dias dos ambientes (erro), conta só o foco.
+  const sequencia = useMemo(() => {
+    const dias = diasAmbientes.data ?? (diasAmbientes.isError ? [] : null)
+    return sessoes && dias
+      ? sequenciaDeEstudo(sessoes, dias).sequencia
+      : undefined
+  }, [sessoes, diasAmbientes.data, diasAmbientes.isError])
 
   const cadeirasAtivas =
     data?.disciplinas.filter(
@@ -108,6 +120,7 @@ const HomePage = () => {
           aluno={data.aluno}
           resumo={data.resumo}
           foco={foco}
+          sequencia={sequencia}
           metaDiaria={configPomodoro.metaDiaria}
         />
       )}

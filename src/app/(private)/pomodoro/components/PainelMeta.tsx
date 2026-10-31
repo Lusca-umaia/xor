@@ -66,7 +66,7 @@ const PainelMeta: React.FC<PainelMetaProps> = ({
               )}
             />
           }
-          titulo="Sequência"
+          titulo="Sequência de foco"
           valor={`${resumo.sequenciaAtual} ${resumo.sequenciaAtual === 1 ? 'dia' : 'dias'}`}
           detalhe={`Recorde: ${resumo.melhorSequencia}`}
           carregando={carregando}

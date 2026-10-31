@@ -379,7 +379,8 @@ export default function VisaoGeralPage() {
               <p className="text-xl font-bold leading-tight text-gray-900">
                 {painel.sequencia}{' '}
                 <span className="text-sm font-medium text-gray-500">
-                  {painel.sequencia === 1 ? 'dia seguido' : 'dias seguidos'}
+                  {painel.sequencia === 1 ? 'dia seguido' : 'dias seguidos'}{' '}
+                  nesta cadeira
                 </span>
               </p>
               <p className="text-xs text-gray-500">
