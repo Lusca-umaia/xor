@@ -39,7 +39,7 @@ import {
   useExcluirAmbiente
 } from '@/hooks/ambienteEstudo/useAmbientes'
 import { useHistoricoCadeiras } from '@/hooks/ambienteEstudo/useHistoricoCadeiras'
-import { LISTA_CORES } from '@/utils/ambienteEstudo/cores'
+import { corDaCadeira } from '@/utils/ambienteEstudo/cores'
 import { pluralizar } from '@/utils/ambienteEstudo/formatar'
 import { normalizarTexto } from '@/utils/historicoAcademico'
 import { mensagemDeErro } from '@/services/ambienteEstudo/erros'
@@ -66,13 +66,6 @@ const passaNoFiltro = (filtro: Filtro, situacao: SituacaoCadeira | null) => {
     return situacao === 'REPROVADA' || situacao === 'TRANCADA'
   return situacao === filtro
 }
-
-// Cor estável por cadeira, para o ambiente criado a partir dela.
-const corDaCadeira = (codigo: string) =>
-  LISTA_CORES[
-    [...codigo].reduce((soma, letra) => soma + letra.charCodeAt(0), 0) %
-      LISTA_CORES.length
-  ]
 
 const classeGrade =
   'grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'

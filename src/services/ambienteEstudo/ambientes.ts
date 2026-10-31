@@ -2,7 +2,8 @@
 import {
   AmbienteEstudo,
   AmbienteListagem,
-  DadosAmbiente
+  DadosAmbiente,
+  ResumoCadeira
 } from '@/@types/AmbienteEstudo'
 import api from '../api'
 import { dados } from './erros'
@@ -10,6 +11,10 @@ import { dados } from './erros'
 /** Na primeira chamada, o servidor cria um ambiente por cadeira em andamento. */
 export const listarAmbientes = () =>
   dados(api.get<AmbienteListagem[]>('/ambientes'))
+
+/** Resumo dos ambientes de cadeira, para os cards da tela inicial. */
+export const listarResumoCadeiras = () =>
+  dados(api.get<ResumoCadeira[]>('/ambientes/resumo'))
 
 export const obterAmbiente = (id: string) =>
   dados(api.get<AmbienteEstudo>(`/ambientes/${id}`))
