@@ -11,6 +11,7 @@ function ler<T>(chave: string, padrao: T): T {
     if (
       typeof padrao === 'object' &&
       padrao !== null &&
+      !Array.isArray(padrao) &&
       typeof valor === 'object' &&
       valor !== null
     ) {
