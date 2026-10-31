@@ -2,7 +2,6 @@ import Link from 'next/link'
 import {
   LuArrowRight,
   LuCirclePlay,
-  LuFlame,
   LuGraduationCap,
   LuTimer
 } from 'react-icons/lu'
@@ -19,8 +18,6 @@ interface BoasVindasProps {
   resumo: ResumoProgresso
   // Indefinido enquanto as sessões de foco carregam.
   foco?: ResumoFoco
-  // Dias seguidos com foco ou estudo em algum ambiente; indefinido carregando.
-  sequencia?: number
   metaDiaria: number
 }
 
@@ -28,10 +25,9 @@ const BoasVindas: React.FC<BoasVindasProps> = ({
   aluno,
   resumo,
   foco,
-  sequencia,
   metaDiaria
 }) => (
-  <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg">
+  <section className="flex h-full flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg">
     <CapaXor className="px-6 py-7 max-md:px-4 max-md:py-5">
       <div className="flex flex-wrap items-end justify-between gap-4 pr-32 max-md:pr-24">
         <div className="space-y-1">
@@ -65,7 +61,7 @@ const BoasVindas: React.FC<BoasVindasProps> = ({
       </div>
     </CapaXor>
 
-    <div className="grid grid-cols-2 gap-3 p-6 max-md:p-4 max-sm:grid-cols-1 xl:grid-cols-4">
+    <div className="grid flex-1 grid-cols-1 content-center gap-3 p-6 max-md:p-4 sm:grid-cols-3">
       <Indicador
         label="Progresso geral"
         value={`${resumo.percentualGeral}%`}
@@ -93,17 +89,6 @@ const BoasVindas: React.FC<BoasVindasProps> = ({
           </IconeTile>
         }
       />
-      <Indicador
-        label="Sequência de estudo"
-        carregando={sequencia === undefined}
-        value={sequencia}
-        detalhe={sequencia === 1 ? 'dia' : 'dias'}
-        icon={
-          <IconeTile>
-            <LuFlame />
-          </IconeTile>
-        }
-      />
     </div>
   </section>
 )
@@ -111,8 +96,8 @@ const BoasVindas: React.FC<BoasVindasProps> = ({
 export const BoasVindasSkeleton = () => (
   <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg">
     <div className="h-32 animate-pulse bg-gray-200" />
-    <div className="grid grid-cols-2 gap-3 p-6 max-md:p-4 max-sm:grid-cols-1 xl:grid-cols-4">
-      {Array.from({ length: 4 }, (_, i) => (
+    <div className="grid grid-cols-1 gap-3 p-6 max-md:p-4 sm:grid-cols-3">
+      {Array.from({ length: 3 }, (_, i) => (
         <Skeleton key={i} className="h-16 rounded-2xl" />
       ))}
     </div>
