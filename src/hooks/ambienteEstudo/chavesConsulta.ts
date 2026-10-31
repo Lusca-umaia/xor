@@ -6,6 +6,7 @@ const raiz = ['ambienteEstudo'] as const
 export const chavesAmbiente = {
   raiz,
   ambientes: () => [...raiz, 'ambientes'] as const,
+  resumoCadeiras: () => [...raiz, 'resumoCadeiras'] as const,
   ambiente: (id: string) => [...raiz, 'ambiente', id] as const,
   materiais: (ambienteId: string) =>
     [...raiz, 'materiais', ambienteId] as const,

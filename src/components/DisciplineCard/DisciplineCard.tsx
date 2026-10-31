@@ -1,22 +1,18 @@
 'use client'
-import Link from 'next/link'
-import { useState } from 'react'
-import {
-  LuCalendar,
-  LuCircleCheck,
-  LuClock,
-  LuListChecks
-} from 'react-icons/lu'
+import { ReactNode } from 'react'
+import { LuCalendar, LuClock } from 'react-icons/lu'
 import { STATUS_KEYS } from '../CourseCard/CourseCard'
-import ModalEncerrarCadeiraParcialmente from '../ModalEncerrarCadeiraParcialmente/ModalEncerrarCadeiraParcialmente'
 
 interface DisciplineCardProps {
   nome: string
-  id: number
   status: (typeof STATUS_KEYS)['ANDAMENTO'] | (typeof STATUS_KEYS)['CONCLUIDA']
   codigo?: string
   cargaHoraria?: number
   periodo?: string | null
+  // Situação no ambiente de estudo e próximo passo (tela inicial).
+  estudo?: ReactNode
+  // Botão que leva ao ambiente de estudo da cadeira.
+  acaoEstudo?: ReactNode
 }
 
 const CARD_STATUS_INFORMATION = {
@@ -36,19 +32,14 @@ const CARD_STATUS_INFORMATION = {
 
 const DisciplineCard: React.FC<DisciplineCardProps> = ({
   nome,
-  id,
   status,
   codigo,
   cargaHoraria,
-  periodo
+  periodo,
+  estudo,
+  acaoEstudo
 }) => {
   const { label, destaque, selo, ponto } = CARD_STATUS_INFORMATION[status]
-  const [openModal, setOpenModal] = useState(false)
-
-  const handleChangeModal = (value: boolean) => {
-    setOpenModal(value)
-  }
-
   return (
     <div className="relative flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-5 pt-6 shadow-sm transition duration-200 hover:border-gray-200 hover:shadow-lg">
       <span
@@ -94,31 +85,9 @@ const DisciplineCard: React.FC<DisciplineCardProps> = ({
         )}
       </div>
 
-      <div className="mt-auto flex gap-2">
-        {status !== STATUS_KEYS.CONCLUIDA && (
-          <button
-            type="button"
-            onClick={() => handleChangeModal(true)}
-            className="inline-flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-xor-navy px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-xor-navy/90"
-          >
-            <LuCircleCheck />
-            Concluir
-          </button>
-        )}
-        <Link
-          href={`/questoes/lista-questionario?disciplina=${id}`}
-          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-        >
-          <LuListChecks />
-          Questões
-        </Link>
-      </div>
-      <ModalEncerrarCadeiraParcialmente
-        disciplinaId={id}
-        disciplinaNome={nome}
-        open={openModal}
-        onClose={handleChangeModal}
-      />
+      {estudo}
+
+      <div className="mt-auto flex gap-2">{acaoEstudo}</div>
     </div>
   )
 }
