@@ -1,0 +1,31 @@
+# IA local do Ambiente de Estudo em Docker (alternativa a instalar o Ollama).
+#
+#   docker compose -f docker-compose.ia.yml up -d
+#   npm run ia:setup
+#
+# Os modelos ficam no volume "ollama" e não são baixados de novo.
+# Com GPU NVIDIA (Linux, ou Windows com WSL2 e o NVIDIA Container Toolkit),
+# descomente o bloco "deploy". Sem GPU, roda na CPU (mais devagar; use
+# `npm run ia:setup -- --leve`).
+
+services:
+  ollama:
+    image: ollama/ollama:0.40.13
+    container_name: xor-ollama
+    ports:
+      # Outra porta se o Ollama já estiver instalado na máquina:
+      #   XOR_IA_PORTA=11435 docker compose -f docker-compose.ia.yml up -d
+      - '${XOR_IA_PORTA:-11434}:11434'
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+volumes:
+  ollama:

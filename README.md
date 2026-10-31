@@ -26,7 +26,7 @@ O XOR ajuda o aluno da Universidade Federal do Ceará a acompanhar a própria gr
 
 ## Como rodar
 
-Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
+Pré-requisitos: Node.js 22.13 ou superior (o leitor e a extração de PDF dependem do `pdfjs-dist`, que exige essa versão; o `.nvmrc` já aponta para o Node 22), npm e um projeto no Supabase.
 
 1. Instale as dependências:
 
@@ -34,18 +34,10 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
    npm install
    ```
 
-2. Crie o arquivo `.env.local` na raiz (ele já está no `.gitignore` e nunca deve ser commitado):
+2. Crie o arquivo `.env.local` a partir do modelo (ele já está no `.gitignore` e nunca deve ser commitado) e preencha as chaves do Supabase:
 
    ```bash
-   NEXT_PUBLIC_SUPABASE_URL=https://<projeto>.supabase.co
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<chave publicável>
-   SUPABASE_SECRET_KEY=<chave secreta>
-
-   # Opcionais
-   NEXT_PUBLIC_SITE_URL=https://<domínio do app>
-   LM_STUDIO_URL=http://localhost:1234/v1
-   LM_STUDIO_MODEL=<modelo carregado no LM Studio>
-   TOGETHER_API_KEY=<chave da Together AI>
+   cp .env.example .env.local
    ```
 
    | Variável | Onde é usada | Obrigatória |
@@ -54,21 +46,68 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Cliente Supabase com a sessão do usuário | Sim |
    | `SUPABASE_SECRET_KEY` | Cliente admin, só no servidor (cadastro e troca de email) | Sim |
    | `NEXT_PUBLIC_SITE_URL` | Links absolutos do Open Graph (prévia ao compartilhar o link) | Não. O padrão é `http://localhost:3000` |
-   | `LM_STUDIO_URL` | Geração de questões com IA | Não. Sem ela, a geração responde 503 |
-   | `LM_STUDIO_MODEL` | Modelo usado pelo LM Studio | Não |
+   | `LM_STUDIO_URL` | IA local: questionários e Ambiente de Estudo (Ollama em `http://localhost:11434/v1` ou LM Studio em `http://localhost:1234/v1`) | Não. Sem ela, a geração responde 503 |
+   | `LM_STUDIO_MODEL` | Modelo usado. Com o Ollama: `xor-estudo` (veja [docs/plano-ambiente-de-estudo-backend.md](docs/plano-ambiente-de-estudo-backend.md)) | Não |
+   | `EMBEDDING_MODEL` | Embeddings da busca semântica nos materiais (no mesmo servidor de `LM_STUDIO_URL`; baixe com `ollama pull nomic-embed-text-v2-moe`) | Não. O padrão é `nomic-embed-text-v2-moe`; sem o modelo, a busca usa só palavras |
    | `TOGETHER_API_KEY` | Chat com IA | Só para o chat |
 
    A chave secreta ignora o RLS. Ela nunca pode ganhar o prefixo `NEXT_PUBLIC_`, senão vai parar no bundle do navegador.
 
 3. Aplique as migrações de [supabase/migrations](supabase/migrations) no banco, em ordem, pelo Supabase CLI (`supabase db push`) ou pelo SQL Editor.
 
-4. Suba o servidor de desenvolvimento:
+4. Prepare a IA local do Ambiente de Estudo (veja [IA local](#ia-local) abaixo):
+
+   ```bash
+   npm run ia:setup
+   ```
+
+5. Suba o servidor de desenvolvimento:
 
    ```bash
    npm run dev
    ```
 
    O app fica em `http://localhost:3000`.
+
+
+## IA local
+
+O Ambiente de Estudo usa uma IA que roda na própria máquina, pelo [Ollama](https://ollama.com), com uma API compatível com a da OpenAI. São dois modelos:
+
+| Modelo | Para quê | Tamanho |
+| --- | --- | --- |
+| `xor-estudo` | Chat, resumos, questões, flashcards, simulados e correção. É o `qwen3:4b-instruct-2507-q4_K_M` com contexto de 8192 tokens ([ia/xor-estudo.Modelfile](ia/xor-estudo.Modelfile)) | 2,5 GB |
+| `nomic-embed-text-v2-moe` | Embeddings da busca semântica nos materiais (multilíngue, 768 dimensões) | 1 GB |
+
+### Passo a passo
+
+1. Instale o Ollama e deixe-o aberto:
+   - Windows: `winget install Ollama.Ollama` (ou o instalador em ollama.com/download)
+   - macOS: `brew install ollama` e `ollama serve` (ou o app em ollama.com/download)
+   - Linux: `curl -fsSL https://ollama.com/install.sh | sh`
+   - Sem instalar nada além do Docker: `docker compose -f docker-compose.ia.yml up -d` (se o Ollama também estiver instalado, use outra porta: `XOR_IA_PORTA=11435 docker compose -f docker-compose.ia.yml up -d` e `LM_STUDIO_URL=http://localhost:11435/v1`)
+2. Rode `npm run ia:setup`. O script baixa os modelos (só na primeira vez), cria o `xor-estudo` e testa o chat e os embeddings.
+3. Reinicie o `npm run dev` se ele já estava rodando.
+
+`npm run ia:verificar` só confere se está tudo instalado e respondendo, sem baixar nada. Dentro do app, o Ambiente de Estudo mostra um aviso quando a IA não responde ou o modelo não está instalado.
+
+### Qual máquina aguenta
+
+| Máquina | Comando | Observação |
+| --- | --- | --- |
+| GPU NVIDIA com 4 GB ou mais | `npm run ia:setup` | Padrão. Respostas em poucos segundos |
+| Sem GPU ou com pouca memória | `npm run ia:setup -- --leve` | Usa o `qwen2.5:1.5b` (1 GB). Mais rápido na CPU, respostas mais simples |
+| GPU com 8 GB ou mais | `npm run ia:setup -- --modelo=qwen3:8b` | Qualquer modelo do Ollama com saída estruturada |
+
+### IA em outra máquina
+
+Uma máquina mais forte pode servir a IA para a equipe. Nela, rode o Ollama aceitando conexões da rede (`OLLAMA_HOST=0.0.0.0 ollama serve`) e o `npm run ia:setup`. Nas outras, aponte o `.env.local` para ela e rode `npm run ia:verificar`:
+
+```bash
+LM_STUDIO_URL=http://<ip-da-maquina>:11434/v1
+```
+
+O LM Studio também funciona (`LM_STUDIO_URL=http://localhost:1234/v1`), carregando os modelos nele à mão.
 
 ## Scripts
 
@@ -79,6 +118,8 @@ Pré-requisitos: Node.js 18 ou superior, npm e um projeto no Supabase.
 | `npm run start` | Sobe o build de produção |
 | `npm run lint` | ESLint |
 | `npm run tsc` | Checagem de tipos sem emitir arquivos |
+| `npm run ia:setup` | Baixa e cria os modelos da IA local e testa (`-- --leve` para máquinas sem GPU) |
+| `npm run ia:verificar` | Confere se a IA local está instalada e respondendo, sem baixar nada |
 
 O hook [.husky/pre-push](.husky/pre-push) roda `tsc`, `lint` e `build`, e o push só sai se os três passarem. Para ativá-lo, rode `npx husky` uma vez depois do `npm install`.
 

@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const ROTAS_PRIVADAS = [
   '/home',
+  '/ambientes',
   '/courseProgression',
   '/pomodoro',
   '/chat',
