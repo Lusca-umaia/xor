@@ -12,6 +12,10 @@ interface GraficoSemanaProps {
 const GraficoSemana: React.FC<GraficoSemanaProps> = ({ dias, metaMinutos }) => {
   const escala = Math.max(metaMinutos * 60, ...dias.map((d) => d.segundos), 1)
   const alturaMeta = ((metaMinutos * 60) / escala) * 100
+  // Média diária das barras do gráfico (dias sem foco contam como zero).
+  const mediaSegundos =
+    dias.reduce((total, d) => total + d.segundos, 0) / Math.max(dias.length, 1)
+  const alturaMedia = (mediaSegundos / escala) * 100
 
   return (
     <div className="bg-white border border-gray-100 rounded-2xl shadow-lg p-6 max-md:p-4 space-y-4">
@@ -22,13 +26,17 @@ const GraficoSemana: React.FC<GraficoSemanaProps> = ({ dias, metaMinutos }) => {
 
       <div className="relative h-36">
         <div
-          className="absolute inset-x-0 border-t border-dashed border-xor-lime z-10"
+          aria-hidden="true"
+          className="absolute inset-x-0 border-t-2 border-dashed border-xor-lime z-10"
           style={{ bottom: `${alturaMeta}%` }}
-        >
-          <span className="absolute right-0 -top-5 text-[10px] font-semibold text-gray-400">
-            meta
-          </span>
-        </div>
+        />
+        {mediaSegundos > 0 && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 border-t-2 border-dotted border-orange-400 z-10 transition-[bottom] duration-700"
+            style={{ bottom: `${alturaMedia}%` }}
+          />
+        )}
         <div className="grid h-full grid-cols-7 items-end gap-2">
           {dias.map((dia) => {
             const bateuMeta = dia.segundos >= metaMinutos * 60
@@ -71,6 +79,23 @@ const GraficoSemana: React.FC<GraficoSemanaProps> = ({ dias, metaMinutos }) => {
             {dia.hoje ? 'hoje' : dia.rotulo}
           </span>
         ))}
+      </div>
+
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden="true"
+            className="w-5 border-t-2 border-dashed border-xor-lime"
+          />
+          Meta diária: {formatarDuracao(metaMinutos * 60)}
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            aria-hidden="true"
+            className="w-5 border-t-2 border-dotted border-orange-400"
+          />
+          Média: {formatarDuracao(Math.round(mediaSegundos))}/dia
+        </span>
       </div>
     </div>
   )

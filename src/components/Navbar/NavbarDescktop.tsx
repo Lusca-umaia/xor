@@ -19,7 +19,7 @@ import { useLogout } from '@/hooks/mutations/useLogout'
 import { useMe } from '@/hooks/queries/useMe'
 import Avatar from '../Avatar/Avatar'
 import Skeleton from '../Skeleton/Skeleton'
-import { estaAtivo, grupos, PERFIL, PRIVACIDADE } from './Navbar'
+import { estaAtivo, grupos, PERFIL, PRIVACIDADE } from './itensNav'
 
 // Atalho para recolher a barra; não age enquanto o aluno digita (no editor
 // de texto, Ctrl+B é negrito).

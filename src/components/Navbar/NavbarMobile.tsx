@@ -22,7 +22,7 @@ import {
   ItemNav,
   PERFIL,
   PRIVACIDADE
-} from './Navbar'
+} from './itensNav'
 
 const todos = grupos.flatMap(({ itens }) => itens)
 const atalhos = ATALHOS_MOBILE.map(
