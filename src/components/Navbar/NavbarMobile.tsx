@@ -3,9 +3,9 @@
 import { FaXmark } from 'react-icons/fa6'
 import { usePathname, useRouter } from 'next/navigation'
 
-import { options } from './Navbar'
+import { grupos } from './Navbar'
 import clsx from 'clsx'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import Image from 'next/image'
 import { IoMenu } from 'react-icons/io5'
 import { HiOutlineLogout } from 'react-icons/hi'
@@ -76,25 +76,34 @@ export default function NavbarMobile() {
             quality={100}
             alt="Logo"
           />
-          {options.map((option, index) => (
-            <li
-              onClick={() => {
-                closeModal()
-                router.push(option.path)
-              }}
-              key={index}
-              className={clsx(
-                option.path.includes(getFirstPath())
-                  ? 'bg-black text-white'
-                  : 'text-gray-900 bg-gray-50',
-                'cursor-pointer text-2xl w-full gap-2 justify-center shadow-md hover:bg-black hover:scale-105 px-3 py-2 hover:text-white duration-100 h-10 flex items-center rounded-full'
+          {grupos.map(({ titulo, itens }, indice) => (
+            <Fragment key={titulo ?? indice}>
+              {titulo && (
+                <p className="px-3 pt-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                  {titulo}
+                </p>
               )}
-            >
-              {option.icon}
-              <span className={'w-full text-sm font-semibold duration-100'}>
-                {option.name}
-              </span>
-            </li>
+              {itens.map((option) => (
+                <li
+                  onClick={() => {
+                    closeModal()
+                    router.push(option.path)
+                  }}
+                  key={option.path}
+                  className={clsx(
+                    option.path.includes(getFirstPath())
+                      ? 'bg-black text-white'
+                      : 'text-gray-900 bg-gray-50',
+                    'cursor-pointer text-2xl w-full gap-2 justify-center shadow-md hover:bg-black hover:scale-105 px-3 py-2 hover:text-white duration-100 h-10 flex items-center rounded-full'
+                  )}
+                >
+                  {option.icon}
+                  <span className={'w-full text-sm font-semibold duration-100'}>
+                    {option.name}
+                  </span>
+                </li>
+              ))}
+            </Fragment>
           ))}
           <li
             onClick={() => sair()}

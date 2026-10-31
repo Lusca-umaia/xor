@@ -4,7 +4,7 @@ import { HiOutlineLogout } from 'react-icons/hi'
 import Link from 'next/link'
 import Image from 'next/image'
 import { classNames } from '@/utils/auxiliars'
-import { options } from './Navbar'
+import { grupos } from './Navbar'
 import { useMe } from '@/hooks/queries/useMe'
 import { useLogout } from '@/hooks/mutations/useLogout'
 import Skeleton from '../Skeleton/Skeleton'
@@ -46,19 +46,30 @@ export default function NavbarDescktop() {
           </span>
         </div>
       </Link>
-      <div className="flex flex-col overflow-auto gap-2">
-        {options.map((option) => (
-          <Link
-            key={option.path}
-            href={`${option.path}`}
-            className={classNames(
-              option.path.includes(getFirstPath()) ? 'bg-black text-white' : '',
-              'text-2xl flex gap-2 text-black justify-start hover:text-white hover:bg-black duration-200 w-full items-center px-3 py-2 rounded-full'
+      <div className="flex flex-col overflow-auto gap-3">
+        {grupos.map(({ titulo, itens }, indice) => (
+          <div key={titulo ?? indice} className="flex flex-col gap-1">
+            {titulo && (
+              <p className="px-3 pt-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                {titulo}
+              </p>
             )}
-          >
-            {option.icon}
-            <span className="text-sm font-semibold">{option.name}</span>
-          </Link>
+            {itens.map((option) => (
+              <Link
+                key={option.path}
+                href={`${option.path}`}
+                className={classNames(
+                  option.path.includes(getFirstPath())
+                    ? 'bg-black text-white'
+                    : '',
+                  'text-2xl flex gap-2 text-black justify-start hover:text-white hover:bg-black duration-200 w-full items-center px-3 py-2 rounded-full'
+                )}
+              >
+                {option.icon}
+                <span className="text-sm font-semibold">{option.name}</span>
+              </Link>
+            ))}
+          </div>
         ))}
       </div>
       <div className="mt-auto">
