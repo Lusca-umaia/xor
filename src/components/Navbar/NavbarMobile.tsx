@@ -26,7 +26,7 @@ export default function NavbarMobile() {
   }
 
   return (
-    <div className="lg:hidden flex items-center w-full fixed top-0 bg-gray-50 border-b border-gray-200/80 h-[50px] z-10">
+    <div className="lg:hidden print:hidden flex items-center w-full fixed top-0 bg-gray-50 border-b border-gray-200/80 h-[50px] z-10">
       <div className="grid grid-cols-3 items-center px-2 w-full">
         <button
           type="button"

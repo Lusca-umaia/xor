@@ -1,5 +1,14 @@
 'use client'
-import { LuGraduationCap, LuTimer, LuUserRound } from 'react-icons/lu'
+import {
+  LuBookOpen,
+  LuCalendarDays,
+  LuClipboardList,
+  LuLibraryBig,
+  LuListChecks,
+  LuGraduationCap,
+  LuTimer,
+  LuUserRound
+} from 'react-icons/lu'
 import { FaTasks } from 'react-icons/fa'
 import { GiProgression } from 'react-icons/gi'
 import { FaHome } from 'react-icons/fa'
@@ -22,6 +31,31 @@ export const options = [
     icon: <LuGraduationCap />,
     path: '/ambientes',
     name: 'Ambientes de estudo'
+  },
+  {
+    icon: <LuBookOpen />,
+    path: '/academico',
+    name: 'Vida acadêmica'
+  },
+  {
+    icon: <LuListChecks />,
+    path: '/planejador',
+    name: 'Planejador de matrícula'
+  },
+  {
+    icon: <LuCalendarDays />,
+    path: '/calendario',
+    name: 'Calendário'
+  },
+  {
+    icon: <LuClipboardList />,
+    path: '/atividades',
+    name: 'Atividades'
+  },
+  {
+    icon: <LuLibraryBig />,
+    path: '/materiais',
+    name: 'Materiais de estudo'
   },
   {
     icon: <LuTimer />,
