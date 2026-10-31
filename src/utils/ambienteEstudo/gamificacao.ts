@@ -5,7 +5,8 @@ import type {
   Material,
   Resumo,
   SimuladoListagem,
-  TentativaSimulado
+  TentativaSimulado,
+  TipoXp
 } from '@/@types/AmbienteEstudo'
 
 // Gamificação da visão geral. O XP e os dias de estudo vêm do registro de
@@ -389,3 +390,68 @@ export function missoesDoDia(
 
   return missoes.slice(0, 3)
 }
+
+// ---------- XP da cadeira: meta do dia, semana e origem ----------
+
+/** XP por dia que conta como "dia bem estudado" na cadeira. */
+export const META_XP_DIARIA = 30
+
+/** XP de cada um dos últimos 7 dias e o total da semana anterior. */
+export function xpDaSemana(eventos: EventoXp[], hoje = new Date()) {
+  const inicioHoje = new Date(
+    hoje.getFullYear(),
+    hoje.getMonth(),
+    hoje.getDate()
+  )
+  const porDia = new Map<string, number>()
+  for (const { criadoEm, xp } of eventos) {
+    const chave = chaveDia(new Date(criadoEm))
+    porDia.set(chave, (porDia.get(chave) ?? 0) + xp)
+  }
+  const dias = Array.from({ length: 14 }, (_, i) => {
+    const dia = new Date(inicioHoje)
+    dia.setDate(dia.getDate() - (13 - i))
+    return {
+      rotulo: dia
+        .toLocaleDateString('pt-BR', { weekday: 'narrow' })
+        .toUpperCase(),
+      data: dia.toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      }),
+      xp: porDia.get(chaveDia(dia)) ?? 0,
+      hoje: i === 13
+    }
+  })
+  const semana = dias.slice(7)
+  const total = semana.reduce((soma, { xp }) => soma + xp, 0)
+  const anterior = dias.slice(0, 7).reduce((soma, { xp }) => soma + xp, 0)
+  return { dias: semana, total, anterior }
+}
+
+const ORIGENS: { rotulo: string; tipos: TipoXp[] }[] = [
+  { rotulo: 'Materiais', tipos: ['MATERIAL'] },
+  { rotulo: 'Chat com a IA', tipos: ['MENSAGEM'] },
+  { rotulo: 'Resumos', tipos: ['RESUMO'] },
+  { rotulo: 'Atividades', tipos: ['ATIVIDADE'] },
+  { rotulo: 'Flashcards', tipos: ['FLASHCARD'] },
+  { rotulo: 'Simulados', tipos: ['SIMULADO', 'SIMULADO_NOTA'] }
+]
+
+/** De onde veio o XP da cadeira, do maior para o menor (sem os zerados). */
+export function origemDoXp(porTipo: Partial<Record<TipoXp, number>> = {}) {
+  const total = Object.values(porTipo).reduce((soma, xp) => soma + (xp ?? 0), 0)
+  return ORIGENS.map(({ rotulo, tipos }) => {
+    const xp = tipos.reduce((soma, tipo) => soma + (porTipo[tipo] ?? 0), 0)
+    return { rotulo, xp, fracao: total ? xp / total : 0 }
+  })
+    .filter(({ xp }) => xp > 0)
+    .sort((a, b) => b.xp - a.xp)
+}
+
+/** A conquista bloqueada mais perto de sair (maior fração da meta). */
+export const proximaConquista = (lista: Conquista[]) =>
+  lista
+    .filter(({ desbloqueada }) => !desbloqueada)
+    .sort((a, b) => b.atual / b.meta - a.atual / a.meta || a.meta - b.meta)[0]

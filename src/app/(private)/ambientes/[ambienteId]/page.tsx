@@ -34,8 +34,10 @@ import {
 import AnelProgresso from '@/components/AnelProgresso/AnelProgresso'
 import IconeTile from '@/components/IconeTile/IconeTile'
 import { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
+import PainelXp from '@/components/AmbienteEstudo/PainelXp/PainelXp'
 import { classeCartao } from '@/components/AmbienteEstudo/estilos'
 import Skeleton from '@/components/Skeleton/Skeleton'
+import { useAmbiente } from '@/hooks/ambienteEstudo/useAmbientes'
 import { useAtividades } from '@/hooks/ambienteEstudo/useAtividades'
 import { useChats } from '@/hooks/ambienteEstudo/useChats'
 import { useMateriais } from '@/hooks/ambienteEstudo/useMateriais'
@@ -47,6 +49,7 @@ import {
   DadosGamificacao,
   diasDeEstudo,
   dominioPorTopico,
+  META_XP_DIARIA,
   missoesDoDia,
   nivelDe,
   REGRAS_XP,
@@ -158,6 +161,7 @@ export default function VisaoGeralPage() {
   const atividades = useAtividades(ambienteId)
   const simulados = useSimulados(ambienteId)
   const progresso = useProgressoXp(ambienteId)
+  const ambiente = useAmbiente(ambienteId)
   const base = `/ambientes/${ambienteId}`
 
   const carregando =
@@ -335,11 +339,27 @@ export default function VisaoGeralPage() {
               <span>
                 Faltam {nivel.faltam} XP para o nível {nivel.nivel + 1}
               </span>
-              {painel.xpHoje > 0 && (
-                <span className="rounded-full bg-xor-lime/30 px-2 py-0.5 text-xs font-semibold text-xor-navy">
-                  +{painel.xpHoje} XP hoje
-                </span>
-              )}
+              <span
+                title={`Meta do dia: ${META_XP_DIARIA} XP nesta cadeira`}
+                className={clsx(
+                  'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold',
+                  painel.xpHoje >= META_XP_DIARIA
+                    ? 'bg-xor-lime/40 text-xor-navy'
+                    : 'bg-gray-100 text-gray-700'
+                )}
+              >
+                <AnelProgresso
+                  percentual={Math.min(
+                    100,
+                    (painel.xpHoje / META_XP_DIARIA) * 100
+                  )}
+                  espessura={6}
+                  className="size-4"
+                />
+                {painel.xpHoje >= META_XP_DIARIA
+                  ? `Meta do dia batida: +${painel.xpHoje} XP`
+                  : `Meta do dia: ${painel.xpHoje}/${META_XP_DIARIA} XP`}
+              </span>
               <details className="relative">
                 <summary className="cursor-pointer list-none font-semibold text-xor-navy hover:text-xor-slate [&::-webkit-details-marker]:hidden">
                   Como ganhar XP?
@@ -647,6 +667,14 @@ export default function VisaoGeralPage() {
           )}
         </Secao>
       </div>
+
+      <PainelXp
+        ambienteId={ambienteId}
+        disciplinaCodigo={ambiente.data?.disciplinaCodigo ?? null}
+        eventos={progresso.data?.eventos ?? []}
+        porTipo={progresso.data?.porTipo}
+        conquistas={painel.conquistas}
+      />
 
       <Secao
         icone={<LuAward />}
