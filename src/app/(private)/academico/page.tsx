@@ -17,7 +17,7 @@ import { CHAVES } from '@/services/academico/chaves'
 import { AVALIACOES_DEMO } from '@/services/mocks/historico'
 import { CURRICULO_CC } from '@/services/mocks/curriculoCC'
 import { situacoes } from '@/utils/academico'
-import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
+import { useSincronizado } from '@/hooks/useSincronizado'
 import CalculadoraTab from './components/CalculadoraTab'
 import { AvisoDemo, Card } from './components/Comuns'
 import DesempenhoTab from './components/DesempenhoTab'
@@ -40,7 +40,7 @@ const AcademicoPage = () => {
   const { data, isLoading, isError } = useAcademico()
   const { ativas, isLoading: carregandoAtivas } = useDisciplinasAtivas()
   // O padrão precisa existir já no primeiro render (o hook o captura uma vez).
-  const [avaliacoes, setAvaliacoes, avaliacoesOk] = useArmazenado<
+  const [avaliacoes, setAvaliacoes, avaliacoesOk] = useSincronizado<
     Record<string, Avaliacao[]>
   >(CHAVES.avaliacoes, {})
 

@@ -1,9 +1,12 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { LuBrainCircuit, LuDatabase } from 'react-icons/lu'
 import { CHAVES } from '@/services/academico/chaves'
-import { useArmazenado } from '../../pomodoro/hooks/useArmazenado'
+import { QUERY_KEYS } from '@/hooks/queryKeys'
+import { useSincronizado } from '@/hooks/useSincronizado'
+import { apagarDadosAluno } from '@/services/academico/dadosAluno'
 import { Aviso, BOTAO_SECUNDARIO, SecaoCard } from './SecaoCard'
 
 const DADOS = [
@@ -13,7 +16,8 @@ const DADOS = [
   ['Playlists do YouTube', CHAVES.playlists],
   ['Portfólio acadêmico', CHAVES.portfolio],
   ['Avaliações da calculadora de meta', CHAVES.avaliacoes],
-  ['Limites do detector de sobrecarga', CHAVES.limites]
+  ['Limites do detector de sobrecarga', CHAVES.limites],
+  ['Plano de matrícula', CHAVES.planejador]
 ] as const
 
 const APAGAVEIS = [
@@ -23,23 +27,36 @@ const APAGAVEIS = [
   CHAVES.atividades,
   CHAVES.eventos,
   CHAVES.avaliacoes,
-  CHAVES.limites
+  CHAVES.limites,
+  CHAVES.planejador
 ]
 
 const PrivacidadeIA: React.FC = () => {
-  const [consentimento, setConsentimento] = useArmazenado(
+  const [consentimento, setConsentimento] = useSincronizado(
     CHAVES.consentimentoIA,
     false
   )
-  const [apagado, setApagado] = useState(false)
+  const queryClient = useQueryClient()
+  const [estado, setEstado] = useState<
+    'ocioso' | 'apagando' | 'apagado' | 'erro'
+  >('ocioso')
 
-  const apagar = () => {
+  // Apaga no servidor e no cache deste navegador.
+  const apagar = async () => {
+    setEstado('apagando')
+    try {
+      await apagarDadosAluno(APAGAVEIS)
+    } catch {
+      setEstado('erro')
+      return
+    }
     try {
       APAGAVEIS.forEach((c) => window.localStorage.removeItem(c))
     } catch {
-      // Sem acesso ao armazenamento: nada a apagar.
+      // Sem acesso ao armazenamento: nada a apagar aqui.
     }
-    setApagado(true)
+    queryClient.removeQueries({ queryKey: QUERY_KEYS.DADOS_ALUNO })
+    setEstado('apagado')
   }
 
   return (
@@ -47,18 +64,23 @@ const PrivacidadeIA: React.FC = () => {
       <SecaoCard
         icon={<LuDatabase />}
         titulo="Dados da vida acadêmica"
-        descricao="O que as telas de calendário, atividades e calculadora guardam."
+        descricao="O que as telas de calendário, tarefas, calculadora e planejador guardam."
         rodape={
-          <button type="button" onClick={apagar} className={BOTAO_SECUNDARIO}>
-            Apagar dados deste navegador
+          <button
+            type="button"
+            onClick={apagar}
+            disabled={estado === 'apagando'}
+            className={BOTAO_SECUNDARIO}
+          >
+            {estado === 'apagando' ? 'Apagando...' : 'Apagar estes dados'}
           </button>
         }
       >
         <p className="text-sm text-gray-600">
-          Hoje, tudo o que você cadastra nessas telas fica{' '}
-          <strong>somente neste navegador</strong> (localStorage). Nada é
-          enviado a servidor nem a serviço de IA. O histórico e a matriz
-          curricular exibidos são dados de demonstração.
+          O que você cadastra nessas telas fica salvo na{' '}
+          <strong>sua conta</strong> e aparece em qualquer dispositivo em que
+          você entrar. Só você tem acesso, e nada disso é enviado a serviço de
+          IA. Este navegador guarda uma cópia para abrir mais rápido.
         </p>
         <ul className="divide-y divide-gray-100 text-sm">
           {DADOS.map(([nome, chave]) => (
@@ -68,9 +90,15 @@ const PrivacidadeIA: React.FC = () => {
             </li>
           ))}
         </ul>
-        {apagado && (
+        {estado === 'apagado' && (
           <Aviso tipo="sucesso">
-            Dados apagados. Recarregue a página para voltar aos exemplos.
+            Dados apagados da sua conta e deste navegador. Recarregue a página
+            para ver as telas vazias.
+          </Aviso>
+        )}
+        {estado === 'erro' && (
+          <Aviso tipo="erro">
+            Não foi possível apagar agora. Verifique a conexão e tente de novo.
           </Aviso>
         )}
       </SecaoCard>

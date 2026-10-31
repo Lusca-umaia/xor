@@ -7,8 +7,8 @@ import { useState } from 'react'
 import { LuLoader, LuPlus, LuTimer, LuTrash2 } from 'react-icons/lu'
 import { SimuladoListagem } from '@/@types/AmbienteEstudo'
 import { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import { EsqueletoCards } from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import { SkeletonCards } from '@/components/Skeleton/Skeleton'
 import { classeCartao } from '@/components/AmbienteEstudo/estilos'
 import MenuAcoes from '@/components/AmbienteEstudo/MenuAcoes/MenuAcoes'
 import ModalConfirmacao from '@/components/AmbienteEstudo/ModalConfirmacao/ModalConfirmacao'
@@ -52,11 +52,11 @@ export default function SimuladosPage() {
         </LinkBotao>
       </div>
 
-      {isLoading && <EsqueletoCards quantidade={2} />}
+      {isLoading && <SkeletonCards quantidade={2} />}
 
       {simulados?.length === 0 && (
         <EstadoVazio
-          icone={<LuTimer />}
+          icon={<LuTimer />}
           titulo="Nenhum simulado ainda"
           descricao="Monte uma prova com cronômetro a partir dos seus materiais e descubra quais tópicos precisam de mais estudo."
           acao={

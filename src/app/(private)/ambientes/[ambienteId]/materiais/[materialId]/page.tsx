@@ -8,8 +8,8 @@ import {
   LuFileX,
   LuMessageSquarePlus
 } from 'react-icons/lu'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import LeitorPdf from '@/components/AmbienteEstudo/LeitorPdf/LeitorPdf'
 import Markdown from '@/components/AmbienteEstudo/Markdown/Markdown'
 import { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
@@ -39,12 +39,12 @@ export default function MaterialPage() {
   const pagina = Number(parametros.get('pagina')) || null
   const trecho = parametros.get('trecho')
 
-  if (isLoading) return <Esqueleto className="h-[60vh] rounded-2xl" />
+  if (isLoading) return <Skeleton className="h-[60vh] rounded-2xl" />
 
   if (!material) {
     return (
       <EstadoVazio
-        icone={<LuFileX />}
+        icon={<LuFileX />}
         titulo="Material não encontrado"
         descricao="Ele pode ter sido excluído da biblioteca."
         acao={

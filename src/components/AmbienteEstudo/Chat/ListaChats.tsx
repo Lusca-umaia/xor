@@ -15,7 +15,7 @@ import { Chat } from '@/@types/AmbienteEstudo'
 import { formatarDataRelativa } from '@/utils/ambienteEstudo/formatar'
 import { normalizarTexto } from '@/utils/historicoAcademico'
 import Botao from '../Botao/Botao'
-import Esqueleto from '../Esqueleto/Esqueleto'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import { classeCampo } from '../estilos'
 import MenuAcoes from '../MenuAcoes/MenuAcoes'
 
@@ -67,8 +67,8 @@ export default function ListaChats({
       <nav aria-label="Chats" className="-mx-1 flex-1 overflow-y-auto px-1">
         {!chats ? (
           <div className="space-y-2">
-            <Esqueleto className="h-12" />
-            <Esqueleto className="h-12" />
+            <Skeleton className="h-12" />
+            <Skeleton className="h-12" />
           </div>
         ) : filtrados.length === 0 ? (
           <p className="px-2 py-4 text-sm text-gray-500">

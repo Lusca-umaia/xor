@@ -37,8 +37,8 @@ import { gerarAtividade } from '@/services/ambienteEstudo/atividades'
 import { mensagemDeErro } from '@/services/ambienteEstudo/erros'
 import { gerarResumo } from '@/services/ambienteEstudo/resumos'
 import Botao, { LinkBotao } from '../Botao/Botao'
-import EstadoVazio from '../EstadoVazio/EstadoVazio'
-import Esqueleto from '../Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import MenuAcoes from '../MenuAcoes/MenuAcoes'
 import ModalRenomear from '../ModalRenomear/ModalRenomear'
 import AlternadorModo from './AlternadorModo'
@@ -95,7 +95,7 @@ export default function JanelaChat({
   if (error) {
     return (
       <EstadoVazio
-        icone={<LuSparkles />}
+        icon={<LuSparkles />}
         titulo="Chat não encontrado"
         descricao={mensagemDeErro(error)}
         acao={
@@ -107,7 +107,7 @@ export default function JanelaChat({
     )
   }
 
-  if (!chat) return <Esqueleto className="h-full min-h-96" />
+  if (!chat) return <Skeleton className="h-full min-h-96" />
 
   const materiaisContexto = materiais.filter(({ id }) =>
     chat.materialIds.includes(id)
@@ -308,7 +308,7 @@ export default function JanelaChat({
           </div>
         )}
         <div className="mx-auto max-w-3xl space-y-5" aria-live="polite">
-          {isLoading && <Esqueleto className="h-24" />}
+          {isLoading && <Skeleton className="h-24" />}
 
           {mensagens?.length === 0 && !pendente && (
             <div className="py-8 text-center">

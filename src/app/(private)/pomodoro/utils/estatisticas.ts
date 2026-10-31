@@ -110,3 +110,28 @@ export function resumirSessoes(
     )
   }
 }
+
+/**
+ * Sequência de estudo da tela inicial: conta o dia que teve foco no pomodoro
+ * ou estudo em qualquer ambiente (dias YYYY-MM-DD vindos do servidor).
+ */
+export function sequenciaDeEstudo(
+  sessoes: SessaoFoco[],
+  diasAmbientes: string[],
+  agora = new Date()
+) {
+  const dias = new Set([
+    ...sessoes.map(({ iniciadaEm }) => chaveDia(new Date(iniciadaEm))),
+    ...diasAmbientes
+  ])
+  const hojeInicio = inicioDoDia(agora)
+  const estudouHoje = dias.has(chaveDia(hojeInicio))
+  let sequencia = 0
+  const cursor = new Date(hojeInicio)
+  if (!estudouHoje) cursor.setDate(cursor.getDate() - 1)
+  while (dias.has(chaveDia(cursor))) {
+    sequencia += 1
+    cursor.setDate(cursor.getDate() - 1)
+  }
+  return { sequencia, estudouHoje }
+}

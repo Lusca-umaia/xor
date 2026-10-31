@@ -6,13 +6,13 @@ import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
 import { CHAVES } from '@/services/academico/chaves'
 import { extrairIdPlaylist } from '@/utils/youtube'
 import { Card } from '../../academico/components/Comuns'
-import { useArmazenado } from '../../pomodoro/hooks/useArmazenado'
+import { useSincronizado } from '@/hooks/useSincronizado'
 import PlayerPlaylist, { type Playlist } from './PlayerPlaylist'
 
 const campo = 'rounded-md border border-gray-300 px-2 py-1.5 text-sm'
 
 const PlaylistsTab: React.FC = () => {
-  const [playlists, setPlaylists] = useArmazenado<Playlist[]>(
+  const [playlists, setPlaylists] = useSincronizado<Playlist[]>(
     CHAVES.playlists,
     []
   )

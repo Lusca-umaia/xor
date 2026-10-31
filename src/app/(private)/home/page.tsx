@@ -1,70 +1,37 @@
 'use client'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import {
-  LuArrowRight,
-  LuBookOpen,
-  LuCirclePlay,
-  LuGraduationCap,
-  LuTimer,
-  LuTrendingUp
-} from 'react-icons/lu'
+import { LuArrowRight, LuBookOpen, LuCirclePlay } from 'react-icons/lu'
 import type { ResumoCadeira } from '@/@types/AmbienteEstudo'
 import DisciplineCard from '@/components/DisciplineCard/DisciplineCard'
 import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
 import IconeTile from '@/components/IconeTile/IconeTile'
-import ModuleCard from '@/components/ModuleCard/ModuleCard'
 import Skeleton, { SkeletonCard } from '@/components/Skeleton/Skeleton'
 import { STATUS_KEYS } from '@/components/CourseCard/CourseCard'
 import { useResumoCadeiras } from '@/hooks/ambienteEstudo/useAmbientes'
+import { useDiasDeEstudo } from '@/hooks/ambienteEstudo/useProgressoXp'
 import { useProgresso } from '@/hooks/queries/useProgresso'
 import { useSessoesFoco } from '@/hooks/queries/useSessoesFoco'
 import { useAgenda } from '@/hooks/useAgenda'
 import GraficoSemana from '../pomodoro/components/GraficoSemana'
 import { CONFIG_PADRAO } from '../pomodoro/consts'
-import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
-import { resumirSessoes } from '../pomodoro/utils/estatisticas'
+import { useSincronizado } from '@/hooks/useSincronizado'
+import { CHAVE_CONFIG_POMODORO } from '@/services/academico/chaves'
+import {
+  resumirSessoes,
+  sequenciaDeEstudo
+} from '../pomodoro/utils/estatisticas'
 import BoasVindas, { BoasVindasSkeleton } from './components/BoasVindas'
 import ContinuarEstudo from './components/ContinuarEstudo'
 import { AcaoEstudo, EstudoDaCadeira } from './components/EstudoCadeira'
-import FocoHoje from './components/FocoHoje'
 import { proximoPasso, situacaoDoEstudo } from './utils/estudoCadeira'
-
-const moduleCard = [
-  {
-    nome: 'Progressão de curso',
-    icon: <LuTrendingUp />,
-    path: '/courseProgression',
-    descricao:
-      'Acompanhe suas disciplinas e veja quanto falta para concluir o curso.'
-  },
-  {
-    nome: 'Pomodoro',
-    icon: <LuTimer />,
-    path: '/pomodoro',
-    descricao:
-      'Alterne períodos de foco e pausas para manter a produtividade em alta.'
-  },
-  {
-    nome: 'Ambientes de estudo',
-    icon: <LuGraduationCap />,
-    path: '/ambientes',
-    descricao:
-      'Materiais, chats, resumos e simulados de cada cadeira em um só lugar.'
-  },
-  {
-    nome: 'Vida acadêmica',
-    icon: <LuBookOpen />,
-    path: '/academico',
-    descricao: 'Veja seu desempenho, os pré-requisitos e o relatório do curso.'
-  }
-]
 
 const HomePage = () => {
   const { data, isLoading, isError } = useProgresso()
   const { data: sessoes } = useSessoesFoco()
-  const [configPomodoro] = useArmazenado('xor:pomodoro:config', CONFIG_PADRAO)
+  const [configPomodoro] = useSincronizado(CHAVE_CONFIG_POMODORO, CONFIG_PADRAO)
   const resumos = useResumoCadeiras()
+  const diasAmbientes = useDiasDeEstudo()
   const agenda = useAgenda()
 
   // Só calcula depois de carregar: depende da data local do navegador.
@@ -72,6 +39,13 @@ const HomePage = () => {
     () => (sessoes ? resumirSessoes(sessoes) : undefined),
     [sessoes]
   )
+  // Sem os dias dos ambientes (erro), conta só o foco.
+  const sequencia = useMemo(() => {
+    const dias = diasAmbientes.data ?? (diasAmbientes.isError ? [] : null)
+    return sessoes && dias
+      ? sequenciaDeEstudo(sessoes, dias).sequencia
+      : undefined
+  }, [sessoes, diasAmbientes.data, diasAmbientes.isError])
 
   const cadeirasAtivas =
     data?.disciplinas.filter(
@@ -108,6 +82,7 @@ const HomePage = () => {
           aluno={data.aluno}
           resumo={data.resumo}
           foco={foco}
+          sequencia={sequencia}
           metaDiaria={configPomodoro.metaDiaria}
         />
       )}
@@ -213,22 +188,9 @@ const HomePage = () => {
               </div>
             )}
           </section>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {moduleCard.map((module) => (
-              <ModuleCard
-                key={module.nome}
-                icon={module.icon}
-                nome={module.nome}
-                path={module.path}
-                descricao={module.descricao}
-              />
-            ))}
-          </div>
         </div>
 
         <aside className="space-y-4">
-          <FocoHoje foco={foco} metaDiaria={configPomodoro.metaDiaria} />
           {foco ? (
             <GraficoSemana
               dias={foco.ultimos7Dias}

@@ -4,8 +4,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { LuLoader, LuTimer } from 'react-icons/lu'
 import { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import ProvaSimulado from '@/components/AmbienteEstudo/Simulado/ProvaSimulado'
 import {
   useSimulado,
@@ -34,7 +34,7 @@ export default function TentativaPage() {
   if (simulado.error || tentativa.error) {
     return (
       <EstadoVazio
-        icone={<LuTimer />}
+        icon={<LuTimer />}
         titulo="Tentativa não encontrada"
         descricao={mensagemDeErro(simulado.error ?? tentativa.error)}
         acao={<LinkBotao href={base}>Voltar ao simulado</LinkBotao>}
@@ -43,13 +43,13 @@ export default function TentativaPage() {
   }
 
   if (!simulado.data || !tentativa.data) {
-    return <Esqueleto className="mx-auto h-96 max-w-5xl" />
+    return <Skeleton className="mx-auto h-96 max-w-5xl" />
   }
 
   if (entregue) {
     return (
       <EstadoVazio
-        icone={<LuLoader className="animate-spin" />}
+        icon={<LuLoader className="animate-spin" />}
         titulo="Simulado entregue"
         descricao="Abrindo o resultado..."
       />

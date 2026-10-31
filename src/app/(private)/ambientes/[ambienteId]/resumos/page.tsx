@@ -13,8 +13,8 @@ import {
 } from 'react-icons/lu'
 import { Resumo } from '@/@types/AmbienteEstudo'
 import Botao from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import { EsqueletoCards } from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import { SkeletonCards } from '@/components/Skeleton/Skeleton'
 import { classeCartao } from '@/components/AmbienteEstudo/estilos'
 import MenuAcoes from '@/components/AmbienteEstudo/MenuAcoes/MenuAcoes'
 import ModalConfirmacao from '@/components/AmbienteEstudo/ModalConfirmacao/ModalConfirmacao'
@@ -71,11 +71,11 @@ export default function ResumosPage() {
         </Botao>
       </div>
 
-      {isLoading && <EsqueletoCards />}
+      {isLoading && <SkeletonCards />}
 
       {resumos?.length === 0 && (
         <EstadoVazio
-          icone={<LuFileText />}
+          icon={<LuFileText />}
           titulo="Nenhum resumo ainda"
           descricao="Gere resumos em tópicos, texto corrido, glossário ou mapa mental a partir dos materiais. Você pode editar tudo depois."
           acao={

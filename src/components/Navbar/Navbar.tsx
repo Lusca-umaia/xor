@@ -14,56 +14,82 @@ import { FaHome } from 'react-icons/fa'
 import NavbarMobile from './NavbarMobile'
 import NavbarDescktop from './NavbarDescktop'
 
-export const options = [
+// Menu em grupos; o título vazio fica sem cabeçalho (início e perfil).
+export const grupos = [
   {
-    path: '/home',
-    icon: <FaHome />,
-    name: 'Tela Inicial'
+    titulo: null,
+    itens: [
+      {
+        path: '/home',
+        icon: <FaHome />,
+        name: 'Tela Inicial'
+      }
+    ]
   },
   {
-    icon: <GiProgression />,
-    path: '/courseProgression',
-    name: 'Progressão de curso'
+    titulo: 'Estudo',
+    itens: [
+      {
+        icon: <LuGraduationCap />,
+        path: '/ambientes',
+        name: 'Ambientes de estudo'
+      },
+      {
+        icon: <LuTimer />,
+        path: '/pomodoro',
+        name: 'Pomodoro'
+      },
+      {
+        icon: <LuLibraryBig />,
+        path: '/materiais',
+        name: 'Biblioteca'
+      }
+    ]
   },
   {
-    icon: <LuGraduationCap />,
-    path: '/ambientes',
-    name: 'Ambientes de estudo'
+    titulo: 'Curso',
+    itens: [
+      {
+        icon: <GiProgression />,
+        path: '/courseProgression',
+        name: 'Progressão de curso'
+      },
+      {
+        icon: <LuBookOpen />,
+        path: '/academico',
+        name: 'Vida acadêmica'
+      },
+      {
+        icon: <LuListChecks />,
+        path: '/planejador',
+        name: 'Planejador de matrícula'
+      }
+    ]
   },
   {
-    icon: <LuBookOpen />,
-    path: '/academico',
-    name: 'Vida acadêmica'
+    titulo: 'Organização',
+    itens: [
+      {
+        icon: <LuCalendarDays />,
+        path: '/calendario',
+        name: 'Calendário'
+      },
+      {
+        icon: <LuClipboardList />,
+        path: '/atividades',
+        name: 'Tarefas e prazos'
+      }
+    ]
   },
   {
-    icon: <LuListChecks />,
-    path: '/planejador',
-    name: 'Planejador de matrícula'
-  },
-  {
-    icon: <LuCalendarDays />,
-    path: '/calendario',
-    name: 'Calendário'
-  },
-  {
-    icon: <LuClipboardList />,
-    path: '/atividades',
-    name: 'Atividades'
-  },
-  {
-    icon: <LuLibraryBig />,
-    path: '/materiais',
-    name: 'Materiais de estudo'
-  },
-  {
-    icon: <LuTimer />,
-    path: '/pomodoro',
-    name: 'Pomodoro'
-  },
-  {
-    icon: <LuUserRound />,
-    path: '/perfil',
-    name: 'Meu perfil'
+    titulo: null,
+    itens: [
+      {
+        icon: <LuUserRound />,
+        path: '/perfil',
+        name: 'Meu perfil'
+      }
+    ]
   }
 ]
 

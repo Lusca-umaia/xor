@@ -35,7 +35,7 @@ import {
 } from '@/utils/ambienteEstudo/corrigirQuestao'
 import { ROTULO_TIPO_ATIVIDADE } from '@/utils/ambienteEstudo/rotulos'
 import Botao from '../Botao/Botao'
-import Esqueleto from '../Esqueleto/Esqueleto'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import { classeCartao } from '../estilos'
 import FeedbackQuestao from '../Questoes/FeedbackQuestao'
 import RenderizadorQuestao from '../Questoes/RenderizadorQuestao'
@@ -215,7 +215,7 @@ export default function PlayerQuestoes({
   }
   useAtalhosTeclado(atalhos, fase === 'RESPONDENDO')
 
-  if (isLoading) return <Esqueleto className="h-64" />
+  if (isLoading) return <Skeleton className="h-64" />
 
   if (fase === 'RESULTADO' && tentativa) {
     return (

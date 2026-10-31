@@ -4,5 +4,6 @@ export const QUERY_KEYS = {
   PERFIL: ['perfil'],
   QUESTIONARIOS: ['questionarios'],
   QUESTIONARIO: (id: number) => ['questionarios', id],
-  SESSOES_FOCO: ['sessoesFoco']
+  SESSOES_FOCO: ['sessoesFoco'],
+  DADOS_ALUNO: ['dadosAluno']
 } as const

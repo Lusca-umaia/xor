@@ -14,8 +14,8 @@ import {
 import { AtividadeListagem, TipoAtividade } from '@/@types/AmbienteEstudo'
 import IconeTile from '@/components/IconeTile/IconeTile'
 import Botao from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import { EsqueletoCards } from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import { SkeletonCards } from '@/components/Skeleton/Skeleton'
 import FormGerarAtividade from '@/components/AmbienteEstudo/FormGerarAtividade/FormGerarAtividade'
 import LinhaAtividade from '@/components/AmbienteEstudo/LinhaAtividade/LinhaAtividade'
 import ModalConfirmacao from '@/components/AmbienteEstudo/ModalConfirmacao/ModalConfirmacao'
@@ -241,11 +241,11 @@ export default function AtividadesPage() {
         </Botao>
       </div>
 
-      {isLoading && <EsqueletoCards />}
+      {isLoading && <SkeletonCards />}
 
       {atividades && atividades.length === 0 && (
         <EstadoVazio
-          icone={<LuListChecks />}
+          icon={<LuListChecks />}
           titulo="Nenhuma atividade ainda"
           descricao="Gere quizzes, questões de verdadeiro ou falso, lacunas, discursivas com rubrica ou flashcards a partir dos seus materiais."
           acao={
@@ -258,7 +258,7 @@ export default function AtividadesPage() {
 
       {temAtividades && grupos.total === 0 && (
         <EstadoVazio
-          icone={<LuSearch />}
+          icon={<LuSearch />}
           titulo="Nenhuma atividade encontrada"
           descricao="Tente outro nome ou tópico, ou mude o filtro de tipo."
         />
