@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { LuAward, LuExternalLink, LuTrash2 } from 'react-icons/lu'
 import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
 import { CHAVES } from '@/services/academico/chaves'
-import { useArmazenado } from '../../pomodoro/hooks/useArmazenado'
+import { useSincronizado } from '@/hooks/useSincronizado'
 import { Card, Explicacao } from './Comuns'
 
 type TipoItem =
@@ -46,7 +46,10 @@ const linkValido = (texto: string) => {
 }
 
 const PortfolioTab: React.FC = () => {
-  const [itens, setItens] = useArmazenado<ItemPortfolio[]>(CHAVES.portfolio, [])
+  const [itens, setItens] = useSincronizado<ItemPortfolio[]>(
+    CHAVES.portfolio,
+    []
+  )
   const [tipo, setTipo] = useState<TipoItem>('PROJETO')
   const [titulo, setTitulo] = useState('')
   const [descricao, setDescricao] = useState('')

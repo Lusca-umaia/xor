@@ -18,7 +18,7 @@ import {
   type ItemCatalogo
 } from '@/utils/academico/planejador'
 import { AvisoDemo, Card, Explicacao } from '../academico/components/Comuns'
-import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
+import { useSincronizado } from '@/hooks/useSincronizado'
 import Catalogo from './components/Catalogo'
 import GradePlano from './components/GradePlano'
 import NovaDisciplina from './components/NovaDisciplina'
@@ -36,7 +36,7 @@ const campo = 'w-24 rounded-md border border-gray-300 px-2 py-1 text-sm'
 
 const PlanejadorPage = () => {
   const { data, isLoading, isError } = useAcademico()
-  const [plano, setPlano] = useArmazenado<PlanoSemestre>(
+  const [plano, setPlano] = useSincronizado<PlanoSemestre>(
     CHAVES.planejador,
     PLANO_PADRAO
   )
