@@ -17,6 +17,8 @@ import { useProgresso } from '@/hooks/queries/useProgresso'
 import Skeleton from '@/components/Skeleton/Skeleton'
 import CursoHero, { CursoHeroSkeleton } from './components/CursoHero'
 import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import EvolucaoMedia from './components/EvolucaoMedia'
+import { evolucaoDaMedia, numeroDoPeriodo } from './utils/evolucaoMedia'
 import GrupoDisciplinas, {
   GrupoDisciplinasSkeleton
 } from './components/GrupoDisciplinas'
@@ -64,13 +66,6 @@ const TABS: {
   }
 ]
 
-function numeroDoPeriodo(periodo: string) {
-  const ano = periodo.match(/^(\d{4})\.(\d)$/)
-  if (ano) return Number(ano[1]) * 10 + Number(ano[2])
-  const semestre = periodo.match(/^(\d+)º/)
-  return semestre ? Number(semestre[1]) : Number.MAX_SAFE_INTEGER
-}
-
 const CourseProgressionPage = () => {
   const [currentTab, setCurrentTab] = useState<keyof typeof TABS_KEYS>(
     TABS_KEYS.ATUAL
@@ -96,6 +91,11 @@ const CourseProgressionPage = () => {
       )
     }
   }, [data])
+
+  const evolucao = useMemo(
+    () => evolucaoDaMedia(data?.disciplinas ?? []),
+    [data]
+  )
 
   if (isLoading) {
     return <ProgressoSkeleton />
@@ -156,6 +156,8 @@ const CourseProgressionPage = () => {
       />
       <div className="space-y-4">
         <CursoHero aluno={aluno} resumo={resumo} />
+
+        <EvolucaoMedia pontos={evolucao} />
 
         <div
           role="tablist"
