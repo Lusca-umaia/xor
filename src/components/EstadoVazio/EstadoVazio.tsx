@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 interface EstadoVazioProps {
   icon: ReactNode
   titulo: string
-  descricao: string
+  descricao?: ReactNode
   acao?: ReactNode
 }
 
@@ -19,7 +19,9 @@ const EstadoVazio: React.FC<EstadoVazioProps> = ({
     </span>
     <div className="space-y-1">
       <p className="font-semibold text-gray-900">{titulo}</p>
-      <p className="max-w-md text-sm text-gray-500">{descricao}</p>
+      {descricao && (
+        <p className="max-w-md text-sm text-gray-500">{descricao}</p>
+      )}
     </div>
     {acao}
   </div>

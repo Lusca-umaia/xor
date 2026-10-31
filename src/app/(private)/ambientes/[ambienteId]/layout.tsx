@@ -22,8 +22,8 @@ import { SITUACOES } from '@/components/AmbienteEstudo/SeloSituacao/SeloSituacao
 import { useHistoricoCadeiras } from '@/hooks/ambienteEstudo/useHistoricoCadeiras'
 import AbasAmbiente from '@/components/AmbienteEstudo/AbasAmbiente/AbasAmbiente'
 import Botao, { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import MenuAcoes from '@/components/AmbienteEstudo/MenuAcoes/MenuAcoes'
 import ModalAmbiente from '@/components/AmbienteEstudo/ModalAmbiente/ModalAmbiente'
 import ModalConfirmacao from '@/components/AmbienteEstudo/ModalConfirmacao/ModalConfirmacao'
@@ -61,7 +61,7 @@ export default function AmbienteLayout({ children }: { children: ReactNode }) {
     const naoEncontrado = error instanceof ErroNaoEncontrado
     return (
       <EstadoVazio
-        icone={<LuGraduationCap />}
+        icon={<LuGraduationCap />}
         titulo={
           naoEncontrado
             ? 'Ambiente não encontrado'
@@ -98,7 +98,7 @@ export default function AmbienteLayout({ children }: { children: ReactNode }) {
         </Link>
 
         {isLoading || !ambiente || !cor ? (
-          <Esqueleto className="h-36 rounded-3xl" />
+          <Skeleton className="h-36 rounded-3xl" />
         ) : (
           <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg">
             <CapaXor className="px-6 py-6 max-md:px-4 max-md:py-5">

@@ -26,8 +26,8 @@ import {
   CardCadeiraSemAmbiente,
   LinhaCadeiraSemAmbiente
 } from '@/components/AmbienteEstudo/CadeiraSemAmbiente/CadeiraSemAmbiente'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import { EsqueletoCards } from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import { SkeletonCards } from '@/components/Skeleton/Skeleton'
 import ModalAmbiente from '@/components/AmbienteEstudo/ModalAmbiente/ModalAmbiente'
 import ModalConfirmacao from '@/components/AmbienteEstudo/ModalConfirmacao/ModalConfirmacao'
 import Botao from '@/components/AmbienteEstudo/Botao/Botao'
@@ -265,11 +265,11 @@ export default function AmbientesPage() {
         }}
       />
 
-      {isLoading && <EsqueletoCards quantidade={3} />}
+      {isLoading && <SkeletonCards quantidade={3} />}
 
       {error && (
         <EstadoVazio
-          icone={<LuGraduationCap />}
+          icon={<LuGraduationCap />}
           titulo="Não foi possível carregar seus ambientes"
           descricao={mensagemDeErro(error)}
           acao={<Botao onClick={() => refetch()}>Tentar novamente</Botao>}
@@ -320,7 +320,7 @@ export default function AmbientesPage() {
 
       {ambientes && nadaParaMostrar && !buscando && (
         <EstadoVazio
-          icone={<LuGraduationCap />}
+          icon={<LuGraduationCap />}
           titulo="Crie seu primeiro ambiente de estudo"
           descricao="Envie os materiais de uma cadeira e use a IA para tirar dúvidas, gerar resumos, praticar com atividades e fazer simulados. As cadeiras do seu histórico acadêmico aparecem aqui."
           acao={
@@ -337,7 +337,7 @@ export default function AmbientesPage() {
 
       {ambientes && nadaParaMostrar && buscando && (
         <EstadoVazio
-          icone={<LuSearch />}
+          icon={<LuSearch />}
           titulo="Nada encontrado"
           descricao="Tente outro nome ou código, ou mude o filtro."
         />

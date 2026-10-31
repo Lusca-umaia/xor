@@ -11,8 +11,8 @@ import {
 } from 'react-icons/lu'
 import { TipoAtividade } from '@/@types/AmbienteEstudo'
 import Botao, { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import ResultadoSimulado from '@/components/AmbienteEstudo/Simulado/ResultadoSimulado'
 import { useGerarAtividade } from '@/hooks/ambienteEstudo/useAtividades'
 import {
@@ -47,7 +47,7 @@ export default function ResultadoPage() {
   if (simulado.error || tentativa.error) {
     return (
       <EstadoVazio
-        icone={<LuTimer />}
+        icon={<LuTimer />}
         titulo="Resultado não encontrado"
         descricao={mensagemDeErro(simulado.error ?? tentativa.error)}
         acao={<LinkBotao href={base}>Voltar aos simulados</LinkBotao>}
@@ -55,12 +55,12 @@ export default function ResultadoPage() {
     )
   }
 
-  if (!simulado.data || !tentativa.data) return <Esqueleto className="h-96" />
+  if (!simulado.data || !tentativa.data) return <Skeleton className="h-96" />
 
   if (!tentativa.data.resultado) {
     return (
       <EstadoVazio
-        icone={<LuLoader className="animate-spin" />}
+        icon={<LuLoader className="animate-spin" />}
         titulo="Esta tentativa ainda não foi entregue"
         acao={
           <LinkBotao
