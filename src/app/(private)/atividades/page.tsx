@@ -22,7 +22,7 @@ const AtividadesPage = () => {
   return (
     <div>
       <Header
-        title="Atividades"
+        title="Tarefas e prazos"
         description="Trabalhos, listas e leituras por disciplina, com prioridade e prazo."
       />
       <div className="space-y-4">
