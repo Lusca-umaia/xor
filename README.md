@@ -4,6 +4,8 @@ Plataforma de estudo para alunos da UFC. A ideia surgiu de uma dor simples: para
 
 O aluno entra com o histórico do SIGAA e, a partir dele, o app monta a graduação inteira e um ambiente de estudo para cada cadeira, com IA rodando localmente em cima do material da própria disciplina.
 
+![Tela inicial do XOR](docs/telas/inicio.webp)
+
 ## O que dá pra fazer
 
 ### Curso
@@ -13,6 +15,15 @@ O aluno entra com o histórico do SIGAA e, a partir dele, o app monta a graduaç
 - Acompanhar a vida acadêmica: IRA, evolução da média por período, desempenho e pré-requisitos.
 - Montar o próximo semestre no planejador de matrícula, arrastando disciplinas para uma grade semanal que respeita pré-requisitos e carga mínima e máxima.
 - Encerrar o semestre lançando as notas, o que já abre as disciplinas do próximo.
+
+<table>
+  <tr>
+    <td><img src="docs/telas/progressao.webp" alt="Progressão de curso"></td>
+    <td><img src="docs/telas/vida-academica.webp" alt="Mapa de pré-requisitos"></td>
+  </tr>
+</table>
+
+![Planejador de matrícula](docs/telas/planejador.webp)
 
 ### Estudo
 
@@ -26,14 +37,39 @@ O aluno entra com o histórico do SIGAA e, a partir dele, o app monta a graduaç
 - Pomodoro com estatísticas de foco por disciplina.
 - Biblioteca com playlists de aulas e livros abertos.
 
+![Ambiente de estudo de uma cadeira](docs/telas/ambiente.webp)
+
+<table>
+  <tr>
+    <td><img src="docs/telas/chat-tutor.webp" alt="Chat no modo tutor"></td>
+    <td><img src="docs/telas/simulado.webp" alt="Simulado com cronômetro"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td><img src="docs/telas/pomodoro.webp" alt="Pomodoro"></td>
+    <td><img src="docs/telas/biblioteca-livros.webp" alt="Biblioteca com livros de acesso livre"></td>
+  </tr>
+</table>
+
 ### Organização
 
 - Calendário com horários das disciplinas e provas.
 - Tarefas e prazos.
 
+<table>
+  <tr>
+    <td><img src="docs/telas/calendario.webp" alt="Calendário"></td>
+    <td><img src="docs/telas/tarefas.webp" alt="Tarefas e prazos"></td>
+  </tr>
+</table>
+
 ## Sobre a IA
 
 A IA roda com modelos abertos pelo Ollama, na máquina do aluno ou num servidor da própria universidade. O material não vai para serviços de IA externos. Todo conteúdo gerado aparece marcado como gerado por IA, pode ser reportado como errado ou sem fonte, e o prompt manda ignorar instruções escondidas dentro dos documentos. Na aba de privacidade do perfil, o aluno vê e apaga os próprios dados.
+
+![Privacidade e IA no perfil](docs/telas/perfil.webp)
 
 ## Arquitetura
 
