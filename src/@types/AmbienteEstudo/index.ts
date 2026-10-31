@@ -38,6 +38,30 @@ export interface AmbienteListagem extends AmbienteEstudo {
   ultimaAtividadeEm: string
 }
 
+/** Algo do ambiente que o aluno pode retomar (tela inicial). */
+export interface ItemRetomar {
+  tipo: 'SIMULADO' | 'ATIVIDADE' | 'CHAT' | 'RESUMO'
+  /** ID do item; no simulado, o da tentativa em andamento. */
+  id: string
+  simuladoId?: string
+  titulo: string
+  emAndamento: boolean
+  quando: string
+}
+
+/** Resumo do ambiente de uma cadeira, para o card da tela inicial. */
+export interface ResumoCadeira {
+  ambienteId: string
+  disciplinaCodigo: string
+  xp: number
+  ultimoEstudoEm: string | null
+  flashcardsPendentes: number
+  /** Tópico com menor acerto nos simulados, quando há dados suficientes. */
+  topicoFraco: { topico: string; taxa: number } | null
+  /** Em andamento primeiro, depois os mais recentes. */
+  retomar: ItemRetomar[]
+}
+
 export interface DadosAmbiente {
   nome: string
   descricao: string | null

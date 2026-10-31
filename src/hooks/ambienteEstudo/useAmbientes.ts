@@ -5,6 +5,7 @@ import {
   criarAmbiente,
   excluirAmbiente,
   listarAmbientes,
+  listarResumoCadeiras,
   obterAmbiente
 } from '@/services/ambienteEstudo/ambientes'
 import { chavesAmbiente, repetirConsulta } from './chavesConsulta'
@@ -14,6 +15,15 @@ export function useAmbientes() {
   return useQuery({
     queryKey: chavesAmbiente.ambientes(),
     queryFn: listarAmbientes,
+    retry: repetirConsulta
+  })
+}
+
+/** Resumo dos ambientes de cadeira, para a tela inicial. */
+export function useResumoCadeiras() {
+  return useQuery({
+    queryKey: chavesAmbiente.resumoCadeiras(),
+    queryFn: listarResumoCadeiras,
     retry: repetirConsulta
   })
 }
