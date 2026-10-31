@@ -17,14 +17,13 @@ import GraficoSemana from '../pomodoro/components/GraficoSemana'
 import { CONFIG_PADRAO } from '../pomodoro/consts'
 import { useSincronizado } from '@/hooks/useSincronizado'
 import { CHAVE_CONFIG_POMODORO } from '@/services/academico/chaves'
-import {
-  resumirSessoes,
-  sequenciaDeEstudo
-} from '../pomodoro/utils/estatisticas'
+import { resumirSessoes } from '../pomodoro/utils/estatisticas'
 import BoasVindas, { BoasVindasSkeleton } from './components/BoasVindas'
 import ContinuarEstudo from './components/ContinuarEstudo'
 import { AcaoEstudo, EstudoDaCadeira } from './components/EstudoCadeira'
+import SequenciaEstudo from './components/SequenciaEstudo'
 import { proximoPasso, situacaoDoEstudo } from './utils/estudoCadeira'
+import { mediaDeFoco, resumirSequencia } from './utils/sequencia'
 
 const HomePage = () => {
   const { data, isLoading, isError } = useProgresso()
@@ -42,10 +41,12 @@ const HomePage = () => {
   // Sem os dias dos ambientes (erro), conta só o foco.
   const sequencia = useMemo(() => {
     const dias = diasAmbientes.data ?? (diasAmbientes.isError ? [] : null)
-    return sessoes && dias
-      ? sequenciaDeEstudo(sessoes, dias).sequencia
-      : undefined
+    return sessoes && dias ? resumirSequencia(sessoes, dias) : undefined
   }, [sessoes, diasAmbientes.data, diasAmbientes.isError])
+  const media = useMemo(
+    () => (sessoes ? mediaDeFoco(sessoes) : undefined),
+    [sessoes]
+  )
 
   const cadeirasAtivas =
     data?.disciplinas.filter(
@@ -71,21 +72,25 @@ const HomePage = () => {
 
   return (
     <div className="space-y-4">
-      {isLoading && <BoasVindasSkeleton />}
       {isError && (
         <p className="text-sm font-medium text-red-600">
           Não foi possível carregar seus dados.
         </p>
       )}
-      {data && (
-        <BoasVindas
-          aluno={data.aluno}
-          resumo={data.resumo}
-          foco={foco}
-          sequencia={sequencia}
-          metaDiaria={configPomodoro.metaDiaria}
-        />
-      )}
+      <div className="grid grid-cols-1 items-stretch gap-4 xl:grid-cols-3">
+        <div className="xl:col-span-2">
+          {isLoading && <BoasVindasSkeleton />}
+          {data && (
+            <BoasVindas
+              aluno={data.aluno}
+              resumo={data.resumo}
+              foco={foco}
+              metaDiaria={configPomodoro.metaDiaria}
+            />
+          )}
+        </div>
+        <SequenciaEstudo resumo={sequencia} media={media} />
+      </div>
 
       <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-3">
         <div className="space-y-4 xl:col-span-2">
