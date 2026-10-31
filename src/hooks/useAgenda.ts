@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 import type { Atividade, Evento, Limites, Turma } from '@/@types/Academico'
-import { useArmazenado } from '@/app/(private)/pomodoro/hooks/useArmazenado'
+import { useSincronizado } from '@/hooks/useSincronizado'
 import { CHAVES } from '@/services/academico/chaves'
 import {
   LIMITE_HORAS_SEMANA,
@@ -14,19 +14,18 @@ import {
 const ehExemploAntigo = ({ id }: { id: string }) => id.startsWith('demo-')
 
 // Atividades, eventos, horários de aula e limites do detector de sobrecarga
-// (localStorage por enquanto). Tudo começa vazio: nada é inventado para o aluno.
+// (salvos na conta do aluno). Tudo começa vazio: nada é inventado para o aluno.
 export function useAgenda() {
   const hoje = useMemo(() => new Date(), [])
-  const [atividades, setAtividades, atividadesOk] = useArmazenado<Atividade[]>(
-    CHAVES.atividades,
-    []
-  )
-  const [eventos, setEventos, eventosOk] = useArmazenado<Evento[]>(
+  const [atividades, setAtividades, atividadesOk] = useSincronizado<
+    Atividade[]
+  >(CHAVES.atividades, [])
+  const [eventos, setEventos, eventosOk] = useSincronizado<Evento[]>(
     CHAVES.eventos,
     []
   )
-  const [turmas, setTurmas] = useArmazenado<Turma[]>(CHAVES.turmas, [])
-  const [limites, setLimites] = useArmazenado<Limites>(CHAVES.limites, {
+  const [turmas, setTurmas] = useSincronizado<Turma[]>(CHAVES.turmas, [])
+  const [limites, setLimites] = useSincronizado<Limites>(CHAVES.limites, {
     horas: LIMITE_HORAS_SEMANA,
     itens: LIMITE_ITENS_SEMANA
   })

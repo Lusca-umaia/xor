@@ -1,4 +1,5 @@
-// Chaves do localStorage usadas pelas telas de vida acadêmica.
+// Chaves dos dados da vida acadêmica. Ficam no localStorage como cache e
+// são sincronizadas com o servidor (tabela dados_aluno).
 export const CHAVES = {
   atividades: 'xor:atividades',
   eventos: 'xor:eventos',
@@ -10,3 +11,11 @@ export const CHAVES = {
   limites: 'xor:limites-sobrecarga',
   consentimentoIA: 'xor:consentimento-ia'
 } as const
+
+export const CHAVE_CONFIG_POMODORO = 'xor:pomodoro:config'
+
+// Tem de bater com o check da tabela dados_aluno.
+export const CHAVES_SINCRONIZADAS: readonly string[] = [
+  ...Object.values(CHAVES),
+  CHAVE_CONFIG_POMODORO
+]

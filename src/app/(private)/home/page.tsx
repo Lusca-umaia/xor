@@ -15,7 +15,8 @@ import { useSessoesFoco } from '@/hooks/queries/useSessoesFoco'
 import { useAgenda } from '@/hooks/useAgenda'
 import GraficoSemana from '../pomodoro/components/GraficoSemana'
 import { CONFIG_PADRAO } from '../pomodoro/consts'
-import { useArmazenado } from '../pomodoro/hooks/useArmazenado'
+import { useSincronizado } from '@/hooks/useSincronizado'
+import { CHAVE_CONFIG_POMODORO } from '@/services/academico/chaves'
 import {
   resumirSessoes,
   sequenciaDeEstudo
@@ -28,7 +29,7 @@ import { proximoPasso, situacaoDoEstudo } from './utils/estudoCadeira'
 const HomePage = () => {
   const { data, isLoading, isError } = useProgresso()
   const { data: sessoes } = useSessoesFoco()
-  const [configPomodoro] = useArmazenado('xor:pomodoro:config', CONFIG_PADRAO)
+  const [configPomodoro] = useSincronizado(CHAVE_CONFIG_POMODORO, CONFIG_PADRAO)
   const resumos = useResumoCadeiras()
   const diasAmbientes = useDiasDeEstudo()
   const agenda = useAgenda()

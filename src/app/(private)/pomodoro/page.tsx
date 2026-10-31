@@ -40,6 +40,8 @@ import {
   MODOS,
   RUIDOS
 } from './consts'
+import { useSincronizado } from '@/hooks/useSincronizado'
+import { CHAVE_CONFIG_POMODORO } from '@/services/academico/chaves'
 import { useArmazenado } from './hooks/useArmazenado'
 import { FocoConcluido, usePomodoro } from './hooks/usePomodoro'
 import { resumirSessoes } from './utils/estatisticas'
@@ -74,8 +76,8 @@ const Pomodoro = () => {
   const registrar = useRegistrarSessaoFoco()
   const excluir = useExcluirSessaoFoco()
 
-  const [config, setConfig] = useArmazenado(
-    'xor:pomodoro:config',
+  const [config, setConfig] = useSincronizado(
+    CHAVE_CONFIG_POMODORO,
     CONFIG_PADRAO
   )
   const [sessao, setSessao] = useArmazenado('xor:pomodoro:sessao', {
