@@ -6,7 +6,7 @@ O aluno entra com o histórico do SIGAA e, a partir dele, o app monta a graduaç
 
 ## O que dá pra fazer
 
-**Curso**
+### Curso
 
 - Importar o histórico do SIGAA em PDF no cadastro. O arquivo é lido no navegador e não sobe para o servidor; dá pra completar ou corrigir à mão.
 - Ver a progressão do curso: o que já foi concluído, o que está em andamento, o que falta e quanto de optativa ainda precisa.
@@ -14,7 +14,7 @@ O aluno entra com o histórico do SIGAA e, a partir dele, o app monta a graduaç
 - Montar o próximo semestre no planejador de matrícula, arrastando disciplinas para uma grade semanal que respeita pré-requisitos e carga mínima e máxima.
 - Encerrar o semestre lançando as notas, o que já abre as disciplinas do próximo.
 
-**Estudo**
+### Estudo
 
 - Ambientes de estudo por cadeira, onde o aluno sobe slides, PDFs, DOCX e PPTX.
 - Chat com a IA em cima desse material, com citação da fonte. Clicar na citação abre o PDF na página certa.
@@ -26,12 +26,12 @@ O aluno entra com o histórico do SIGAA e, a partir dele, o app monta a graduaç
 - Pomodoro com estatísticas de foco por disciplina.
 - Biblioteca com playlists de aulas e livros abertos.
 
-**Organização**
+### Organização
 
 - Calendário com horários das disciplinas e provas.
 - Tarefas e prazos.
 
-### Sobre a IA
+## Sobre a IA
 
 A IA roda com modelos abertos pelo Ollama, na máquina do aluno ou num servidor da própria universidade. O material não vai para serviços de IA externos. Todo conteúdo gerado aparece marcado como gerado por IA, pode ser reportado como errado ou sem fonte, e o prompt manda ignorar instruções escondidas dentro dos documentos. Na aba de privacidade do perfil, o aluno vê e apaga os próprios dados.
 
@@ -44,11 +44,11 @@ tela → hook do React Query → service (axios) → middleware → /api/... →
                                                                           └─→ Ollama (IA local)
 ```
 
-- **Front:** Next.js 15 (App Router), React 19, TypeScript, Tailwind 4, React Query, react-hook-form e zod.
-- **Back:** rotas de API do Next, validação com zod, sessão em cookie httpOnly via `@supabase/ssr` e checagem de origem contra CSRF no middleware.
-- **Banco:** Postgres do Supabase, com RLS em todas as tabelas, pgvector para a busca semântica e Storage privado para os materiais.
-- **IA:** Ollama com API compatível com a da OpenAI. O `xor-estudo` (Qwen3 4B) faz chat, resumos, questões e correção, e o `nomic-embed-text-v2-moe` gera os embeddings. A busca nos materiais é híbrida: por significado e por palavra-chave.
-- **PDF:** `pdfjs-dist` para ler o histórico no navegador e para o leitor de PDF; `mammoth` e `jszip` para DOCX e PPTX.
+- Front: Next.js 15 (App Router), React 19, TypeScript, Tailwind 4, React Query, react-hook-form e zod.
+- Back: rotas de API do Next, validação com zod, sessão em cookie httpOnly via `@supabase/ssr` e checagem de origem contra CSRF no middleware.
+- Banco: Postgres do Supabase, com RLS em todas as tabelas, pgvector para a busca semântica e Storage privado para os materiais.
+- IA: Ollama com API compatível com a da OpenAI. O `xor-estudo` (Qwen3 4B) faz chat, resumos, questões e correção, e o `nomic-embed-text-v2-moe` gera os embeddings. A busca nos materiais é híbrida: por significado e por palavra-chave.
+- PDF: `pdfjs-dist` para ler o histórico no navegador e para o leitor de PDF; `mammoth` e `jszip` para DOCX e PPTX.
 
 Os detalhes estão em [docs/](docs):
 

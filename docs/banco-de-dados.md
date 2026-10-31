@@ -18,11 +18,11 @@ O banco é o Postgres do Supabase. O schema fica versionado em [supabase/migrati
 
 ## Princípios
 
-- **RLS ligado em todas as tabelas.** As políticas liberam só as linhas em que `aluno_id = auth.uid()` (em `perfis`, `id = auth.uid()`). O papel `anon` não lê nada.
-- **Permissões por coluna.** O `update` é revogado e concedido de volta só nas colunas editáveis. Por exemplo, o aluno não consegue mudar o `aluno_id` de uma linha.
-- **Chaves compostas `(id, aluno_id)`.** As tabelas filhas referenciam o pai por `(id, aluno_id)`. Assim, o banco garante que uma tentativa, questão ou sessão sempre aponta para um registro do mesmo aluno.
-- **Funções `security invoker` por padrão.** Elas rodam como o aluno, então o RLS continua valendo. A única exceção é `registrar_aluno` (`security definer`), que só o `service_role` pode executar.
-- **`search_path = ''`** em todas as funções, com nomes sempre qualificados (`public.tabela`).
+- RLS ligado em todas as tabelas. As políticas liberam só as linhas em que `aluno_id = auth.uid()` (em `perfis`, `id = auth.uid()`). O papel `anon` não lê nada.
+- Permissões por coluna. O `update` é revogado e concedido de volta só nas colunas editáveis. Por exemplo, o aluno não consegue mudar o `aluno_id` de uma linha.
+- Chaves compostas `(id, aluno_id)`. As tabelas filhas referenciam o pai por `(id, aluno_id)`. Assim, o banco garante que uma tentativa, questão ou sessão sempre aponta para um registro do mesmo aluno.
+- Funções `security invoker` por padrão. Elas rodam como o aluno, então o RLS continua valendo. A única exceção é `registrar_aluno` (`security definer`), que só o `service_role` pode executar.
+- `search_path = ''` em todas as funções, com nomes sempre qualificados (`public.tabela`).
 
 ## Tabelas
 
@@ -69,7 +69,7 @@ Cada vez que o aluno cursou ou está cursando uma disciplina.
 | `periodo` | text | ex.: `2025.1` |
 | `semestre` | integer | semestre do aluno em que foi cursada |
 
-Índices únicos parciais garantem **no máximo uma tentativa em andamento e uma aprovação por disciplina**.
+Índices únicos parciais garantem no máximo uma tentativa em andamento e uma aprovação por disciplina.
 
 ### `questionarios`, `questoes`, `resolucoes`
 
@@ -108,7 +108,7 @@ Um ambiente por cadeira (ou tema livre), com o conteúdo de estudo gerado pela I
 
 As tabelas filhas referenciam o pai por `(id, aluno_id)` e são apagadas em cascata com o ambiente. O RLS segue a regra das demais tabelas, e o `update` é concedido só nas colunas que mudam (status, conteúdo gerado, respostas).
 
-**Storage:** bucket privado `materiais`, com os arquivos em `<aluno_id>/<material_id>/<nome>`. As políticas de `storage.objects` só deixam o aluno ler, enviar e excluir dentro da própria pasta.
+Storage: bucket privado `materiais`, com os arquivos em `<aluno_id>/<material_id>/<nome>`. As políticas de `storage.objects` só deixam o aluno ler, enviar e excluir dentro da própria pasta.
 
 ### `dados_aluno`
 
@@ -139,7 +139,7 @@ Cria perfil, disciplinas e tentativas em uma transação. É `security definer` 
 
 ### `encerrar_semestre(p_resultados jsonb, p_proximas bigint[])`
 
-1. Exige um resultado (`APROVADA`, `REPROVADA` ou `TRANCADA`) para **cada** tentativa em andamento.
+1. Exige um resultado (`APROVADA`, `REPROVADA` ou `TRANCADA`) para cada tentativa em andamento.
 2. Grava os resultados. `TRANCADA` não tem nota.
 3. Avança `perfis.semestre_atual`.
 4. Abre tentativas `ANDAMENTO` para as disciplinas em `p_proximas` que ainda não estão aprovadas nem em andamento.
@@ -156,7 +156,7 @@ Muda a situação de uma disciplina sem deixar o histórico incoerente:
 
 ### `salvar_questionario(p_questionario bigint, p_dados jsonb)`
 
-Com `p_questionario` nulo, cria o questionário. Com id, atualiza os dados e **substitui todas as questões**. Devolve o id.
+Com `p_questionario` nulo, cria o questionário. Com id, atualiza os dados e substitui todas as questões. Devolve o id.
 
 ### `xp_por_ambiente()` e `dias_de_estudo()`
 
@@ -168,7 +168,7 @@ Agregam `xp_eventos` no banco, com as permissões do aluno. A primeira devolve o
 
 ## Como alterar o schema
 
-1. Crie um arquivo novo em `supabase/migrations/` com prefixo de data e hora **único** (`AAAAMMDDHHMMSS_descricao.sql`). Não edite uma migração que já foi aplicada.
+1. Crie um arquivo novo em `supabase/migrations/` com prefixo de data e hora único (`AAAAMMDDHHMMSS_descricao.sql`). Não edite uma migração que já foi aplicada.
 2. Ligue o RLS em toda tabela nova e escreva as políticas por `auth.uid()`.
 3. Revogue `update` e conceda só nas colunas editáveis.
 4. Funções novas: `security invoker` e `set search_path = ''`, com `revoke execute ... from public, anon`.

@@ -4,10 +4,10 @@ As rotas ficam em [src/app/api](../src/app/api) e são servidas em `/api`. Os sc
 
 ## Regras gerais
 
-- **Autenticação**: cookie de sessão do Supabase. Sem sessão, toda rota responde `401`, exceto `POST /api/auth/login` e `POST /api/auth/register`.
-- **CSRF**: `POST`, `PUT`, `PATCH` e `DELETE` precisam do header `Origin` igual à origem do app. Se não vier, a resposta é `403`. O navegador envia esse header sozinho, mas chamadas por `curl` precisam incluí-lo.
-- **Corpo**: JSON. Campos fora do schema são descartados.
-- **Erros**: sempre no formato abaixo. `details` só aparece em erro de validação.
+- Autenticação: cookie de sessão do Supabase. Sem sessão, toda rota responde `401`, exceto `POST /api/auth/login` e `POST /api/auth/register`.
+- CSRF: `POST`, `PUT`, `PATCH` e `DELETE` precisam do header `Origin` igual à origem do app. Se não vier, a resposta é `403`. O navegador envia esse header sozinho, mas chamadas por `curl` precisam incluí-lo.
+- Corpo: JSON. Campos fora do schema são descartados.
+- Erros: sempre no formato abaixo. `details` só aparece em erro de validação.
 
   ```json
   { "error": "Dados inválidos", "details": { "nome": ["Nome é obrigatório"] } }
@@ -64,7 +64,7 @@ As rotas ficam em [src/app/api](../src/app/api) e são servidas em `/api`. Os sc
 | PATCH | `/api/questionarios/:id` | Substitui o questionário inteiro |
 | DELETE | `/api/questionarios/:id` | Exclui o questionário, as questões e as resoluções |
 | POST | `/api/questionarios/:id/resolucoes` | Registra uma resolução. O placar é calculado no servidor a partir das respostas |
-| POST | `/api/questionarios/gerar` | Gera questões com IA a partir de tema, quantidade, dificuldade, número de alternativas, disciplina, instruções e material. **Não salva**: devolve as questões para o editor |
+| POST | `/api/questionarios/gerar` | Gera questões com IA a partir de tema, quantidade, dificuldade, número de alternativas, disciplina, instruções e material. Não salva: devolve as questões para o editor |
 
 ## Pomodoro
 

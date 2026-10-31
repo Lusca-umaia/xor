@@ -26,19 +26,19 @@ Exemplo, a tela de progressão:
 
 ### Cliente
 
-- **services/**: uma função por endpoint, sobre a instância axios de [services/api.ts](../src/services/api.ts) (`baseURL: '/api'`). O arquivo também exporta `getErrorMessage` e `getErrorStatus` para transformar erros em mensagens para o usuário.
-- **hooks/**: envolvem os services em `useQuery` e `useMutation`. As mutations invalidam as chaves de [queryKeys.ts](../src/hooks/queryKeys.ts) que afetam.
-- **ReactQueryProvider**: `staleTime` de 30 s, sem refetch ao focar a janela, sem retry em erro 4xx. Qualquer 401 manda o usuário para `/login`. Mutations em que 401 não quer dizer sessão expirada, como o login, passam `meta: { ignorarNaoAutenticado: true }`.
+- services/: uma função por endpoint, sobre a instância axios de [services/api.ts](../src/services/api.ts) (`baseURL: '/api'`). O arquivo também exporta `getErrorMessage` e `getErrorStatus` para transformar erros em mensagens para o usuário.
+- hooks/: envolvem os services em `useQuery` e `useMutation`. As mutations invalidam as chaves de [queryKeys.ts](../src/hooks/queryKeys.ts) que afetam.
+- ReactQueryProvider: `staleTime` de 30 s, sem refetch ao focar a janela, sem retry em erro 4xx. Qualquer 401 manda o usuário para `/login`. Mutations em que 401 não quer dizer sessão expirada, como o login, passam `meta: { ignorarNaoAutenticado: true }`.
 
 ### Servidor
 
-- **[lib/api/http.ts](../src/lib/api/http.ts)**: utilitários das rotas.
+- [lib/api/http.ts](../src/lib/api/http.ts): utilitários das rotas.
   - `handler(fn)` captura erros. `ApiError` vira `{ error, details }` com o status certo; qualquer outro erro vira 500 sem expor detalhes.
   - `requireUser()` devolve o cliente Supabase e o usuário da sessão, ou lança 401.
   - `parseBody(request, schema)` valida o JSON com zod e descarta campos fora do schema. Corpo inválido dá 400, dados inválidos dão 422.
   - `parseId(params)` valida ids numéricos de rota.
-- **[lib/api/schemas.ts](../src/lib/api/schemas.ts)**: schemas zod de todas as entradas da API.
-- **lib/api/&lt;recurso&gt;.ts**: consultas ao Supabase e mapeamento das linhas do banco para os tipos de `@types/`.
+- [lib/api/schemas.ts](../src/lib/api/schemas.ts): schemas zod de todas as entradas da API.
+- lib/api/&lt;recurso&gt;.ts: consultas ao Supabase e mapeamento das linhas do banco para os tipos de `@types/`.
 
 ### Clientes Supabase
 
@@ -46,7 +46,7 @@ Exemplo, a tela de progressão:
 | --- | --- | --- | --- |
 | [lib/supabase/server.ts](../src/lib/supabase/server.ts) | publicável + cookie | Vale | Rotas de API e server components. É o padrão |
 | [lib/supabase/middleware.ts](../src/lib/supabase/middleware.ts) | publicável + cookie | Vale | Só no middleware |
-| [lib/supabase/admin.ts](../src/lib/supabase/admin.ts) | secreta | **Ignorada** | Só quando o cliente do usuário não resolve: criar o perfil logo após o `signUp` e trocar o email depois de conferir a senha |
+| [lib/supabase/admin.ts](../src/lib/supabase/admin.ts) | secreta | Ignorada | Só quando o cliente do usuário não resolve: criar o perfil logo após o `signUp` e trocar o email depois de conferir a senha |
 
 O cliente admin importa `server-only`, então o build quebra se alguém tentar usá-lo em um componente de cliente.
 
@@ -54,20 +54,20 @@ O cliente admin importa `server-only`, então o build quebra se alguém tentar u
 
 - Login, cadastro e logout passam pelas rotas `/api/auth/*`, que usam o Supabase Auth. A sessão fica em cookie httpOnly gerenciado pelo `@supabase/ssr`. O navegador nunca recebe o token.
 - O [middleware](../src/middleware.ts) roda em toda requisição, exceto arquivos estáticos, e faz três coisas:
-  1. **CSRF**: em `/api/*`, métodos que alteram estado (`POST`, `PUT`, `PATCH`, `DELETE`) precisam do header `Origin` igual à origem do app. Se não vier, a resposta é 403.
-  2. **Sessão**: chama `supabase.auth.getUser()`, que valida e renova o token.
-  3. **Rotas**: sem sessão, `/api/*` responde 401 (exceto login e cadastro) e as telas privadas redirecionam para `/login`. Com sessão, `/login` e `/register` redirecionam para `/home`.
+  1. CSRF: em `/api/*`, métodos que alteram estado (`POST`, `PUT`, `PATCH`, `DELETE`) precisam do header `Origin` igual à origem do app. Se não vier, a resposta é 403.
+  2. Sessão: chama `supabase.auth.getUser()`, que valida e renova o token.
+  3. Rotas: sem sessão, `/api/*` responde 401 (exceto login e cadastro) e as telas privadas redirecionam para `/login`. Com sessão, `/login` e `/register` redirecionam para `/home`.
 - Para trocar email ou senha, o aluno precisa informar a senha atual ([lib/api/perfil.ts](../src/lib/api/perfil.ts)). Assim, quem pegar uma sessão aberta não consegue tomar a conta.
 
 ## Cadastro
 
 O cadastro é um wizard controlado pelo [RegisterContext](../src/context/RegisterContext/index.tsx):
 
-1. **Dados pessoais**: nome, email e senha.
-2. **Curso**: importação do histórico em PDF ([HistoricoImport](../src/app/(public)/register/components/HistoricoImport.tsx)) ou preenchimento manual.
-3. **Semestre atual**: disciplinas que o aluno está cursando.
+1. Dados pessoais: nome, email e senha.
+2. Curso: importação do histórico em PDF ([HistoricoImport](../src/app/(public)/register/components/HistoricoImport.tsx)) ou preenchimento manual.
+3. Semestre atual: disciplinas que o aluno está cursando.
 
-O PDF é lido **no navegador** com `pdfjs-dist` ([utils/historicoAcademico](../src/utils/historicoAcademico)). O arquivo não sobe para o servidor. Só os dados extraídos (curso, disciplinas e tentativas) vão no corpo do `POST /api/auth/register`.
+O PDF é lido no navegador com `pdfjs-dist` ([utils/historicoAcademico](../src/utils/historicoAcademico)). O arquivo não sobe para o servidor. Só os dados extraídos (curso, disciplinas e tentativas) vão no corpo do `POST /api/auth/register`.
 
 No servidor, a rota faz o `signUp` e, com o cliente admin, chama a função `registrar_aluno`, que grava perfil, disciplinas e tentativas em uma transação. Se essa etapa falhar, a rota remove o usuário recém-criado. O cliente admin é necessário porque, com confirmação de email ligada, ainda não existe sessão nesse momento.
 
@@ -87,11 +87,11 @@ As operações que mexem em várias linhas ficam em funções do Postgres, para 
 
 O código fica em [lib/api/ambienteEstudo](../src/lib/api/ambienteEstudo).
 
-- **Materiais:** o arquivo vai para o bucket privado `materiais`. O texto é extraído no servidor (PDF por página, PPTX por slide, DOCX e texto puro), quebrado em trechos e gravado em `trechos` com o embedding.
-- **Busca:** cada pergunta busca os trechos por similaridade de embedding (`buscar_trechos`, pgvector) e por palavra-chave, e junta os dois resultados. Sem o modelo de embeddings, fica só a palavra-chave.
-- **Geração:** chat, resumos, atividades, simulados e correção chamam a IA local em `LM_STUDIO_URL/chat/completions`. Quando a saída é estruturada, o pedido usa `response_format: json_schema` e o resultado passa pelo zod antes de ser salvo. Os prompts mandam ignorar instruções escritas dentro do material ou da resposta do aluno.
-- **Citações:** a IA informa o número do trecho usado e o servidor troca pelo material e pela página, que o leitor de PDF abre direto.
-- **XP:** cada ação vira uma linha em `xp_eventos`, gravada pelo servidor com o cliente admin e única por tipo e referência, então repetir a mesma ação não rende pontos.
+- Materiais: o arquivo vai para o bucket privado `materiais`. O texto é extraído no servidor (PDF por página, PPTX por slide, DOCX e texto puro), quebrado em trechos e gravado em `trechos` com o embedding.
+- Busca: cada pergunta busca os trechos por similaridade de embedding (`buscar_trechos`, pgvector) e por palavra-chave, e junta os dois resultados. Sem o modelo de embeddings, fica só a palavra-chave.
+- Geração: chat, resumos, atividades, simulados e correção chamam a IA local em `LM_STUDIO_URL/chat/completions`. Quando a saída é estruturada, o pedido usa `response_format: json_schema` e o resultado passa pelo zod antes de ser salvo. Os prompts mandam ignorar instruções escritas dentro do material ou da resposta do aluno.
+- Citações: a IA informa o número do trecho usado e o servidor troca pelo material e pela página, que o leitor de PDF abre direto.
+- XP: cada ação vira uma linha em `xp_eventos`, gravada pelo servidor com o cliente admin e única por tipo e referência, então repetir a mesma ação não rende pontos.
 
 ## Questionários
 
