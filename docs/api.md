@@ -74,11 +74,79 @@ As rotas ficam em [src/app/api](../src/app/api) e são servidas em `/api`. Os sc
 | POST | `/api/pomodoro/sessoes` | Registra um bloco de foco concluído |
 | DELETE | `/api/pomodoro/sessoes/:id` | Exclui uma sessão |
 
-## Chat
+## Ambiente de Estudo
+
+Todas as rotas de IA usam o modelo local (`LM_STUDIO_URL`). Os ids são `uuid`.
+
+### Ambientes
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
-| POST | `/api/chat` | `{ messages: [{ role, content }] }`. Responde em streaming pela Together AI (`TOGETHER_API_KEY`) |
+| GET | `/api/ambientes` | Ambientes do aluno |
+| POST | `/api/ambientes` | Cria um ambiente, opcionalmente ligado a uma disciplina |
+| GET | `/api/ambientes/:id` | Ambiente com contagens |
+| PATCH | `/api/ambientes/:id` | Renomeia, troca a cor ou arquiva |
+| DELETE | `/api/ambientes/:id` | Exclui o ambiente e tudo o que está dentro dele |
+| GET | `/api/ambientes/:id/progresso` | XP do ambiente e os eventos dos últimos 60 dias |
+| GET | `/api/ambientes/resumo` | Nível, revisões pendentes e o que retomar em cada cadeira, para a tela inicial |
+| GET | `/api/ambientes/dias` | Dias com estudo nos últimos 90 dias, para a sequência de estudo |
+| GET | `/api/ia/status` | Se a IA local responde e tem os modelos instalados |
+
+### Materiais
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/api/ambientes/:id/materiais` | Materiais do ambiente |
+| POST | `/api/ambientes/:id/materiais` | Envia um arquivo (PDF, DOCX, PPTX ou texto). A extração e os embeddings rodam em seguida |
+| POST | `/api/ambientes/:id/materiais/texto` | Cria um material a partir de texto colado |
+| PATCH | `/api/materiais/:id` | Renomeia |
+| DELETE | `/api/materiais/:id` | Exclui o material, os trechos e o arquivo |
+| GET | `/api/materiais/:id/arquivo` | Redireciona para uma URL assinada e temporária do Storage |
+
+### Chats
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET, POST | `/api/ambientes/:id/chats` | Lista ou cria chats, com os materiais de contexto e o modo (explicação ou tutor) |
+| GET, PATCH, DELETE | `/api/chats/:id` | Chat, renomeia ou troca os materiais, exclui |
+| GET | `/api/chats/:id/mensagens` | Histórico |
+| POST | `/api/chats/:id/mensagens` | Pergunta. A resposta vem em streaming (`text/plain`): a primeira linha é um JSON com as duas mensagens e o resto é o texto do assistente. Se o cliente abortar, o que chegou até ali é salvo |
+
+### Resumos, atividades e simulados
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET, POST | `/api/ambientes/:id/resumos` | Lista ou gera um resumo (tópicos, texto, glossário ou mapa mental) |
+| GET, PATCH, DELETE | `/api/resumos/:id` | Resumo, edição e exclusão |
+| GET, POST | `/api/ambientes/:id/atividades` | Lista ou gera uma atividade (quiz, V/F, lacunas, discursiva ou flashcards) |
+| GET, DELETE | `/api/atividades/:id` | Atividade e exclusão |
+| GET, POST | `/api/atividades/:id/tentativas` | Tentativas da atividade |
+| PUT | `/api/atividades/:id/tentativas/:tid` | Salva o andamento ou conclui a tentativa |
+| POST | `/api/atividades/:id/flashcards/:cid/revisoes` | Aplica a avaliação do aluno à revisão espaçada (SM-2) |
+| POST | `/api/questoes/:id/correcoes` | Corrige uma resposta discursiva pela rubrica, com feedback |
+| POST | `/api/questoes/:id/explicacoes` | Explica uma questão |
+| GET, POST | `/api/ambientes/:id/simulados` | Lista ou gera um simulado |
+| GET, DELETE | `/api/simulados/:id` | Simulado e exclusão |
+| POST | `/api/simulados/:id/tentativas` | Começa uma tentativa. O prazo é definido no servidor |
+| GET, PATCH | `/api/tentativas-simulado/:id` | Tentativa e respostas parciais. Com o prazo vencido, é entregue automaticamente; depois disso, `PATCH` responde 409 |
+| POST | `/api/tentativas-simulado/:id/entrega` | Entrega e calcula o resultado |
+| POST | `/api/reportes-ia` | Reporta um conteúdo gerado pela IA |
+
+## Dados da vida acadêmica
+
+Tarefas, provas, horários, plano de matrícula, playlists e preferências, guardados em `dados_aluno`.
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| GET | `/api/dados` | Todas as chaves do aluno numa resposta |
+| PUT | `/api/dados/:chave` | Substitui o valor de uma chave |
+| DELETE | `/api/dados` | `{ chaves }`. Apaga as chaves pedidas (tela de privacidade) |
+
+## Chat antigo
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| POST | `/api/chat` | `{ messages: [{ role, content }] }`. Streaming pela Together AI (`TOGETHER_API_KEY`). A tela saiu do menu; o chat atual é o do Ambiente de Estudo |
 
 ## Como criar uma rota
 

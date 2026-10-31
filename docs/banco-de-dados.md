@@ -7,11 +7,14 @@ O banco é o Postgres do Supabase. O schema fica versionado em [supabase/migrati
 | `20261029000000_init.sql` | `perfis`, `disciplinas`, `tentativas`, `registrar_aluno`, `encerrar_semestre` |
 | `20261029010000_edicao_disciplinas.sql` | Exclusão e troca de código de disciplinas, `definir_situacao_disciplina` |
 | `20261029020000_questionarios.sql` | `questionarios`, `questoes`, `resolucoes`, `salvar_questionario` |
-| `20261029020000_sessoes_foco.sql` | `sessoes_foco` (Pomodoro) |
+| `20261029030000_sessoes_foco.sql` | `sessoes_foco` (Pomodoro) |
 | `20261030000000_ambiente_estudo.sql` | Ambiente de Estudo: `ambientes`, `materiais`, `trechos`, `chats`, `mensagens`, `resumos`, `atividades`, `simulados`, tentativas, `reportes_ia` e o bucket `materiais` |
 | `20261031000000_embeddings_trechos.sql` | `pgvector`: colunas `embedding` e `modelo_embedding` em `trechos`, índice HNSW e a função `buscar_trechos` |
 | `20261101000000_ambientes_sob_demanda.sql` | Remove os ambientes criados automaticamente e nunca usados e a tabela `ambientes_config` |
 | `20261102000000_xp_eventos.sql` | `xp_eventos` (XP do ambiente de estudo como registro de eventos), a função `xp_do_ambiente` e o preenchimento retroativo |
+| `20261103000000_xp_por_ambiente.sql` | `xp_por_ambiente`: XP total e último estudo de cada ambiente, para a tela inicial |
+| `20261104000000_dias_de_estudo.sql` | `dias_de_estudo`: dias com XP nos últimos 90 dias, para a sequência de estudo |
+| `20261105000000_dados_aluno.sql` | `dados_aluno`: dados da vida acadêmica que antes ficavam só no navegador |
 
 ## Princípios
 
@@ -107,6 +110,18 @@ As tabelas filhas referenciam o pai por `(id, aluno_id)` e são apagadas em casc
 
 **Storage:** bucket privado `materiais`, com os arquivos em `<aluno_id>/<material_id>/<nome>`. As políticas de `storage.objects` só deixam o aluno ler, enviar e excluir dentro da própria pasta.
 
+### `dados_aluno`
+
+Tarefas, provas, horários, notas, plano de matrícula, playlists, portfólio e preferências (como a configuração do Pomodoro e o consentimento de IA). Uma linha por aluno e chave, com o valor em `jsonb`.
+
+| Coluna | Tipo | Observação |
+| --- | --- | --- |
+| `aluno_id`, `chave` | | PK. `chave` só aceita a lista fechada da migração (`xor:atividades`, `xor:planejador`, `xor:pomodoro:config` etc.) |
+| `valor` | jsonb | até 512 KB por chave |
+| `atualizado_em` | timestamptz | |
+
+No front, o hook [useSincronizado](../src/hooks/useSincronizado.ts) usa o `localStorage` como cache e grava a versão oficial aqui, então os dados acompanham o aluno em qualquer dispositivo.
+
 ## Funções
 
 ### `registrar_aluno(p_aluno uuid, p_dados jsonb)`
@@ -142,6 +157,14 @@ Muda a situação de uma disciplina sem deixar o histórico incoerente:
 ### `salvar_questionario(p_questionario bigint, p_dados jsonb)`
 
 Com `p_questionario` nulo, cria o questionário. Com id, atualiza os dados e **substitui todas as questões**. Devolve o id.
+
+### `xp_por_ambiente()` e `dias_de_estudo()`
+
+Agregam `xp_eventos` no banco, com as permissões do aluno. A primeira devolve o XP total e o último estudo de cada ambiente; a segunda, os dias (no fuso de Fortaleza) com XP nos últimos 90 dias.
+
+## Dados de exemplo
+
+[supabase/exemplos](../supabase/exemplos) tem scripts para popular uma conta de teste (`popular_exemplo.sql`), deixar alguns dos últimos dias sem estudo (`dias_sem_estudo.sql`) e limpar tudo (`limpar_exemplo.sql`).
 
 ## Como alterar o schema
 

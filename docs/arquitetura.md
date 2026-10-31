@@ -83,17 +83,33 @@ O status exibido é derivado das tentativas ([lib/api/progresso.ts](../src/lib/a
 
 As operações que mexem em várias linhas ficam em funções do Postgres, para rodar em uma transação: `encerrar_semestre` e `definir_situacao_disciplina`. Veja [banco-de-dados.md](banco-de-dados.md).
 
-## Questionários e IA
+## Ambiente de Estudo
+
+O código fica em [lib/api/ambienteEstudo](../src/lib/api/ambienteEstudo).
+
+- **Materiais:** o arquivo vai para o bucket privado `materiais`. O texto é extraído no servidor (PDF por página, PPTX por slide, DOCX e texto puro), quebrado em trechos e gravado em `trechos` com o embedding.
+- **Busca:** cada pergunta busca os trechos por similaridade de embedding (`buscar_trechos`, pgvector) e por palavra-chave, e junta os dois resultados. Sem o modelo de embeddings, fica só a palavra-chave.
+- **Geração:** chat, resumos, atividades, simulados e correção chamam a IA local em `LM_STUDIO_URL/chat/completions`. Quando a saída é estruturada, o pedido usa `response_format: json_schema` e o resultado passa pelo zod antes de ser salvo. Os prompts mandam ignorar instruções escritas dentro do material ou da resposta do aluno.
+- **Citações:** a IA informa o número do trecho usado e o servidor troca pelo material e pela página, que o leitor de PDF abre direto.
+- **XP:** cada ação vira uma linha em `xp_eventos`, gravada pelo servidor com o cliente admin e única por tipo e referência, então repetir a mesma ação não rende pontos.
+
+## Questionários
+
+A tela saiu do menu, mas as rotas continuam.
 
 - Criar e editar sempre substitui o questionário inteiro pela função `salvar_questionario`. As resoluções guardam só o placar, então continuam válidas depois da edição.
-- A geração por IA ([lib/api/ia.ts](../src/lib/api/ia.ts)) chama o LM Studio em `LM_STUDIO_URL/chat/completions` com `response_format: json_schema`. O resultado é validado com zod antes de voltar para a tela. O tempo limite é de 180 s. Sem `LM_STUDIO_URL`, a rota responde 503.
+- A geração por IA ([lib/api/ia.ts](../src/lib/api/ia.ts)) usa a mesma IA local do Ambiente de Estudo, com `response_format: json_schema` e validação com zod. O tempo limite é de 180 s. Sem `LM_STUDIO_URL`, a rota responde 503.
 - As questões geradas voltam para o editor e só são salvas quando o aluno confirma.
 - O editor trabalha sobre um estado de rascunho ([questoes/components/rascunho.ts](../src/app/(private)/questoes/components/rascunho.ts)), que é convertido e validado com o mesmo schema zod da API antes de salvar.
 
 ## Pomodoro
 
-- O timer roda no cliente ([usePomodoro](../src/app/(private)/pomodoro/hooks/usePomodoro.ts)). As configurações (durações, ciclos, meta diária, som, ruído, notificações) e a disciplina/tarefa selecionadas ficam no `localStorage` via `useArmazenado` (chaves `xor:pomodoro:*`).
+- O timer roda no cliente ([usePomodoro](../src/app/(private)/pomodoro/hooks/usePomodoro.ts)). As configurações (durações, ciclos, meta diária, som, ruído, notificações) são sincronizadas em `dados_aluno` (chave `xor:pomodoro:config`). A disciplina e a tarefa selecionadas ficam só no `localStorage`.
 - Só os blocos de foco concluídos vão para o banco (`sessoes_foco`). As estatísticas são calculadas no cliente em [utils/estatisticas.ts](../src/app/(private)/pomodoro/utils/estatisticas.ts).
+
+## Dados sincronizados
+
+Tarefas, calendário, notas, plano de matrícula, playlists e preferências usam o [useSincronizado](../src/hooks/useSincronizado.ts): o `localStorage` funciona como cache e a versão oficial fica em `dados_aluno`, via `/api/dados`. Na primeira vez, o que estava só no navegador sobe para o servidor. Sem conexão, o app continua funcionando só no navegador.
 
 ## Convenções do código
 
