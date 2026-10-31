@@ -30,4 +30,26 @@ export const SkeletonCard: React.FC<SkeletonProps> = ({ className }) => (
   </div>
 )
 
+// Grade de cards em carregamento, para listas.
+export function SkeletonCards({ quantidade = 3 }: { quantidade?: number }) {
+  return (
+    <div
+      className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+      role="status"
+      aria-label="Carregando"
+    >
+      {Array.from({ length: quantidade }, (_, indice) => (
+        <div
+          key={indice}
+          className="space-y-3 rounded-2xl border border-gray-100 bg-white p-5"
+        >
+          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default Skeleton

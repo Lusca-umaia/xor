@@ -18,8 +18,8 @@ import {
 import Botao, { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
 import BotaoReportar from '@/components/AmbienteEstudo/BotaoReportar/BotaoReportar'
 import Citacoes from '@/components/AmbienteEstudo/Citacoes/Citacoes'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import { classeCartao } from '@/components/AmbienteEstudo/estilos'
 import MenuAcoes from '@/components/AmbienteEstudo/MenuAcoes/MenuAcoes'
 import ModalConfirmacao from '@/components/AmbienteEstudo/ModalConfirmacao/ModalConfirmacao'
@@ -92,11 +92,11 @@ export default function ResumoPage() {
         <LuArrowLeft aria-hidden /> Resumos
       </Link>
 
-      {isLoading && <Esqueleto className="h-96" />}
+      {isLoading && <Skeleton className="h-96" />}
 
       {error && (
         <EstadoVazio
-          icone={<LuFileText />}
+          icon={<LuFileText />}
           titulo="Resumo não encontrado"
           descricao={mensagemDeErro(error)}
           acao={<LinkBotao href={voltar}>Voltar aos resumos</LinkBotao>}
@@ -105,7 +105,7 @@ export default function ResumoPage() {
 
       {resumo?.status === 'GERANDO' && (
         <EstadoVazio
-          icone={<LuLoader className="animate-spin" />}
+          icon={<LuLoader className="animate-spin" />}
           titulo="Gerando o resumo..."
           descricao="A IA está lendo os materiais selecionados. Isso leva alguns segundos."
         />

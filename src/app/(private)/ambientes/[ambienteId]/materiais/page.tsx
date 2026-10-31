@@ -7,8 +7,8 @@ import { LuLibrary, LuSearch, LuShieldCheck } from 'react-icons/lu'
 import { Material } from '@/@types/AmbienteEstudo'
 import IconeTile from '@/components/IconeTile/IconeTile'
 import Botao from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import {
   classeCampo,
   classeCartao,
@@ -70,12 +70,12 @@ export default function MateriaisPage() {
 
       {isLoading ? (
         <div className={clsx(classeCartao, 'space-y-4 p-4')}>
-          <Esqueleto className="h-10" />
-          <Esqueleto className="h-10" />
+          <Skeleton className="h-10" />
+          <Skeleton className="h-10" />
         </div>
       ) : materiais && materiais.length === 0 ? (
         <EstadoVazio
-          icone={<LuLibrary />}
+          icon={<LuLibrary />}
           titulo="A biblioteca está vazia"
           descricao="Envie slides, apostilas, listas de exercícios ou anotações. Eles serão a base dos chats, resumos, atividades e simulados."
         />

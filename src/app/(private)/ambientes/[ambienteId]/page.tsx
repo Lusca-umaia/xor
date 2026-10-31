@@ -35,7 +35,7 @@ import AnelProgresso from '@/components/AnelProgresso/AnelProgresso'
 import IconeTile from '@/components/IconeTile/IconeTile'
 import { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
 import { classeCartao } from '@/components/AmbienteEstudo/estilos'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import { useAtividades } from '@/hooks/ambienteEstudo/useAtividades'
 import { useChats } from '@/hooks/ambienteEstudo/useChats'
 import { useMateriais } from '@/hooks/ambienteEstudo/useMateriais'
@@ -270,11 +270,11 @@ export default function VisaoGeralPage() {
   if (carregando) {
     return (
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-3">
-        <Esqueleto className="h-56 rounded-2xl lg:col-span-2" />
-        <Esqueleto className="h-56 rounded-2xl" />
-        <Esqueleto className="h-20 rounded-2xl lg:col-span-3" />
-        <Esqueleto className="h-64 rounded-2xl lg:col-span-2" />
-        <Esqueleto className="h-64 rounded-2xl" />
+        <Skeleton className="h-56 rounded-2xl lg:col-span-2" />
+        <Skeleton className="h-56 rounded-2xl" />
+        <Skeleton className="h-20 rounded-2xl lg:col-span-3" />
+        <Skeleton className="h-64 rounded-2xl lg:col-span-2" />
+        <Skeleton className="h-64 rounded-2xl" />
       </div>
     )
   }

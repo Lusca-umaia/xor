@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 import { LuArrowLeft, LuListChecks, LuLoader } from 'react-icons/lu'
 import { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import PlayerFlashcards from '@/components/AmbienteEstudo/PlayerFlashcards/PlayerFlashcards'
 import PlayerQuestoes from '@/components/AmbienteEstudo/PlayerQuestoes/PlayerQuestoes'
 import { useAtividade } from '@/hooks/ambienteEstudo/useAtividades'
@@ -29,11 +29,11 @@ export default function AtividadePage() {
         <LuArrowLeft aria-hidden /> Atividades
       </Link>
 
-      {isLoading && <Esqueleto className="mx-auto h-72 max-w-3xl" />}
+      {isLoading && <Skeleton className="mx-auto h-72 max-w-3xl" />}
 
       {error && (
         <EstadoVazio
-          icone={<LuListChecks />}
+          icon={<LuListChecks />}
           titulo="Atividade não encontrada"
           descricao={mensagemDeErro(error)}
           acao={<LinkBotao href={voltar}>Voltar às atividades</LinkBotao>}
@@ -42,7 +42,7 @@ export default function AtividadePage() {
 
       {atividade?.status === 'GERANDO' && (
         <EstadoVazio
-          icone={<LuLoader className="animate-spin" />}
+          icon={<LuLoader className="animate-spin" />}
           titulo="Gerando a atividade..."
           descricao="A IA está criando as questões a partir dos seus materiais. Isso leva alguns segundos."
         />
@@ -59,7 +59,7 @@ export default function AtividadePage() {
           />
         ) : atividade.questoes.length === 0 ? (
           <EstadoVazio
-            icone={<LuListChecks />}
+            icon={<LuListChecks />}
             titulo="Nenhuma questão foi gerada"
             descricao="Os materiais selecionados não tinham conteúdo suficiente para este tipo de atividade. Tente outro tipo ou adicione mais materiais."
             acao={<LinkBotao href={voltar}>Voltar às atividades</LinkBotao>}

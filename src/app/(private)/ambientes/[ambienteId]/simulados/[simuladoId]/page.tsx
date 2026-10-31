@@ -18,8 +18,8 @@ import {
 } from 'react-icons/lu'
 import IconeTile from '@/components/IconeTile/IconeTile'
 import Botao, { LinkBotao } from '@/components/AmbienteEstudo/Botao/Botao'
-import EstadoVazio from '@/components/AmbienteEstudo/EstadoVazio/EstadoVazio'
-import Esqueleto from '@/components/AmbienteEstudo/Esqueleto/Esqueleto'
+import EstadoVazio from '@/components/EstadoVazio/EstadoVazio'
+import Skeleton from '@/components/Skeleton/Skeleton'
 import { classeCartao } from '@/components/AmbienteEstudo/estilos'
 import {
   useIniciarTentativa,
@@ -65,11 +65,11 @@ export default function SimuladoPage() {
         <LuArrowLeft aria-hidden /> Simulados
       </Link>
 
-      {isLoading && <Esqueleto className="mx-auto h-80 max-w-2xl" />}
+      {isLoading && <Skeleton className="mx-auto h-80 max-w-2xl" />}
 
       {error && (
         <EstadoVazio
-          icone={<LuTimer />}
+          icon={<LuTimer />}
           titulo="Simulado não encontrado"
           descricao={mensagemDeErro(error)}
           acao={<LinkBotao href={base}>Voltar aos simulados</LinkBotao>}
@@ -78,7 +78,7 @@ export default function SimuladoPage() {
 
       {simulado?.status === 'GERANDO' && (
         <EstadoVazio
-          icone={<LuLoader className="animate-spin" />}
+          icon={<LuLoader className="animate-spin" />}
           titulo="Montando o seu simulado..."
           descricao="A IA está selecionando e equilibrando as questões a partir dos materiais. Isso leva alguns segundos."
         />
@@ -86,7 +86,7 @@ export default function SimuladoPage() {
 
       {simulado?.status === 'ERRO' && (
         <EstadoVazio
-          icone={<LuTimer />}
+          icon={<LuTimer />}
           titulo="Não foi possível gerar o simulado"
           descricao="Os materiais não tinham conteúdo suficiente para os tipos de questão escolhidos. Tente outra configuração."
           acao={
