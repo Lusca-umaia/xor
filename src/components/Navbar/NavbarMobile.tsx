@@ -1,119 +1,225 @@
 'use client'
-
-import { FaXmark } from 'react-icons/fa6'
-import { usePathname, useRouter } from 'next/navigation'
-
-import { grupos } from './Navbar'
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import clsx from 'clsx'
-import { Fragment, useState } from 'react'
 import Image from 'next/image'
-import { IoMenu } from 'react-icons/io5'
-import { HiOutlineLogout } from 'react-icons/hi'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import {
+  LuLayoutGrid,
+  LuLock,
+  LuLogOut,
+  LuUserRound,
+  LuX
+} from 'react-icons/lu'
 import { useLogout } from '@/hooks/mutations/useLogout'
+import { useMe } from '@/hooks/queries/useMe'
+import Avatar from '../Avatar/Avatar'
+import {
+  ATALHOS_MOBILE,
+  estaAtivo,
+  grupos,
+  ItemNav,
+  PERFIL,
+  PRIVACIDADE
+} from './Navbar'
+
+const todos = grupos.flatMap(({ itens }) => itens)
+const atalhos = ATALHOS_MOBILE.map(
+  (path) => todos.find((item) => item.path === path) as ItemNav
+)
+// Na folha "Mais" entra só o que não está na barra inferior.
+const gruposMais = grupos
+  .map(({ titulo, itens }) => ({
+    titulo,
+    itens: itens.filter(({ path }) => !ATALHOS_MOBILE.includes(path))
+  }))
+  .filter(({ itens }) => itens.length > 0)
+
+const classeLinhaFolha =
+  'flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium'
 
 export default function NavbarMobile() {
-  const router = useRouter()
   const pathname = usePathname()
+  const { data: me } = useMe()
+  const { mutate: sair, isPending: saindo } = useLogout()
+  const [maisAberto, setMaisAberto] = useState(false)
 
-  const [openMenu, setOpenMenu] = useState(false)
-  const { mutate: sair } = useLogout()
-  const getFirstPath = () => {
-    return '/' + pathname.split('/')[1]
-  }
+  // Fecha a folha ao trocar de tela.
+  useEffect(() => setMaisAberto(false), [pathname])
 
-  const closeModal = () => {
-    setOpenMenu(false)
-  }
+  const maisAtivo =
+    !ATALHOS_MOBILE.some((path) => estaAtivo(pathname, path)) || maisAberto
 
   return (
-    <div className="lg:hidden print:hidden flex items-center w-full fixed top-0 bg-gray-50 border-b border-gray-200/80 h-[50px] z-10">
-      <div className="grid grid-cols-3 items-center px-2 w-full">
-        <button
-          type="button"
-          onClick={() => setOpenMenu(true)}
-          className="col-span-1 cursor-pointer inline-flex rounded-md bg-white text-gray-900 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-xor-navy focus:ring-offset-2"
-        >
-          <IoMenu className="text-2xl" />
-        </button>
-        <Image
-          src={'/logo.png'}
-          className="h-10 col-span-1 mx-auto w-auto my-2"
-          width={1000}
-          height={1000}
-          quality={100}
-          alt="Logo"
-        />
-      </div>
-      {openMenu && (
-        <div
-          onClick={() => closeModal()}
-          className="lg:hidden fixed inset-0 backdrop-blur-md z-0 animate-appearance"
-        ></div>
-      )}
-      <div
-        className={clsx(
-          openMenu ? 'left-0' : '-left-full',
-          'duration-700 lg:hidden max-[340px]:w-full z-10 top-0 fixed flex items-start h-full'
-        )}
-      >
-        <ul
-          className={
-            'flex flex-col max-[340px]:w-full w-72 gap-2.5 duration-100 h-full bg-white py-2.5 border-r border-gray-200/80 px-2 shadow-inner'
-          }
-        >
-          <button
-            type="button"
-            onClick={() => closeModal()}
-            className="lg:hidden cursor-pointer inline-flex ml-auto rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-xor-navy focus:ring-offset-2"
-          >
-            <FaXmark className="h-5 w-5" />
-          </button>
+    <div className="lg:hidden print:hidden">
+      <header className="fixed inset-x-0 top-0 z-20 flex h-[50px] items-center justify-between border-b border-gray-100 bg-white/90 px-3 backdrop-blur">
+        <Link href="/home" aria-label="Tela inicial">
           <Image
-            src={'/logo.png'}
-            className="w-2/3 my-2 mx-auto h-auto"
-            width={1000}
-            height={1000}
-            quality={100}
-            alt="Logo"
+            src="/logo.png"
+            alt="XOR"
+            width={832}
+            height={389}
+            className="h-7 w-auto"
+            priority
           />
-          {grupos.map(({ titulo, itens }, indice) => (
-            <Fragment key={titulo ?? indice}>
-              {titulo && (
-                <p className="px-3 pt-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
-                  {titulo}
-                </p>
-              )}
-              {itens.map((option) => (
-                <li
-                  onClick={() => {
-                    closeModal()
-                    router.push(option.path)
-                  }}
-                  key={option.path}
+        </Link>
+        <Link href={PERFIL} aria-label="Meu perfil">
+          <Avatar nome={me?.nome} className="size-8 text-xs" />
+        </Link>
+      </header>
+
+      <nav
+        aria-label="Menu principal"
+        className="fixed inset-x-0 bottom-0 z-20 border-t border-gray-100 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+      >
+        <ul className="grid grid-cols-5">
+          {atalhos.map((item) => {
+            const ativo = estaAtivo(pathname, item.path)
+            return (
+              <li key={item.path}>
+                <Link
+                  href={item.path}
+                  aria-current={ativo ? 'page' : undefined}
                   className={clsx(
-                    option.path.includes(getFirstPath())
-                      ? 'bg-black text-white'
-                      : 'text-gray-900 bg-gray-50',
-                    'cursor-pointer text-2xl w-full gap-2 justify-center shadow-md hover:bg-black hover:scale-105 px-3 py-2 hover:text-white duration-100 h-10 flex items-center rounded-full'
+                    'flex h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium',
+                    ativo ? 'text-xor-navy' : 'text-gray-500'
                   )}
                 >
-                  {option.icon}
-                  <span className={'w-full text-sm font-semibold duration-100'}>
-                    {option.name}
+                  <span
+                    className={clsx(
+                      'flex h-7 w-12 items-center justify-center rounded-full text-lg transition-colors',
+                      ativo && 'bg-xor-navy/10'
+                    )}
+                  >
+                    {item.icon}
                   </span>
-                </li>
-              ))}
-            </Fragment>
-          ))}
-          <li
-            onClick={() => sair()}
-            className="mt-auto mb-2 cursor-pointer text-2xl w-full gap-2 px-3 py-2 h-10 flex items-center rounded-full text-gray-900 hover:bg-gray-100"
-          >
-            <HiOutlineLogout />
-            <span className="text-sm font-semibold">Sair</span>
+                  {item.curto ?? item.name}
+                </Link>
+              </li>
+            )
+          })}
+          <li>
+            <button
+              type="button"
+              onClick={() => setMaisAberto(true)}
+              aria-haspopup="dialog"
+              aria-expanded={maisAberto}
+              className={clsx(
+                'flex h-14 w-full cursor-pointer flex-col items-center justify-center gap-0.5 text-[11px] font-medium',
+                maisAtivo ? 'text-xor-navy' : 'text-gray-500'
+              )}
+            >
+              <span
+                className={clsx(
+                  'flex h-7 w-12 items-center justify-center rounded-full text-lg transition-colors',
+                  maisAtivo && 'bg-xor-navy/10'
+                )}
+              >
+                <LuLayoutGrid />
+              </span>
+              Mais
+            </button>
           </li>
         </ul>
-      </div>
+      </nav>
+
+      <Dialog
+        open={maisAberto}
+        onClose={() => setMaisAberto(false)}
+        className="relative z-50 lg:hidden"
+      >
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+        />
+        <div className="fixed inset-x-0 bottom-0 flex max-h-[85vh]">
+          <DialogPanel
+            transition
+            className="flex w-full flex-col overflow-hidden rounded-t-2xl bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition duration-200 ease-out data-closed:translate-y-full"
+          >
+            <div className="flex items-center justify-between px-4 pt-3 pb-2">
+              <DialogTitle className="text-base font-bold text-gray-900">
+                Menu
+              </DialogTitle>
+              <button
+                type="button"
+                onClick={() => setMaisAberto(false)}
+                aria-label="Fechar menu"
+                className="cursor-pointer rounded-full p-2 text-lg text-gray-500 hover:bg-gray-100"
+              >
+                <LuX />
+              </button>
+            </div>
+
+            <div className="space-y-4 overflow-y-auto px-3 pb-4">
+              {gruposMais.map(({ titulo, itens }, indice) => (
+                <div key={titulo ?? indice} className="space-y-0.5">
+                  {titulo && (
+                    <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                      {titulo}
+                    </p>
+                  )}
+                  {itens.map((item) => {
+                    const ativo = estaAtivo(pathname, item.path)
+                    return (
+                      <Link
+                        key={item.path}
+                        href={item.path}
+                        aria-current={ativo ? 'page' : undefined}
+                        className={clsx(
+                          classeLinhaFolha,
+                          ativo
+                            ? 'bg-xor-navy/5 text-xor-navy'
+                            : 'text-gray-700 active:bg-gray-100'
+                        )}
+                      >
+                        <span className="text-lg">{item.icon}</span>
+                        {item.name}
+                      </Link>
+                    )
+                  })}
+                </div>
+              ))}
+
+              <div className="space-y-0.5 border-t border-gray-100 pt-3">
+                <Link
+                  href={PERFIL}
+                  className={clsx(
+                    classeLinhaFolha,
+                    'text-gray-700 active:bg-gray-100'
+                  )}
+                >
+                  <LuUserRound className="text-lg" />
+                  Meu perfil
+                </Link>
+                <Link
+                  href={PRIVACIDADE}
+                  className={clsx(
+                    classeLinhaFolha,
+                    'text-gray-700 active:bg-gray-100'
+                  )}
+                >
+                  <LuLock className="text-lg" />
+                  Privacidade e IA
+                </Link>
+                <button
+                  type="button"
+                  disabled={saindo}
+                  onClick={() => sair()}
+                  className={clsx(
+                    classeLinhaFolha,
+                    'w-full cursor-pointer text-red-600 active:bg-red-50 disabled:opacity-60'
+                  )}
+                >
+                  <LuLogOut className="text-lg" />
+                  {saindo ? 'Saindo...' : 'Sair'}
+                </button>
+              </div>
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
     </div>
   )
 }

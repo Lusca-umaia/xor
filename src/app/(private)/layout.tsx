@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <div className="flex max-lg:flex-col">
       <Navbar />
-      <div className="p-8 max-md:p-3 w-full min-w-0 max-lg:mt-[40px]">
+      <div className="p-8 max-md:p-3 w-full min-w-0 max-lg:mt-[50px] max-lg:pb-24">
         {children}
       </div>
       <Toaster position="top-right" richColors closeButton />
