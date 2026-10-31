@@ -112,3 +112,12 @@ export async function obterProgressoXp(
     )
   }
 }
+
+/** Dias (YYYY-MM-DD) com XP em qualquer ambiente, nos últimos 90 dias. */
+export async function listarDiasDeEstudo({
+  supabase
+}: Contexto): Promise<string[]> {
+  const { data, error } = await supabase.rpc('dias_de_estudo')
+  verificar(error)
+  return ((data ?? []) as { dia: string }[]).map(({ dia }) => dia)
+}

@@ -19,6 +19,8 @@ interface BoasVindasProps {
   resumo: ResumoProgresso
   // Indefinido enquanto as sessões de foco carregam.
   foco?: ResumoFoco
+  // Dias seguidos com foco ou estudo em algum ambiente; indefinido carregando.
+  sequencia?: number
   metaDiaria: number
 }
 
@@ -26,6 +28,7 @@ const BoasVindas: React.FC<BoasVindasProps> = ({
   aluno,
   resumo,
   foco,
+  sequencia,
   metaDiaria
 }) => (
   <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg">
@@ -92,9 +95,9 @@ const BoasVindas: React.FC<BoasVindasProps> = ({
       />
       <Indicador
         label="Sequência de estudo"
-        carregando={!foco}
-        value={foco?.sequenciaAtual}
-        detalhe={foco?.sequenciaAtual === 1 ? 'dia' : 'dias'}
+        carregando={sequencia === undefined}
+        value={sequencia}
+        detalhe={sequencia === 1 ? 'dia' : 'dias'}
         icon={
           <IconeTile>
             <LuFlame />
