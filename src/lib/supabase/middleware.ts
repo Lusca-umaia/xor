@@ -8,7 +8,11 @@ const ROTAS_PRIVADAS = [
   '/pomodoro',
   '/chat',
   '/questoes',
-  '/extrator',
+  '/academico',
+  '/planejador',
+  '/calendario',
+  '/atividades',
+  '/materiais',
   '/perfil'
 ]
 
