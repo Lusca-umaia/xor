@@ -1,7 +1,7 @@
 'use client'
 
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LuLock, LuShieldCheck, LuUserPen } from 'react-icons/lu'
 import Header from '@/components/Header/Header'
 import Skeleton from '@/components/Skeleton/Skeleton'
@@ -25,12 +25,13 @@ const ABAS = [
   },
   {
     label: 'Privacidade e IA',
-    descricao: 'Dados locais e uso de IA',
+    descricao: 'Seus dados e uso de IA',
     icon: <LuLock />
   }
 ]
 
 const ABA_SEGURANCA = 1
+const ABA_PRIVACIDADE = 2
 
 const PerfilSkeleton = () => (
   <div className="space-y-4">
@@ -58,6 +59,14 @@ const PerfilSkeleton = () => (
 export default function PerfilPage() {
   const { data: perfil, isLoading, isError } = usePerfil()
   const [aba, setAba] = useState(0)
+
+  // O menu da conta abre direto em Privacidade com ?aba=privacidade.
+  useEffect(() => {
+    if (
+      new URLSearchParams(window.location.search).get('aba') === 'privacidade'
+    )
+      setAba(ABA_PRIVACIDADE)
+  }, [])
 
   return (
     <div>

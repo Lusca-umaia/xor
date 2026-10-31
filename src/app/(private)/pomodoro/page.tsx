@@ -514,7 +514,7 @@ const Pomodoro = () => {
           {aviso && (
             <div
               role="status"
-              className="fixed bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-xl max-md:w-[calc(100%-2rem)]"
+              className="fixed bottom-6 max-lg:bottom-24 left-1/2 z-20 -translate-x-1/2 rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-xl max-md:w-[calc(100%-2rem)]"
             >
               {aviso}
             </div>

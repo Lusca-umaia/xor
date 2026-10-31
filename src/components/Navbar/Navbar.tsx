@@ -1,28 +1,38 @@
 'use client'
+import { ReactNode } from 'react'
 import {
   LuBookOpen,
   LuCalendarDays,
+  LuChartNoAxesColumnIncreasing,
   LuClipboardList,
+  LuGraduationCap,
+  LuHouse,
   LuLibraryBig,
   LuListChecks,
-  LuGraduationCap,
-  LuTimer,
-  LuUserRound
+  LuTimer
 } from 'react-icons/lu'
-import { GiProgression } from 'react-icons/gi'
-import { FaHome } from 'react-icons/fa'
 import NavbarMobile from './NavbarMobile'
 import NavbarDescktop from './NavbarDescktop'
 
-// Menu em grupos; o título vazio fica sem cabeçalho (início e perfil).
-export const grupos = [
+export interface ItemNav {
+  path: string
+  icon: ReactNode
+  name: string
+  // Nome curto para a barra inferior do celular.
+  curto?: string
+}
+
+// Menu em grupos; o título vazio fica sem cabeçalho (início). O perfil fica
+// no menu da conta, no rodapé da barra.
+export const grupos: { titulo: string | null; itens: ItemNav[] }[] = [
   {
     titulo: null,
     itens: [
       {
         path: '/home',
-        icon: <FaHome />,
-        name: 'Tela Inicial'
+        icon: <LuHouse />,
+        name: 'Tela Inicial',
+        curto: 'Início'
       }
     ]
   },
@@ -30,38 +40,27 @@ export const grupos = [
     titulo: 'Estudo',
     itens: [
       {
-        icon: <LuGraduationCap />,
         path: '/ambientes',
-        name: 'Ambientes de estudo'
+        icon: <LuGraduationCap />,
+        name: 'Ambientes de estudo',
+        curto: 'Ambientes'
       },
-      {
-        icon: <LuTimer />,
-        path: '/pomodoro',
-        name: 'Pomodoro'
-      },
-      {
-        icon: <LuLibraryBig />,
-        path: '/materiais',
-        name: 'Biblioteca'
-      }
+      { path: '/pomodoro', icon: <LuTimer />, name: 'Pomodoro' },
+      { path: '/materiais', icon: <LuLibraryBig />, name: 'Biblioteca' }
     ]
   },
   {
     titulo: 'Curso',
     itens: [
       {
-        icon: <GiProgression />,
         path: '/courseProgression',
+        icon: <LuChartNoAxesColumnIncreasing />,
         name: 'Progressão de curso'
       },
+      { path: '/academico', icon: <LuBookOpen />, name: 'Vida acadêmica' },
       {
-        icon: <LuBookOpen />,
-        path: '/academico',
-        name: 'Vida acadêmica'
-      },
-      {
-        icon: <LuListChecks />,
         path: '/planejador',
+        icon: <LuListChecks />,
         name: 'Planejador de matrícula'
       }
     ]
@@ -70,28 +69,34 @@ export const grupos = [
     titulo: 'Organização',
     itens: [
       {
-        icon: <LuCalendarDays />,
         path: '/calendario',
-        name: 'Calendário'
+        icon: <LuCalendarDays />,
+        name: 'Calendário',
+        curto: 'Agenda'
       },
       {
-        icon: <LuClipboardList />,
         path: '/atividades',
+        icon: <LuClipboardList />,
         name: 'Tarefas e prazos'
-      }
-    ]
-  },
-  {
-    titulo: null,
-    itens: [
-      {
-        icon: <LuUserRound />,
-        path: '/perfil',
-        name: 'Meu perfil'
       }
     ]
   }
 ]
+
+// Destinos fixos da barra inferior do celular; o resto fica em "Mais".
+export const ATALHOS_MOBILE = [
+  '/home',
+  '/ambientes',
+  '/pomodoro',
+  '/calendario'
+]
+
+export const PERFIL = '/perfil'
+export const PRIVACIDADE = '/perfil?aba=privacidade'
+
+/** Item ativo: a rota exata ou uma subrota dela. */
+export const estaAtivo = (pathname: string, path: string) =>
+  pathname === path || pathname.startsWith(`${path}/`)
 
 export default function Navbar() {
   return (
