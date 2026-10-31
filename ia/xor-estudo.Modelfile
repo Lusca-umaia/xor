@@ -1,0 +1,7 @@
+# Modelo de texto do Ambiente de Estudo. O `npm run ia:setup` cria este
+# modelo automaticamente; use este arquivo só para criar à mão:
+#   ollama pull qwen3:4b-instruct-2507-q4_K_M
+#   ollama create xor-estudo -f ia/xor-estudo.Modelfile
+FROM qwen3:4b-instruct-2507-q4_K_M
+PARAMETER num_ctx 8192
+PARAMETER temperature 0.4

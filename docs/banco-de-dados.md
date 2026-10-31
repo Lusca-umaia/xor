@@ -8,6 +8,10 @@ O banco é o Postgres do Supabase. O schema fica versionado em [supabase/migrati
 | `20261029010000_edicao_disciplinas.sql` | Exclusão e troca de código de disciplinas, `definir_situacao_disciplina` |
 | `20261029020000_questionarios.sql` | `questionarios`, `questoes`, `resolucoes`, `salvar_questionario` |
 | `20261029020000_sessoes_foco.sql` | `sessoes_foco` (Pomodoro) |
+| `20261030000000_ambiente_estudo.sql` | Ambiente de Estudo: `ambientes`, `materiais`, `trechos`, `chats`, `mensagens`, `resumos`, `atividades`, `simulados`, tentativas, `reportes_ia` e o bucket `materiais` |
+| `20261031000000_embeddings_trechos.sql` | `pgvector`: colunas `embedding` e `modelo_embedding` em `trechos`, índice HNSW e a função `buscar_trechos` |
+| `20261101000000_ambientes_sob_demanda.sql` | Remove os ambientes criados automaticamente e nunca usados e a tabela `ambientes_config` |
+| `20261102000000_xp_eventos.sql` | `xp_eventos` (XP do ambiente de estudo como registro de eventos), a função `xp_do_ambiente` e o preenchimento retroativo |
 
 ## Princípios
 
@@ -82,6 +86,26 @@ Um bloco de foco concluído no Pomodoro.
 | `iniciada_em`, `concluida_em` | timestamptz | `concluida_em >= iniciada_em` |
 
 O aluno pode ler, criar e excluir as próprias sessões, mas não editá-las.
+
+### Ambiente de Estudo
+
+Um ambiente por cadeira (ou tema livre), com o conteúdo de estudo gerado pela IA. Diferente das outras tabelas, os ids são `uuid`, porque o contrato do front usa ids string. Estruturas aninhadas ficam em `jsonb`, no mesmo formato dos tipos de [src/@types/AmbienteEstudo](../src/@types/AmbienteEstudo/index.ts).
+
+| Tabela | Conteúdo |
+| --- | --- |
+| `ambientes` | Nome, cor, disciplina vinculada (`disciplina_codigo`, opcional) e `arquivado` |
+| `materiais` | Arquivos enviados ou texto colado. `status` vai de `PROCESSANDO` a `PRONTO` (ou `ERRO`) depois da extração do texto. O arquivo fica no Storage em `storage_path` |
+| `trechos` | Texto extraído dos materiais, por página, usado como contexto da IA, com o embedding (768 dimensões) para a busca semântica |
+| `xp_eventos` | XP do ambiente de estudo: um evento por ação (material, resposta da IA, resumo, atividade concluída, revisão de flashcard, simulado), único por tipo e referência. Só o servidor grava, com a chave secreta; o aluno só lê |
+| `chats`, `mensagens` | Conversas com a IA. `chats.material_ids` são os materiais usados como contexto; `mensagens.citacoes` guarda as fontes |
+| `resumos` | Resumos gerados. `status` `GERANDO` enquanto a IA trabalha |
+| `atividades`, `tentativas_atividade` | Quiz, V/F, lacunas, discursiva e flashcards (`questoes` e `flashcards` em jsonb) e o andamento de cada tentativa |
+| `simulados`, `tentativas_simulado` | Simulados e tentativas. `prazo_final` é definido pelo servidor; o `resultado` (jsonb) é calculado na entrega |
+| `reportes_ia` | Conteúdo gerado pela IA que o aluno reportou (só leitura e inserção) |
+
+As tabelas filhas referenciam o pai por `(id, aluno_id)` e são apagadas em cascata com o ambiente. O RLS segue a regra das demais tabelas, e o `update` é concedido só nas colunas que mudam (status, conteúdo gerado, respostas).
+
+**Storage:** bucket privado `materiais`, com os arquivos em `<aluno_id>/<material_id>/<nome>`. As políticas de `storage.objects` só deixam o aluno ler, enviar e excluir dentro da própria pasta.
 
 ## Funções
 
