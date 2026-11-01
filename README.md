@@ -4,8 +4,6 @@ Plataforma de estudo para alunos da UFC. A ideia surgiu de uma dor simples: para
 
 O aluno entra com o histórico do SIGAA e, a partir dele, o app monta a graduação inteira e um ambiente de estudo para cada cadeira, com IA rodando localmente em cima do material da própria disciplina.
 
-[![Vídeo de apresentação do XOR](docs/telas/video.webp)](https://www.youtube.com/watch?v=EYPAPfNXWes)
-
 [Assista ao vídeo de apresentação no YouTube](https://www.youtube.com/watch?v=EYPAPfNXWes).
 
 ![Tela inicial do XOR](docs/telas/inicio.webp)
