@@ -28,7 +28,7 @@ O aluno entra com o histórico do SIGAA e, a partir dele, o app monta a graduaç
 ### Estudo
 
 - Ambientes de estudo por cadeira, onde o aluno sobe slides, PDFs, DOCX e PPTX.
-- Chat com a IA em cima desse material, com citação da fonte. Clicar na citação abre o PDF na página certa.
+- Chat com a IA em cima desse material, com citação da fonte.
 - Modo tutor: em vez de entregar a resposta do exercício, a IA faz perguntas e dá dicas aos poucos.
 - Atividades geradas a partir do material (quiz, verdadeiro ou falso, lacunas, flashcards e discursivas). As discursivas são corrigidas por rubrica, com feedback.
 - Resumos em tópicos, texto corrido, glossário ou mapa mental.

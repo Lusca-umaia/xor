@@ -90,7 +90,7 @@ O código fica em [lib/api/ambienteEstudo](../src/lib/api/ambienteEstudo).
 - Materiais: o arquivo vai para o bucket privado `materiais`. O texto é extraído no servidor (PDF por página, PPTX por slide, DOCX e texto puro), quebrado em trechos e gravado em `trechos` com o embedding.
 - Busca: cada pergunta busca os trechos por similaridade de embedding (`buscar_trechos`, pgvector) e por palavra-chave, e junta os dois resultados. Sem o modelo de embeddings, fica só a palavra-chave.
 - Geração: chat, resumos, atividades, simulados e correção chamam a IA local em `LM_STUDIO_URL/chat/completions`. Quando a saída é estruturada, o pedido usa `response_format: json_schema` e o resultado passa pelo zod antes de ser salvo. Os prompts mandam ignorar instruções escritas dentro do material ou da resposta do aluno.
-- Citações: a IA informa o número do trecho usado e o servidor troca pelo material e pela página, que o leitor de PDF abre direto.
+- Citações: a IA informa o número do trecho usado e o servidor troca pelo material e pela página de origem.
 - XP: cada ação vira uma linha em `xp_eventos`, gravada pelo servidor com o cliente admin e única por tipo e referência, então repetir a mesma ação não rende pontos.
 
 ## Questionários
