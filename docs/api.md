@@ -142,11 +142,6 @@ Tarefas, provas, horários, plano de matrícula, playlists e preferências, guar
 | PUT | `/api/dados/:chave` | Substitui o valor de uma chave |
 | DELETE | `/api/dados` | `{ chaves }`. Apaga as chaves pedidas (tela de privacidade) |
 
-## Chat antigo
-
-| Método | Rota | Descrição |
-| --- | --- | --- |
-| POST | `/api/chat` | `{ messages: [{ role, content }] }`. Streaming pela Together AI (`TOGETHER_API_KEY`). A tela saiu do menu; o chat atual é o do Ambiente de Estudo |
 
 ## Como criar uma rota
 

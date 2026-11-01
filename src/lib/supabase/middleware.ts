@@ -6,7 +6,6 @@ const ROTAS_PRIVADAS = [
   '/ambientes',
   '/courseProgression',
   '/pomodoro',
-  '/chat',
   '/questoes',
   '/academico',
   '/planejador',
